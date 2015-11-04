@@ -1,0 +1,710 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		132239B2D3D0320D9D4BA36E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */; };
+		310871D975AC584DE2576C48 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */; };
+		4A5B6837B3EBAA181EEBAF57 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A5D38A72F529F0B7DA626FD /* Foundation.framework */; };
+		782D3BE5BA64D9FC83728775 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
+		8FA1C729D572390720479B7E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
+		A49F4DB3F710C45C29E75732 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
+		E36F58D81AFC6DC100DEEE20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
+		E38C2B751B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */; };
+		E38C2B761B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E38C2B9A1B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B991B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework */; };
+		E38C2B9B1B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B991B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */; };
+		E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */; };
+		E3C9DC0A1BE94D5D00593C6F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F86EA198D6632F06B8ECE658 /* Info.plist */; };
+		E3C9DC0B1BE94D5D00593C6F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C1432EA0C58AFB4EA2B8DD /* LaunchScreen.xib */; };
+		E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */; };
+		E3C9DC0D1BE94D5D00593C6F /* RefPlayer_Prefix.pch in Resources */ = {isa = PBXBuildFile; fileRef = 8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */; };
+		E3C9DC0E1BE94D6C00593C6F /* CdmHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD11AF2C37200BF7D6C /* CdmHost.mm */; };
+		E3C9DC0F1BE94D6C00593C6F /* CdmWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */; };
+		E3C9DC101BE94D6C00593C6F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D2270C567D944441117F046 /* AppDelegate.m */; };
+		E3C9DC111BE94D6C00593C6F /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 314D35F3B535A008EC6F276F /* DetailViewController.m */; };
+		E3C9DC121BE94D6C00593C6F /* Downloader.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */; };
+		E3C9DC131BE94D6D00593C6F /* LicenseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */; };
+		E3C9DC141BE94D6D00593C6F /* LocalWebConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 080A1685568016AFB8419D56 /* LocalWebConnection.m */; };
+		E3C9DC151BE94D6D00593C6F /* LocalWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */; };
+		E3C9DC161BE94D6D00593C6F /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 688EE9F49558E65235EEC34E /* MasterViewController.m */; };
+		E3C9DC171BE94D6D00593C6F /* MediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D431BD58DD90018A2E4 /* MediaCell.m */; };
+		E3C9DC181BE94D6D00593C6F /* MediaResource.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D451BD58DD90018A2E4 /* MediaResource.m */; };
+		E3C9DC191BE94D6D00593C6F /* Mpd.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */; };
+		E3C9DC1A1BE94D6D00593C6F /* PlaybackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C99ABA0498D603BF32587C9 /* PlaybackView.m */; };
+		E3C9DC1B1BE94D6D00593C6F /* PlayerControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */; };
+		E3C9DC1C1BE94D6D00593C6F /* PlayerScrubberView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */; };
+		E3C9DC1D1BE94D6D00593C6F /* Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AD38975B118A3FAC18FAD2 /* Stream.m */; };
+		E3C9DC1E1BE94D6D00593C6F /* Streaming.mm in Sources */ = {isa = PBXBuildFile; fileRef = FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */; };
+		E3C9DC1F1BE94D6D00593C6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EA175CCA2CEE5F83A658681 /* main.m */; };
+		E3C9DC401BE95D3400593C6F /* libTBXML-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */; };
+		E3C9DC4A1BE95ED700593C6F /* ico_download_after.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */; };
+		E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
+		E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
+		E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */; };
+		F78F3116635CA2F99CE0F2B7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E3C9DBE51BE94D1B00593C6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9C6EA8A644F5608B6413BC9F;
+			remoteInfo = CocoaAsyncSocket;
+		};
+		E3C9DBE81BE94D1B00593C6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9BB11FE1284BB55356E02F47;
+			remoteInfo = CocoaHTTPServer;
+		};
+		E3C9DC3B1BE95D1B00593C6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 829FA09C14D5B52A00D18697;
+			remoteInfo = TBXML;
+		};
+		E3C9DC3D1BE95D1B00593C6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8290352514D9F5B200ACF7E4;
+			remoteInfo = "TBXML-iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E367137E1B6BDAFB00B56510 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E38C2B761B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Embed Frameworks */,
+				E38C2B9B1B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		07AD38975B118A3FAC18FAD2 /* Stream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Stream.m; sourceTree = "<group>"; };
+		080A1685568016AFB8419D56 /* LocalWebConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalWebConnection.m; sourceTree = "<group>"; };
+		0D2270C567D944441117F046 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalWebServer.m; sourceTree = "<group>"; };
+		1E2D8E07E53399051A05A871 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		21307AADD0E69F1E41A83014 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		29A3C6D1FFFB13C23EE63305 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
+		314D35F3B535A008EC6F276F /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
+		3218E52728994F1C4870D5AC /* Streaming.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Streaming.h; sourceTree = "<group>"; };
+		3C99ABA0498D603BF32587C9 /* PlaybackView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlaybackView.m; sourceTree = "<group>"; };
+		5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		568580C710C0BA1203D3341E /* Stream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Stream.h; sourceTree = "<group>"; };
+		5F5EF5DB13BA3A4B36A1D312 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		603E1E8725C6CCB785CC2B86 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
+		688EE9F49558E65235EEC34E /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
+		8A5D38A72F529F0B7DA626FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefPlayer_Prefix.pch; sourceTree = "<group>"; };
+		8EA175CCA2CEE5F83A658681 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9D83446E14317C30391A4A86 /* PlaybackView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlaybackView.h; sourceTree = "<group>"; };
+		A7F71E543DBDA8A390C4C10E /* LocalWebConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalWebConnection.h; sourceTree = "<group>"; };
+		A8AC6A1E44D852B3F0594CC8 /* CDMPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CDMPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		CEC6EFA8FBF6FD21F52904AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		CF23949319E471FB0F7FED76 /* LocalWebServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalWebServer.h; sourceTree = "<group>"; };
+		DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		E367BDCF1AF2C37200BF7D6C /* CdmHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHandler.h; sourceTree = "<group>"; };
+		E367BDD01AF2C37200BF7D6C /* CdmHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHost.h; sourceTree = "<group>"; };
+		E367BDD11AF2C37200BF7D6C /* CdmHost.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CdmHost.mm; sourceTree = "<group>"; };
+		E367BDD21AF2C37200BF7D6C /* CdmWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmWrapper.h; sourceTree = "<group>"; };
+		E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CdmWrapper.mm; sourceTree = "<group>"; };
+		E367BDD51AF2C37200BF7D6C /* iOSDeviceCert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iOSDeviceCert.h; sourceTree = "<group>"; };
+		E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "oemcrypto_tfit2-eit_dev_dylib.framework"; path = "dev/oemcrypto_tfit2-eit_dev_dylib.framework"; sourceTree = "<group>"; };
+		E38C2B991B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = oemcrypto_tfit2_dev_dylib_sim.framework; path = dev/oemcrypto_tfit2_dev_dylib_sim.framework; sourceTree = "<group>"; };
+		E3A59D3A1BD58DAA0018A2E4 /* PlayerControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerControlsView.h; sourceTree = "<group>"; };
+		E3A59D3B1BD58DAA0018A2E4 /* PlayerScrubberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerScrubberView.h; sourceTree = "<group>"; };
+		E3A59D3C1BD58DAA0018A2E4 /* Downloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Downloader.h; sourceTree = "<group>"; };
+		E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Downloader.m; sourceTree = "<group>"; };
+		E3A59D3E1BD58DAA0018A2E4 /* Mpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mpd.h; sourceTree = "<group>"; };
+		E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mpd.m; sourceTree = "<group>"; };
+		E3A59D421BD58DD90018A2E4 /* MediaCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaCell.h; sourceTree = "<group>"; };
+		E3A59D431BD58DD90018A2E4 /* MediaCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaCell.m; sourceTree = "<group>"; };
+		E3A59D441BD58DD90018A2E4 /* MediaResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaResource.h; sourceTree = "<group>"; };
+		E3A59D451BD58DD90018A2E4 /* MediaResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaResource.m; sourceTree = "<group>"; };
+		E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerControlsView.m; sourceTree = "<group>"; };
+		E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerScrubberView.m; sourceTree = "<group>"; };
+		E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mediaResources.json; sourceTree = "<group>"; };
+		E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ico_download_after.png; sourceTree = "<group>"; };
+		E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ico_download_before.png; sourceTree = "<group>"; };
+		E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inline_playback_enter_fullscreen_2x.png; sourceTree = "<group>"; };
+		E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inline_playback_exit_fullscreen_2x.png; sourceTree = "<group>"; };
+		E3C428901BDB4F3F0083B0D9 /* LicenseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LicenseManager.h; sourceTree = "<group>"; };
+		E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LicenseManager.m; sourceTree = "<group>"; };
+		E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaAsyncSocket_ios.xcodeproj; sourceTree = "<group>"; };
+		E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaHTTPServer_ios.xcodeproj; sourceTree = "<group>"; };
+		E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "TBXML-WV.xcodeproj"; sourceTree = "<group>"; };
+		F86EA198D6632F06B8ECE658 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Streaming.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F4D69EDAE6C83DB1A44DF17B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3C9DC401BE95D3400593C6F /* libTBXML-iOS.a in Frameworks */,
+				E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */,
+				E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */,
+				310871D975AC584DE2576C48 /* AVFoundation.framework in Frameworks */,
+				132239B2D3D0320D9D4BA36E /* CFNetwork.framework in Frameworks */,
+				782D3BE5BA64D9FC83728775 /* CoreFoundation.framework in Frameworks */,
+				E36F58D81AFC6DC100DEEE20 /* CoreGraphics.framework in Frameworks */,
+				F78F3116635CA2F99CE0F2B7 /* CoreMedia.framework in Frameworks */,
+				4A5B6837B3EBAA181EEBAF57 /* Foundation.framework in Frameworks */,
+				8FA1C729D572390720479B7E /* Security.framework in Frameworks */,
+				A49F4DB3F710C45C29E75732 /* UIKit.framework in Frameworks */,
+				E38C2B9A1B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework in Frameworks */,
+				E38C2B751B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08AD10C3E36DBE4038F4EA9B /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				21307AADD0E69F1E41A83014 /* AppDelegate.h */,
+				0D2270C567D944441117F046 /* AppDelegate.m */,
+				29A3C6D1FFFB13C23EE63305 /* DetailViewController.h */,
+				314D35F3B535A008EC6F276F /* DetailViewController.m */,
+				E3A59D3C1BD58DAA0018A2E4 /* Downloader.h */,
+				E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */,
+				E3C428901BDB4F3F0083B0D9 /* LicenseManager.h */,
+				E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */,
+				A7F71E543DBDA8A390C4C10E /* LocalWebConnection.h */,
+				080A1685568016AFB8419D56 /* LocalWebConnection.m */,
+				CF23949319E471FB0F7FED76 /* LocalWebServer.h */,
+				0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */,
+				603E1E8725C6CCB785CC2B86 /* MasterViewController.h */,
+				688EE9F49558E65235EEC34E /* MasterViewController.m */,
+				E3A59D421BD58DD90018A2E4 /* MediaCell.h */,
+				E3A59D431BD58DD90018A2E4 /* MediaCell.m */,
+				E3A59D441BD58DD90018A2E4 /* MediaResource.h */,
+				E3A59D451BD58DD90018A2E4 /* MediaResource.m */,
+				E3A59D3E1BD58DAA0018A2E4 /* Mpd.h */,
+				E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */,
+				9D83446E14317C30391A4A86 /* PlaybackView.h */,
+				3C99ABA0498D603BF32587C9 /* PlaybackView.m */,
+				E3A59D3A1BD58DAA0018A2E4 /* PlayerControlsView.h */,
+				E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */,
+				E3A59D3B1BD58DAA0018A2E4 /* PlayerScrubberView.h */,
+				E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */,
+				568580C710C0BA1203D3341E /* Stream.h */,
+				07AD38975B118A3FAC18FAD2 /* Stream.m */,
+				3218E52728994F1C4870D5AC /* Streaming.h */,
+				FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */,
+				8EA175CCA2CEE5F83A658681 /* main.m */,
+			);
+			name = Classes;
+			path = cdm_player/player/Classes;
+			sourceTree = SOURCE_ROOT;
+		};
+		12FE417566700E00AC9EB66F = {
+			isa = PBXGroup;
+			children = (
+				E367BDCE1AF2C37200BF7D6C /* Host */,
+				22DCDD3337FCA837753D2ADF /* Player */,
+				79940DC7BEC6AFA41F6F558B /* Projects */,
+				FBB0EF706389D1AF4E5FED57 /* Frameworks */,
+				286A7B295A360CBB3FA1F411 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		22DCDD3337FCA837753D2ADF /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				08AD10C3E36DBE4038F4EA9B /* Classes */,
+				23A073E842144D99CA3438F6 /* Support */,
+			);
+			name = Player;
+			path = cdm_player/player;
+			sourceTree = "<group>";
+		};
+		23A073E842144D99CA3438F6 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */,
+				E3A59D5E1BD59B4F0018A2E4 /* Images */,
+				F86EA198D6632F06B8ECE658 /* Info.plist */,
+				B5C1432EA0C58AFB4EA2B8DD /* LaunchScreen.xib */,
+				E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */,
+				8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */,
+			);
+			name = Support;
+			path = cdm_player/player/Support;
+			sourceTree = SOURCE_ROOT;
+		};
+		286A7B295A360CBB3FA1F411 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A8AC6A1E44D852B3F0594CC8 /* CDMPlayer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79940DC7BEC6AFA41F6F558B /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DA541BE94D1800593C6F /* CocoaHTTPServer-2.3 */,
+				E3C9DA1A1BE94CC200593C6F /* TBXML-1.5 */,
+			);
+			name = Projects;
+			path = cdm_player/third_party;
+			sourceTree = "<group>";
+		};
+		E367BDCE1AF2C37200BF7D6C /* Host */ = {
+			isa = PBXGroup;
+			children = (
+				E367BDCF1AF2C37200BF7D6C /* CdmHandler.h */,
+				E367BDD01AF2C37200BF7D6C /* CdmHost.h */,
+				E367BDD11AF2C37200BF7D6C /* CdmHost.mm */,
+				E367BDD21AF2C37200BF7D6C /* CdmWrapper.h */,
+				E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */,
+				E367BDD51AF2C37200BF7D6C /* iOSDeviceCert.h */,
+			);
+			name = Host;
+			path = cdm_player/cdm_host;
+			sourceTree = "<group>";
+		};
+		E3A59D5E1BD59B4F0018A2E4 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */,
+				E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */,
+				E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */,
+				E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		E3C9DA001BE94B8000593C6F /* CDM */ = {
+			isa = PBXGroup;
+			children = (
+				E38C2B991B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework */,
+				E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */,
+			);
+			name = CDM;
+			path = cdm_player/cdm;
+			sourceTree = "<group>";
+		};
+		E3C9DA1A1BE94CC200593C6F /* TBXML-1.5 */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */,
+			);
+			path = "TBXML-1.5";
+			sourceTree = "<group>";
+		};
+		E3C9DA541BE94D1800593C6F /* CocoaHTTPServer-2.3 */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */,
+				E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */,
+			);
+			path = "CocoaHTTPServer-2.3";
+			sourceTree = "<group>";
+		};
+		E3C9DA581BE94D1800593C6F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E3C9DA5B1BE94D1800593C6F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E3C9DC371BE95D1B00593C6F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DC3C1BE95D1B00593C6F /* libTBXML.a */,
+				E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FBB0EF706389D1AF4E5FED57 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E3C9DA001BE94B8000593C6F /* CDM */,
+				E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */,
+				A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */,
+				DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */,
+				1E2D8E07E53399051A05A871 /* CoreFoundation.framework */,
+				5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */,
+				8A5D38A72F529F0B7DA626FD /* Foundation.framework */,
+				5F5EF5DB13BA3A4B36A1D312 /* Security.framework */,
+				2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EA366CA36E247489944F66E2 /* CDM Player */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player" */;
+			buildPhases = (
+				C5B744002620F58517BB55A1 /* Resources */,
+				028F2F3FBFC5782034C1559F /* Sources */,
+				F4D69EDAE6C83DB1A44DF17B /* Frameworks */,
+				E367137E1B6BDAFB00B56510 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CDM Player";
+			productName = cdm_reference_player;
+			productReference = A8AC6A1E44D852B3F0594CC8 /* CDMPlayer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1BAAD98B51B7F97C7161E79C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = AE631399C0E341BF039B7144 /* Build configuration list for PBXProject "CDMPlayer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+				Base,
+				English,
+			);
+			mainGroup = 12FE417566700E00AC9EB66F;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E3C9DA581BE94D1800593C6F /* Products */;
+					ProjectRef = E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */;
+				},
+				{
+					ProductGroup = E3C9DA5B1BE94D1800593C6F /* Products */;
+					ProjectRef = E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */;
+				},
+				{
+					ProductGroup = E3C9DC371BE95D1B00593C6F /* Products */;
+					ProjectRef = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				EA366CA36E247489944F66E2 /* CDM Player */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCocoaAsyncSocket.a;
+			remoteRef = E3C9DBE51BE94D1B00593C6F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCocoaHTTPServer.a;
+			remoteRef = E3C9DBE81BE94D1B00593C6F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E3C9DC3C1BE95D1B00593C6F /* libTBXML.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libTBXML.a;
+			remoteRef = E3C9DC3B1BE95D1B00593C6F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libTBXML-iOS.a";
+			remoteRef = E3C9DC3D1BE95D1B00593C6F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C5B744002620F58517BB55A1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3C9DC4A1BE95ED700593C6F /* ico_download_after.png in Resources */,
+				E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */,
+				E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */,
+				E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */,
+				E3C9DC0A1BE94D5D00593C6F /* Info.plist in Resources */,
+				E3C9DC0B1BE94D5D00593C6F /* LaunchScreen.xib in Resources */,
+				E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */,
+				E3C9DC0D1BE94D5D00593C6F /* RefPlayer_Prefix.pch in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		028F2F3FBFC5782034C1559F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3C9DC0E1BE94D6C00593C6F /* CdmHost.mm in Sources */,
+				E3C9DC0F1BE94D6C00593C6F /* CdmWrapper.mm in Sources */,
+				E3C9DC101BE94D6C00593C6F /* AppDelegate.m in Sources */,
+				E3C9DC111BE94D6C00593C6F /* DetailViewController.m in Sources */,
+				E3C9DC121BE94D6C00593C6F /* Downloader.m in Sources */,
+				E3C9DC131BE94D6D00593C6F /* LicenseManager.m in Sources */,
+				E3C9DC141BE94D6D00593C6F /* LocalWebConnection.m in Sources */,
+				E3C9DC151BE94D6D00593C6F /* LocalWebServer.m in Sources */,
+				E3C9DC161BE94D6D00593C6F /* MasterViewController.m in Sources */,
+				E3C9DC171BE94D6D00593C6F /* MediaCell.m in Sources */,
+				E3C9DC181BE94D6D00593C6F /* MediaResource.m in Sources */,
+				E3C9DC191BE94D6D00593C6F /* Mpd.m in Sources */,
+				E3C9DC1A1BE94D6D00593C6F /* PlaybackView.m in Sources */,
+				E3C9DC1B1BE94D6D00593C6F /* PlayerControlsView.m in Sources */,
+				E3C9DC1C1BE94D6D00593C6F /* PlayerScrubberView.m in Sources */,
+				E3C9DC1D1BE94D6D00593C6F /* Stream.m in Sources */,
+				E3C9DC1E1BE94D6D00593C6F /* Streaming.mm in Sources */,
+				E3C9DC1F1BE94D6D00593C6F /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		B5C1432EA0C58AFB4EA2B8DD /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CEC6EFA8FBF6FD21F52904AE /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		0C8AC55ECF4C599A03E6A8B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
+				"ARCHS[sdk=iphonesimulator*]" = (
+					i386,
+					x86_64,
+				);
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				HEADER_SEARCH_PATHS = (
+					"${SRCROOT}/cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				TARGETED_DEVICE_FAMILY = 1;
+				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include TBXML/TBXML-Headers widevine-cdm/core/include widevine-cdm/cdm/include";
+				VALID_ARCHS = "i386 x86_64 armv7 arm64";
+			};
+			name = Release;
+		};
+		66A570A1E2E01D21EA234A20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					cdm_player/cdm/dev,
+				);
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
+					"PLATFORM_MODEL_NAME_WV=\\\"6+\\\"",
+					"PLATFORM_ARCHITECTURE_NAME_WV=\\\"arm64\\\"",
+					"PLATFORM_DEVICE_NAME_WV=\\\"iPhone\\\"",
+					"PLATFORM_PRODUCT_NAME_WV=\\\"cdm_test_app\\\"",
+					"PLATFORM_BUILDINFO_WV=\\\"0.1\\\"",
+					"PLATFORM_CERTIFICATE_PROV=true",
+					"PLATFORM_REQUIRES_SECURE_BUFFERS=false",
+					"PLATFORM_USES_CLEAR_BUFFERS=!false",
+					OEMCRYPTO_DYLIB,
+				);
+				HEADER_SEARCH_PATHS = (
+					"cdm_player/third_party/TBXML-1.5/TBXML-Headers",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mycompany.CDMPlayer;
+				PRODUCT_NAME = CDMPlayer;
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "cdm_player/third_party/CocoaHTTPServer-2.3/Core cdm_player/third_party/TBXML-1.5/TBXML-Headers cdm_player/cdm/dev/oemcrypto_tfit2-eit_dev_dylib.framework/Headers";
+				VALID_ARCHS = "i386 armv7 arm64 x86_64";
+				WRAPPER_PREFIX = "";
+				proto_dir = cdm_host_interface;
+				protobuf_lib = libProtocolBuffers.a;
+				protobuf_lib_type = "";
+				protoc_dir = cdm_host_interface;
+			};
+			name = Release;
+		};
+		A1342A3431FF0549449AC119 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
+				"ARCHS[sdk=iphonesimulator*]" = (
+					i386,
+					x86_64,
+				);
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				ENABLE_TESTABILITY = YES;
+				HEADER_SEARCH_PATHS = (
+					"${SRCROOT}/cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				TARGETED_DEVICE_FAMILY = 1;
+				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include TBXML/TBXML-Headers widevine-cdm/core/include widevine-cdm/cdm/include";
+				VALID_ARCHS = "i386 armv7 arm64 x86_64";
+			};
+			name = Debug;
+		};
+		F817ACD45E7561B0C5BE5BF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					cdm_player/cdm/dev,
+				);
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
+					"PLATFORM_MODEL_NAME_WV=\\\"6+\\\"",
+					"PLATFORM_ARCHITECTURE_NAME_WV=\\\"arm64\\\"",
+					"PLATFORM_DEVICE_NAME_WV=\\\"iPhone\\\"",
+					"PLATFORM_PRODUCT_NAME_WV=\\\"cdm_test_app\\\"",
+					"PLATFORM_BUILDINFO_WV=\\\"0.1\\\"",
+					"PLATFORM_CERTIFICATE_PROV=true",
+					"PLATFORM_REQUIRES_SECURE_BUFFERS=false",
+					"PLATFORM_USES_CLEAR_BUFFERS=!false",
+					OEMCRYPTO_DYLIB,
+					_DEBUG,
+				);
+				HEADER_SEARCH_PATHS = (
+					"cdm_player/third_party/TBXML-1.5/TBXML-Headers",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mycompany.CDMPlayer;
+				PRODUCT_NAME = CDMPlayer;
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "cdm_player/third_party/CocoaHTTPServer-2.3/Core cdm_player/third_party/TBXML-1.5/TBXML-Headers cdm_player/cdm/dev/oemcrypto_tfit2-eit_dev_dylib.framework/Headers";
+				VALID_ARCHS = "i386 armv7 arm64 x86_64";
+				WRAPPER_PREFIX = "";
+				proto_dir = cdm_host_interface;
+				protobuf_lib = libProtocolBuffers.a;
+				protobuf_lib_type = "";
+				protoc_dir = cdm_host_interface;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AE631399C0E341BF039B7144 /* Build configuration list for PBXProject "CDMPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1342A3431FF0549449AC119 /* Debug */,
+				0C8AC55ECF4C599A03E6A8B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+		BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F817ACD45E7561B0C5BE5BF9 /* Debug */,
+				66A570A1E2E01D21EA234A20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1BAAD98B51B7F97C7161E79C /* Project object */;
+}

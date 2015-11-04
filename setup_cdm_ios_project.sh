@@ -23,9 +23,10 @@ while (($#)); do
 done
 
 # Static Links to download external projects
-COCOAHTTP_URL="https://github.com/robbiehanson/CocoaHTTPServer/archive/master.zip"
-TBXML_URL="https://github.com/71squared/TBXML/archive/master.zip"
+COCOAHTTP_URL="https://github.com/robbiehanson/CocoaHTTPServer/archive/2.3.zip"
+TBXML_URL="https://github.com/71squared/TBXML/archive/v1.5.zip"
 
+THIRDPARTY_DIR="cdm_player/third_party"
 echo
 echo
 
@@ -56,14 +57,14 @@ download_file() {
   if [ -f ${1} ]; then
     echo "File Already Downloaded, Extracting..."
   else
-     curl -L -o ${1} ${2}
+     curl -L -o ${THIRDPARTY_DIR}/${1} ${2}
   fi
 }
 
 # Using tar or zip to extract packages based on extension.
 extract_file() {
   if [ ${2} == "zip" ]; then
-    unzip ${1}.zip
+    unzip ${THIRDPARTY_DIR}/${1}.zip -d ${THIRDPARTY_DIR}
   else
     mkdir -p ${3}
     tar -pxzvf ${1}.${2} -C ${3} ${4}
@@ -164,7 +165,7 @@ if [ -d "/Applications/XCode.app" ]; then
   read -p "Open XCode Project? [y/n] " y
   echo
   case $y in
-    [Yy]* ) open cdm_player_ios.xcodeproj;;
+    [Yy]* ) open CDMPlayer.xcodeproj;;
     * ) echo "Install Complete. Open Project: cdm_player_ios.xcodeproj";;
  esac
  else

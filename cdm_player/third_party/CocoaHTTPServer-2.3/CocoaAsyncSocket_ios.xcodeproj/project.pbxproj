@@ -1,0 +1,275 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E3C9DC231BE9570300593C6F /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 00D4D4B248EFD31A354E9847 /* GCDAsyncSocket.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00D4D4B248EFD31A354E9847 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		989317DDCADA2CE3FC24F716 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		9C6EA8A644F5608B6413BC9F /* libCocoaAsyncSocket.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocoaAsyncSocket.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F8F70F98C8A8D0DC644976B4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4ABBB8FA12E9DC33284844C4 = {
+			isa = PBXGroup;
+			children = (
+				9343EEC1C7B79307EEBFC769 /* Source */,
+				D118B008879F5A50950D47A4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9343EEC1C7B79307EEBFC769 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				989317DDCADA2CE3FC24F716 /* GCDAsyncSocket.h */,
+				00D4D4B248EFD31A354E9847 /* GCDAsyncSocket.m */,
+			);
+			name = Source;
+			path = Vendor/CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
+		D118B008879F5A50950D47A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9C6EA8A644F5608B6413BC9F /* libCocoaAsyncSocket.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F89FC05EADCE6FD6CE26E210 /* CocoaAsyncSocket */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C6F5114765609F2F6174FD47 /* Build configuration list for PBXNativeTarget "CocoaAsyncSocket" */;
+			buildPhases = (
+				19951D16021E9FBD1DD12E85 /* Sources */,
+				F8F70F98C8A8D0DC644976B4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CocoaAsyncSocket;
+			productName = CocoaAsyncSocket;
+			productReference = 9C6EA8A644F5608B6413BC9F /* libCocoaAsyncSocket.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		364928A3315EBDA2C98A9A89 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+			};
+			buildConfigurationList = B4714A343E9FB94CA45B52A8 /* Build configuration list for PBXProject "CocoaAsyncSocket_ios" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4ABBB8FA12E9DC33284844C4;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F89FC05EADCE6FD6CE26E210 /* CocoaAsyncSocket */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		19951D16021E9FBD1DD12E85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3C9DC231BE9570300593C6F /* GCDAsyncSocket.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4643CD5494ADCFDC6C939D58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
+				"ARCHS[sdk=iphonesimulator*]" = (
+					i386,
+					x86_64,
+				);
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "i386 armv7 arm64";
+			};
+			name = Release;
+		};
+		8701B4005F8762A72B2D5949 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
+					"PLATFORM_MODEL_NAME_WV=\\\"6+\\\"",
+					"PLATFORM_ARCHITECTURE_NAME_WV=\\\"arm64\\\"",
+					"PLATFORM_DEVICE_NAME_WV=\\\"iPhone\\\"",
+					"PLATFORM_PRODUCT_NAME_WV=\\\"cdm_test_app\\\"",
+					"PLATFORM_BUILDINFO_WV=\\\"0.1\\\"",
+					"PLATFORM_CERTIFICATE_PROV=true",
+					"PLATFORM_REQUIRES_SECURE_BUFFERS=false",
+					"PLATFORM_USES_CLEAR_BUFFERS=!false",
+					"$(inherited)",
+					NDEBUG,
+				);
+				"GCC_VERSION[sdk=iphone*5.0*]" = com.apple.compilers.llvm.clang.1_0;
+				GOOGLE_MAC_ROOT = ../../../googlemac/;
+				GOOGLE_VERSION_FIXLEVEL = 1;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_NAME = CocoaAsyncSocket;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wendif-labels",
+					"-Wnewline-eof",
+					"-Wno-unused-parameter",
+					"-Wno-missing-field-initializers",
+				);
+			};
+			name = Release;
+		};
+		AD466F0163AC265F4F8035F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
+					"PLATFORM_MODEL_NAME_WV=\\\"6+\\\"",
+					"PLATFORM_ARCHITECTURE_NAME_WV=\\\"arm64\\\"",
+					"PLATFORM_DEVICE_NAME_WV=\\\"iPhone\\\"",
+					"PLATFORM_PRODUCT_NAME_WV=\\\"cdm_test_app\\\"",
+					"PLATFORM_BUILDINFO_WV=\\\"0.1\\\"",
+					"PLATFORM_CERTIFICATE_PROV=true",
+					"PLATFORM_REQUIRES_SECURE_BUFFERS=false",
+					"PLATFORM_USES_CLEAR_BUFFERS=!false",
+					"$(inherited)",
+					_DEBUG,
+				);
+				"GCC_VERSION[sdk=iphone*5.0*]" = com.apple.compilers.llvm.clang.1_0;
+				GOOGLE_MAC_ROOT = ../../../googlemac/;
+				GOOGLE_VERSION_FIXLEVEL = 1;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_NAME = CocoaAsyncSocket;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wendif-labels",
+					"-Wnewline-eof",
+					"-Wno-unused-parameter",
+					"-Wno-missing-field-initializers",
+				);
+			};
+			name = Debug;
+		};
+		C5DC1CF00C902090DD9113B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
+				"ARCHS[sdk=iphonesimulator*]" = (
+					i386,
+					x86_64,
+				);
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "i386 armv7 arm64";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B4714A343E9FB94CA45B52A8 /* Build configuration list for PBXProject "CocoaAsyncSocket_ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4643CD5494ADCFDC6C939D58 /* Release */,
+				C5DC1CF00C902090DD9113B1 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Release;
+		};
+		C6F5114765609F2F6174FD47 /* Build configuration list for PBXNativeTarget "CocoaAsyncSocket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8701B4005F8762A72B2D5949 /* Release */,
+				AD466F0163AC265F4F8035F0 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 364928A3315EBDA2C98A9A89 /* Project object */;
+}
