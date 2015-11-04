@@ -141,27 +141,6 @@ verify_download() {
 #########################
 # Script Start
 
-OEC="oemcrypto_tfit_ios_dylib"
-echo "=============================================================="
-echo "          Preparing ${OEC} ... [1/5]"
-echo "=============================================================="
-OEC_READY=$(find_files ${OEC})
-handle_files ${OEC} ${OEC_URL} ${OEC_READY}
-
-CDM_HOST="cdm_host_interface"
-echo "=============================================================="
-echo "          Preparing ${CDM_HOST} ... [2/5]"
-echo "=============================================================="
-CDM_HOST_READY=$(find_files ${CDM_HOST})
-handle_files ${CDM_HOST} ${CDM_HOST_URL} ${CDM_HOST_READY}
-
-CDM_REF="cdm_reference_player_ios"
-echo "=============================================================="
-echo "          Preparing ${CDM_REF} ... [3/5]"
-echo "=============================================================="
-CDM_REF_READY=$(find_files ${CDM_REF})
-handle_files ${CDM_REF} ${CDM_REF_URL} ${CDM_REF_READY}
-
 TBXML="TBXML"
 echo "=============================================================="
 echo "          Preparing ${TBXML} ... [4/5]"

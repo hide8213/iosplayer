@@ -1,0 +1,15 @@
+[{
+  "name": "Short",
+  "thumbnail": "",
+  "url": "http://storage.googleapis.com/wvmedia/cenc/tears.mpd"
+},
+{
+  "name": "Long",
+  "thumbnail": "",
+  "url": "http://storage.googleapis.com/wvmedia/cenc/valkaama.mpd"
+},
+{
+  "name": "Clear",
+  "thumbnail": "",
+  "url": "http://yt-dash-mse-test.commondatastorage.googleapis.com/media/oops-20120802-manifest.mpd"
+}]
