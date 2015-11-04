@@ -1,0 +1,21 @@
+v2.0.2 (2015 October)
+ - Create Separate Controls for Buttons and Scrubber
+ - Add Full Screen Support
+ - Integrate Offline support (License Manager)
+ - Breakout Tableview from SplitViewController
+ - Remove Storyboards
+ - Add Download Manager
+ - Update UDT with Bug Fixes / Requests
+
+v2.0.1 (2015 August)
+ - Add Playback controls
+ - Enable both Simulator and Device support
+ - Build Dynamic Library containing CDM and UDT
+ - Improve XML Parsing
+ - Update UDT version
+
+v2.0.0 (2015 March)
+ - Build OEMCrypto Static Library
+ - Integrated UDT
+ - Integrated XML Parsing
+ - Added Local HTTP Server
