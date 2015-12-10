@@ -3,7 +3,7 @@
 #import <Foundation/Foundation.h>
 
 #import "CdmWrapper.h"
-#import "OemcryptoIncludes.h"
+#import "DashToHlsApi.h"
 
 struct DashToHlsIndex;
 struct DashToHlsSession;

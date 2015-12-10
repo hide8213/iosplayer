@@ -1,17 +1,21 @@
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2015 Google Inc. All rights reserved.
 
 #import "Streaming.h"
 
+#import <arpa/inet.h>
+#import <ifaddrs.h>
 #import <Responses/HTTPDataResponse.h>
+#import <string.h>
 
 #import "AppDelegate.h"
+#import "DashToHlsApi.h"
+#import "DashToHlsApiAVFramework.h"
 #import "DetailViewController.h"
 #import "Downloader.h"
 #import "HTTPResponse.h"
 #import "LicenseManager.h"
 #import "LocalWebServer.h"
 #import "Mpd.h"
-#import "OemcryptoIncludes.h"
 #import "Stream.h"
 #import "TBXML.h"
 
@@ -26,15 +30,16 @@ NSString *kStreamingReadyNotification = @"StreamingReadyNotificaiton";
 
 @synthesize manifestURL = _manifestURL;
 
+static int kHttpPort = 8080;
 static float k90KRatio = 90000.0;
-static NSString *kLocalPlaylist = @"dash2hls.m3u8";
+static NSString *const kLocalPlaylist = @"dash2hls.m3u8";
+static NSString *const kLocalHost = @"localhost";
 
 static NSString *kAudioPlaylistFormat =
     @"#EXT-X-MEDIA:URI=\"%d.m3u8\",TYPE=AUDIO,GROUP-ID=\"audio\",NAME=\"audio%d\","
     @"DEFAULT=%@,AUTOSELECT=YES\n";
 
-static NSString *kAudioSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
-    @"50699/%d-%d.ts\n";
+static NSString *kAudioSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 
 static NSString *kPlaylist = @"#EXTM3U\n#EXT-X-VERSION:3\n%@"
     @"#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:%lld\n%@#EXT-X-ENDLIST";
@@ -43,21 +48,36 @@ static NSString *kVideoPlaylistFormat =
     @"#EXT-X-STREAM-INF:BANDWIDTH=%lu,CODECS=\"%@\",RESOLUTION=%.0lux%.0lu,AUDIO=\"audio\""
     @"\n%d.m3u8\n";
 
-static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
-    @"50699/%d-%d.ts\n";
+static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 
-
-- (id)init {
+- (id)initWithAirplay:(BOOL)isAirplayActive {
   self = [super init];
   if (self) {
+    _address = kLocalHost;
+    if (isAirplayActive) {
+      _address = [self getIPAddress];
+    }
     _localWebServer = [[LocalWebServer alloc] initWithStreaming:self];
     NSError *error = nil;
+    _httpPort = kHttpPort;
     [_localWebServer start:&error];
+
     _streamingQ = dispatch_queue_create("Streaming", NULL);
     _streams = [NSMutableArray array];
     _variantPlaylist = @"#EXTM3U\n#EXT-X-VERSION:3\n";
   }
   return self;
+}
+
+- (void)restart:(BOOL)isAirplayActive {
+  if (isAirplayActive) {
+    _address = [self getIPAddress];
+  } else {
+    _address = kLocalHost;
+  }
+  NSError *error = nil;
+  [_localWebServer stop];
+  [_localWebServer start:&error];
 }
 
 - (void)stop {
@@ -83,6 +103,33 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
   });
 }
 
+- (NSString *)getIPAddress {
+  NSString *address;
+  struct ifaddrs *interfaces = NULL;
+  struct ifaddrs *temp_addr = NULL;
+
+  // retrieve the current interfaces - returns 0 on success
+  int retValue = getifaddrs(&interfaces);
+  if (retValue == 0) {
+    // Loop through linked list of interfaces
+    temp_addr = interfaces;
+    while (temp_addr != NULL) {
+      if (temp_addr->ifa_addr->sa_family == AF_INET) {
+        // Check if interface is en0 which is the wifi connection on the iPhone
+        if (strcmp(temp_addr->ifa_name, "en0") == 0) {
+          // Get NSString from C String
+          address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)
+                                                              temp_addr->ifa_addr)->sin_addr)];
+          break;
+        }
+      }
+      temp_addr = temp_addr->ifa_next;
+    }
+  }
+  freeifaddrs(interfaces);
+  return address;
+}
+
 - (void)startVideoPlayer {
   [[NSNotificationCenter defaultCenter] postNotificationName:kStreamingReadyNotification
                                                       object:self];
@@ -96,11 +143,13 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
       _variantPlaylist = [_variantPlaylist
                           stringByAppendingString:[NSString stringWithFormat:kVideoPlaylistFormat,
                                                    stream.bandwidth, stream.codec,
-                                                   stream.width, stream.height, stream.index]];
+                                                   stream.width, stream.height,
+                                                   stream.index]];
     } else {
       _variantPlaylist = [_variantPlaylist
                           stringByAppendingString:[NSString stringWithFormat:kAudioPlaylistFormat,
-                                                   stream.index, stream.index, defaultAudioString]];
+                                                   stream.index, stream.index,
+                                                   defaultAudioString]];
       defaultAudioString = @"NO";
     }
   }
@@ -269,9 +318,8 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
 
 - (NSData *)tsDataForIndex:(int)index segment:(int)segment {
   Stream *stream = _streams[index];
-  NSURL *url = stream.url;
   NSMutableURLRequest *request =
-      [NSMutableURLRequest requestWithURL:url
+      [NSMutableURLRequest requestWithURL:stream.url
                               cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                           timeoutInterval:5];
 
@@ -285,10 +333,10 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
   }
   const uint8_t *hlsSegment;
   size_t hlsSize;
-  DashToHlsStatus status = DashToHls_ConvertDashSegmentData(stream.session, segment,
-                                                            (const uint8_t *)[response_data bytes],
-                                                            [response_data length],
-                                                            &hlsSegment, &hlsSize);
+  DashToHlsStatus status = DashToHls_ConvertDashSegment(stream.session, segment,
+                                                        (const uint8_t *)[response_data bytes],
+                                                        [response_data length],
+                                                        &hlsSegment, &hlsSize);
   if (kDashToHlsStatus_OK == status) {
     NSData  *response_data = [NSData dataWithBytes:hlsSegment length:hlsSize];
     DashToHls_ReleaseHlsSegment(stream.session, segment);
@@ -310,7 +358,7 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
     // Catches children playlist requests and provides the appropriate data in place of m3u8.
     NSScanner *scanner = [NSScanner scannerWithString:path];
     int index = 0;
-    if ([scanner scanString:@"/hls/" intoString:NULL] &&
+    if ([scanner scanString:@"/" intoString:NULL] &&
       [scanner scanInt:&index]) {
       Stream *stream = _streams[index];
       response_data = stream.m3u8;
@@ -328,7 +376,6 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\nhttp://localhost:"
       response_data = [self tsDataForIndex:index segment:segment];
     }
   }
-  NSLog(@"responding %lu", (unsigned long)response_data.length);
   if (response_data) {
     return [[HTTPDataResponse alloc] initWithData:response_data];
   }

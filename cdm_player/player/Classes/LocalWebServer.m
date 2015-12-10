@@ -6,7 +6,7 @@
 #import "LocalWebConnection.h"
 
 NSString *kHttpPrefix = @"http://%@";
-NSString *kLocalHost = @"localhost:%d";
+NSString *kHost = @"%@:%d";
 
 @implementation LocalWebServer
 
@@ -22,9 +22,9 @@ NSString *kLocalHost = @"localhost:%d";
   if (self.isRunning) {
     return YES;
   }
-  [self setPort:50699];
-  [self setInterface:@"localhost"];
+  [self setPort:_streaming.httpPort];
   [self setType:@"_http._tcp."];
+  [self setInterface:_streaming.address];
   [self setConnectionClass:[LocalWebConnection class]];
   BOOL success = [super start:errPtr];
   if (success) {
@@ -34,7 +34,7 @@ NSString *kLocalHost = @"localhost:%d";
 }
 
 - (NSString *)hostname {
-  return [NSString stringWithFormat:kLocalHost, [self listeningPort]];
+  return [NSString stringWithFormat:kHost, _streaming.address, _streaming.httpPort];
 }
 
 - (dispatch_queue_t)connectionQueue {

@@ -1,7 +1,15 @@
+v3.0.3 (2015 December)
+ - Clean up project layout
+ - Upgrade CDM to v3 (See CDM docs for details)
+ - Updated HOST files to handle CDM v3 API changes
+ - UDT Fixes: Multiple MOOF per segement, Mutiple PSSHs
+ - Airplay Support
+
 v2.0.3 (2015 November)
  - Redesign project structure
  - Push to Git repository for easy cloning
  - Fix SIDX, MVHD and SPS bugs in Dash Transmuxer
+ - Move TBXML to specific SHA download link (766b375)
 
 v2.0.2 (2015 October)
  - Create Separate Controls for Buttons and Scrubber

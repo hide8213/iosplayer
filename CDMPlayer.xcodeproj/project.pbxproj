@@ -13,6 +13,7 @@
 		782D3BE5BA64D9FC83728775 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
 		8FA1C729D572390720479B7E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
 		A49F4DB3F710C45C29E75732 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
+		E353B9C21C21DFF400233332 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */; };
 		E36F58D81AFC6DC100DEEE20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
 		E38C2B751B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */; };
 		E38C2B761B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -20,7 +21,6 @@
 		E38C2B9B1B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B991B7124BD008700FB /* oemcrypto_tfit2_dev_dylib_sim.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */; };
 		E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */; };
-		E3C9DC0A1BE94D5D00593C6F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F86EA198D6632F06B8ECE658 /* Info.plist */; };
 		E3C9DC0B1BE94D5D00593C6F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C1432EA0C58AFB4EA2B8DD /* LaunchScreen.xib */; };
 		E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */; };
 		E3C9DC0D1BE94D5D00593C6F /* RefPlayer_Prefix.pch in Resources */ = {isa = PBXBuildFile; fileRef = 8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */; };
@@ -47,6 +47,7 @@
 		E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
 		E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
 		E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */; };
+		E3F1DF961C1A3DFA008CDE56 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */; };
 		F78F3116635CA2F99CE0F2B7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
@@ -155,6 +156,7 @@
 		E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaAsyncSocket_ios.xcodeproj; sourceTree = "<group>"; };
 		E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaHTTPServer_ios.xcodeproj; sourceTree = "<group>"; };
 		E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "TBXML-WV.xcodeproj"; sourceTree = "<group>"; };
+		E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		F86EA198D6632F06B8ECE658 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Streaming.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -164,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3F1DF961C1A3DFA008CDE56 /* MediaPlayer.framework in Frameworks */,
 				E3C9DC401BE95D3400593C6F /* libTBXML-iOS.a in Frameworks */,
 				E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */,
 				E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */,
@@ -355,6 +358,7 @@
 		FBB0EF706389D1AF4E5FED57 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */,
 				E3C9DA001BE94B8000593C6F /* CDM */,
 				E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */,
 				A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */,
@@ -396,7 +400,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0710;
 			};
 			buildConfigurationList = AE631399C0E341BF039B7144 /* Build configuration list for PBXProject "CDMPlayer" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -466,11 +470,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E353B9C21C21DFF400233332 /* Images.xcassets in Resources */,
 				E3C9DC4A1BE95ED700593C6F /* ico_download_after.png in Resources */,
 				E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */,
 				E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */,
 				E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */,
-				E3C9DC0A1BE94D5D00593C6F /* Info.plist in Resources */,
 				E3C9DC0B1BE94D5D00593C6F /* LaunchScreen.xib in Resources */,
 				E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */,
 				E3C9DC0D1BE94D5D00593C6F /* RefPlayer_Prefix.pch in Resources */,

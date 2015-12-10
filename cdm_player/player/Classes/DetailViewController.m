@@ -1,34 +1,38 @@
 // Copyright 2015 Google Inc. All rights reserved.
-
 #import "DetailViewController.h"
 
+#import <AudioToolbox/AudioToolbox.h>
+
 #import "CdmWrapper.h"
+#import "DashToHlsApi.h"
+#import "DashToHlsApiAVFramework.h"
 #import "MasterViewController.h"
 #import "MediaResource.h"
-#import "OemcryptoIncludes.h"
 #import "LicenseManager.h"
 #import "PlaybackView.h"
 #import "PlayerControlsView.h"
 #import "PlayerScrubberView.h"
 #import "Streaming.h"
 
+
 static DetailViewController *sDetailViewController;
 
 @interface DetailViewController() <PlayerControlsDelegate, PlayerScrubberDelegate> {
-  AVPlayer *_player;
+  BOOL _isSeeking;
+  NSURL *_keyStoreURL;
+  NSString *_mediaName;
+  NSURL *_mediaUrl;
   BOOL *_offline;
   PlaybackView *_playbackView;
-  Streaming *_streaming;
-  BOOL _isSeeking;
-  NSURL *_mediaUrl;
-  NSString *_mediaName;
-  float _restoreAfterScrubbingRate;
-  BOOL _seekToZeroBeforePlay;
-  id _timeObserver;
-  NSURL *_keyStoreURL;
+  AVPlayer *_player;
   UIView *_renderingView;
-  id _timer;
+  float _restoreAfterScrubbingRate;
+  float _resumeTime;
+  BOOL _seekToZeroBeforePlay;
+  Streaming *_streaming;
   UITapGestureRecognizer *_tapRecognizer;
+  id _timeObserver;
+  id _timer;
 }
 @end
 
@@ -49,7 +53,7 @@ static void *PlaybackViewControllerStatusObservationContext =
 static void *PlaybackViewControllerCurrentItemObservationContext =
     &PlaybackViewControllerCurrentItemObservationContext;
 
-NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
+NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 
 @implementation DetailViewController
 
@@ -66,8 +70,7 @@ NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
 }
 
 - (void)setupStreaming:(MediaResource *)mediaResource {
-
-  _streaming = [[Streaming alloc] init];
+  _streaming = [[Streaming alloc] initWithAirplay:[self isAirplayActive]];
   _streaming.offline = mediaResource.isDownloaded;
   _mediaName = mediaResource.name;
   if (_streaming.offline) {
@@ -158,17 +161,22 @@ NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
 #pragma mark View Controller
 
 - (void)loadView {
-    _playbackView = [[PlaybackView alloc] init];
-    _playbackView.controlsView.delegate = self;
-    _playbackView.scrubberView.scrubberDelegate = self;
-    [_playbackView setVideoRenderingView:_renderingView];
-    [self setView:_playbackView];
-    _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                             action:@selector(handleTap)];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(streamingReady:)
-                                                 name:kStreamingReadyNotification
-                                               object:nil];
+  _playbackView = [[PlaybackView alloc] init];
+  _playbackView.controlsView.delegate = self;
+  _playbackView.scrubberView.scrubberDelegate = self;
+  [_playbackView setVideoRenderingView:_renderingView];
+  [self setView:_playbackView];
+  _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                           action:@selector(handleTap)];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(streamingReady:)
+                                               name:kStreamingReadyNotification
+                                             object:nil];
+  // Notification when Airplay route has been invoked.
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(audioRouteHasChangedNotification:)
+                                               name:AVAudioSessionRouteChangeNotification
+                                             object:[AVAudioSession sharedInstance]];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -190,7 +198,9 @@ NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
 }
 
 - (void)streamingReady:(NSNotification *)notification {
-  _mediaUrl = [[NSURL alloc] initWithString:kDash2HlsUrl];
+  NSString *address = [[NSString alloc] initWithFormat:kDash2HlsUrl,
+                       _streaming.address, _streaming.httpPort];
+  _mediaUrl = [[NSURL alloc] initWithString:address];
   AVURLAsset *asset = [AVURLAsset URLAssetWithURL:_mediaUrl options:nil];
   if (DashToHls_SetAVURLAsset(asset, NULL, dispatch_get_main_queue()) != kDashToHlsStatus_OK) {
     NSLog(@"Cannot set the loopback encryption");
@@ -210,6 +220,25 @@ NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
   return YES;
+}
+
+#pragma mark - External screen handling
+
+- (BOOL)isAirplayActive {
+  AVAudioSession* audioSession = [AVAudioSession sharedInstance];
+  AVAudioSessionRouteDescription* currentRoute = audioSession.currentRoute;
+  for (AVAudioSessionPortDescription* outputPort in currentRoute.outputs){
+    if ([outputPort.portType isEqualToString:AVAudioSessionPortAirPlay])
+    return YES;
+  }
+  return NO;
+}
+
+- (void)audioRouteHasChangedNotification:(NSNotification*)notification {
+  _resumeTime = CMTimeGetSeconds([_player currentTime]);
+  [_streaming restart:[self isAirplayActive]];
+  [[NSNotificationCenter defaultCenter] postNotificationName:kStreamingReadyNotification
+                                                      object:self];
 }
 
 @end
@@ -349,6 +378,9 @@ NSString *kDash2HlsUrl = @"http://localhost:50699/hls/dash2hls.m3u8";
      replacement will/did occur.
      */
     [_player replaceCurrentItemWithPlayerItem:_playerItem];
+  }
+  if (_resumeTime) {
+    [_player seekToTime:(CMTimeMakeWithSeconds(_resumeTime, NSEC_PER_SEC))];
   }
   [_player play];
 }

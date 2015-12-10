@@ -1,5 +1,7 @@
 #import "PlayerControlsView.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+
 #import "PlaybackView.h"
 
 @implementation PlayerControlsView {
@@ -36,6 +38,11 @@
     _flexItem = [self barButtonWithTitle:@"Flex"
                               systemItem:UIBarButtonSystemItemFlexibleSpace
                                 selector:nil];
+    MPVolumeView *airplayView = [[MPVolumeView alloc] init];
+    [airplayView setShowsVolumeSlider:NO];
+    [airplayView sizeToFit];
+    UIBarButtonItem *airplayButtonItem = [[UIBarButtonItem alloc] initWithCustomView:airplayView];
+    [_buttonBarItems addObject:airplayButtonItem];
     _restartButtonItem = [self barButtonWithTitle:@"Restart"
                                        systemItem:UIBarButtonSystemItemRefresh
                                          selector:@selector(didPressRestart)];

@@ -16,8 +16,7 @@ limitations under the License.
 /*
 iOS and OSX require extra care to make sure that only the AVPlayer in the
 current application has access to the content in the clear.  To solve that
-we use the resource loader to serve a random key.  The key use of a key
-requires a random number function passed in DashToHls_InitializeEncryption.
+we use the resource loader to serve a random key.
 
 As reencryption is assuming there is a CDM the format of the function matches
 the built in OEMCrypto_GetRandom.
@@ -37,19 +36,13 @@ be called on all AVAssetResourceLoaderDelegate not handled by the UDT.
 
 #import <AVFoundation/AVFoundation.h>
 
-#if OEMCRYPTO_DYLIB
 #include "DashToHlsApi.h"
-#else
-#include "include/DashToHlsApi.h"
-#endif // OEMCRYPTO_DYLIB
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-typedef void (*CENC_Random)(uint8_t* random_data, size_t data_length);
-
-void DashToHls_InitializeEncryption(CENC_Random random_function);
+void DashToHls_InitializeEncryption();
 
 DashToHlsStatus DashToHls_SetAVURLAsset(AVURLAsset* asset,
                                         id<AVAssetResourceLoaderDelegate> assetDelegate,

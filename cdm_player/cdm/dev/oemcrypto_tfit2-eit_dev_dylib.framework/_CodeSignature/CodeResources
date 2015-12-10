@@ -10,15 +10,15 @@
 		</data>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
 		<data>
-		+MxKGgpqQxFiBJFpe17k3uWiOD0=
+		0EkU1e2Vy8IMGzGp32KzQo9QXKc=
 		</data>
 		<key>Headers/OEMCryptoCENC.h</key>
 		<data>
 		hUXaRQPnLGsmuaYpm8sz/0O0KY8=
 		</data>
-		<key>Headers/content_decryption_module.h</key>
+		<key>Headers/cdm.h</key>
 		<data>
-		jQ1xCv+kNjydzyRmbJRRzYnwt80=
+		k01RfTZONKri7DaZS2hJfI1QTms=
 		</data>
 		<key>Headers/tfit_rsa_keys.h</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		yvyFKemngsuLlEnhlCX8hwTWrto=
+		ulfkqz7zxvmkX3LWrRVuT9frfgU=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -37,15 +37,15 @@
 		</data>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
 		<data>
-		+MxKGgpqQxFiBJFpe17k3uWiOD0=
+		0EkU1e2Vy8IMGzGp32KzQo9QXKc=
 		</data>
 		<key>Headers/OEMCryptoCENC.h</key>
 		<data>
 		hUXaRQPnLGsmuaYpm8sz/0O0KY8=
 		</data>
-		<key>Headers/content_decryption_module.h</key>
+		<key>Headers/cdm.h</key>
 		<data>
-		jQ1xCv+kNjydzyRmbJRRzYnwt80=
+		k01RfTZONKri7DaZS2hJfI1QTms=
 		</data>
 		<key>Headers/tfit_rsa_keys.h</key>
 		<data>

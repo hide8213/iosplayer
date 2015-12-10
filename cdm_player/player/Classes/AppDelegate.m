@@ -2,17 +2,13 @@
 
 #import "AppDelegate.h"
 
+#import "DashToHlsApiAVFramework.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 #import "LicenseManager.h"
-#import "OemcryptoIncludes.h"
 
 @implementation AppDelegate {
   UIWindow *_window;
-}
-
-void CDMRandom(uint8_t* random_data, size_t data_length) {
-  OEMCrypto_GetRandom(random_data, data_length);
 }
 
 - (NSURL *)urlInDocumentDirectoryForFile:(NSString *)filename {
@@ -42,7 +38,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
   [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:NO];
   [LicenseManager startup];
-  DashToHls_InitializeEncryption(&CDMRandom);
+  DashToHls_InitializeEncryption();
   return YES;
 }
 

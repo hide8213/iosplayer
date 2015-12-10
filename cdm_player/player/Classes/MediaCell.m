@@ -52,9 +52,6 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
     [self.textLabel setTextColor:[UIColor grayColor]];
     [_downloadPercentLabel setHidden:NO];
     [_downloadPercentLabel setText:[NSString stringWithFormat:@"%d%%", _percentage]];
-    [_offlineButton addTarget:self
-                       action:@selector(didPressDelete)
-             forControlEvents:UIControlEventTouchUpInside];
     return;
   }
   // Streaming Files

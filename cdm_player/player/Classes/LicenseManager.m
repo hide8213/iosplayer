@@ -79,6 +79,33 @@ NSString *kLicenseUrlString = @"https://widevine-proxy.appspot.com/proxy";
   }
 }
 
+- (BOOL)fileExists:(NSString *)fileName {
+  NSError *error;
+  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
+  return [fileURL checkResourceIsReachableAndReturnError:&error];
+}
+
+- (int32_t)fileSize:(NSString *)fileName {
+  NSError *error;
+  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
+  NSDictionary *fileAttributes = [[NSFileManager defaultManager]
+      attributesOfItemAtPath:[fileURL absoluteString] error:&error];
+  if (error) {
+    return -1;
+  }
+
+  NSNumber *sizeNumber = [fileAttributes objectForKey:NSFileSize];
+  return [sizeNumber intValue];
+}
+
+- (BOOL)removeFile:(NSString *)fileName {
+  NSError *error;
+  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
+  NSString *pathToFile = [fileURL absoluteString];
+  [[NSFileManager defaultManager] removeItemAtPath:pathToFile error:&error];
+  return error == nil;
+}
+
 - (void)onSessionCreatedWithPssh:(NSData *)pssh webId:(NSString *)webId {
   NSURL *fileURL = [NSURL URLWithString:kKeyMapName relativeToURL:_keyStoreURL];
 

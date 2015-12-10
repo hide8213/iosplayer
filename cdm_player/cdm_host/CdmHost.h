@@ -21,50 +21,11 @@
 #include "CdmIncludes.h"
 
 // Wrapper for calls to the CDM.
-class iOSCdmHost : public cdm::Host_4 {
+class iOSCdmHost : public widevine::Cdm::IEventListener,
+                   public widevine::Cdm::ITimer,
+                   public widevine::Cdm::IClock,
+                   public widevine::Cdm::IStorage {
  public:
-  // Make the cdm::Buffer concrete.
-  class MediaBuffer : public cdm::Buffer {
-   public:
-    MediaBuffer(size_t size) {
-      media_buffer_.resize(size);
-    }
-    virtual void Destroy() {delete this;}
-    virtual int32_t Capacity() const {return (int32_t)media_buffer_.capacity();}
-    virtual uint8_t* Data() {return media_buffer_.data();}
-    virtual void SetSize(int32_t size) {media_buffer_.resize(size);}
-    virtual int32_t Size() const {return (int32_t)media_buffer_.size();}
-
-   protected:
-    MediaBuffer() {}
-    virtual ~MediaBuffer() {}
-
-   private:
-    MediaBuffer(const MediaBuffer&);
-    void operator=(const MediaBuffer&);
-    std::vector<uint8_t> media_buffer_;
-  };
-
-  // Make the DecryptedBlock concrete from decrypted media chunk.
-  class DecryptedBlock : public cdm::DecryptedBlock {
-   public:
-    DecryptedBlock() {}
-    virtual ~DecryptedBlock() {
-      if (media_buffer_) {
-        media_buffer_->Destroy();
-      }
-    }
-    virtual void SetDecryptedBuffer(cdm::Buffer* buffer) {media_buffer_ = buffer;}
-    virtual cdm::Buffer* DecryptedBuffer() {return media_buffer_;}
-
-    virtual void SetTimestamp(int64_t timestamp) {timestamp_ = timestamp;}
-    virtual int64_t Timestamp() const {return timestamp_;}
-
-   private:
-    cdm::Buffer *media_buffer_;
-    int64_t timestamp_;
-  };
-
   // API
   static iOSCdmHost* GetHost() {
     static dispatch_once_t token;
@@ -75,8 +36,12 @@ class iOSCdmHost : public cdm::Host_4 {
     return s_host;
   }
 
+  iOSCdmHost();
+
   // Initalize/Deinitialize should be called once for the lifetime of the app.
-  void Initialize();
+  NSError *Initialize(const widevine::Cdm::ClientInfo& clientInfo,
+                      widevine::Cdm::LogLevel verbosity);
+
   void Deinitialize();
 
   // Set the callback object to handle responses from the CDM. Since CdmHost
@@ -84,30 +49,16 @@ class iOSCdmHost : public cdm::Host_4 {
   // handler.
   void SetiOSCdmHandler(id<iOSCdmHandler> handler);
 
-  // Creates the session for a |sessionId| and |pssh| key. Caller must generate
-  // a unique |sessionId| for each unique |pssh| key. |mimetype| enables the host
-  // to identify if the file type is supported.
-  // Valid |sessionType| are defined in the spec: http://goo.gl/vmc3pd
-  void CreateSession(uint32_t sessionId,
-                     NSString *mimeType,
-                     NSData *pssh,
-                     cdm::SessionType sessionType);
+  // Creates a session and returns the |sessionId|.  Valid |sessionType|
+  // are defined in the spec: http://goo.gl/vmc3pd
+  NSError *CreateSession(widevine::Cdm::SessionType sessionType,
+                          NSString **sessionId);
 
-  // Loads the session for a |sessionId| and continues the |webSessionId|.
-  // The |sessionId| is unique for each run of the application and is not
-  // preserved between sessions.  The |webSessionId| is the prior |webSessionId|
-  // from OnSessionCreated.
-  // It is up to the user application to know if LoadSession can be called and
-  // what |webSessionId|s the application can continue.
-  void LoadSession(uint32_t sessionId,
-                   NSString *webSessionId);
+  // Loads the session for a |sessionId|.
+  NSError *LoadSession(NSString *sessionId);
 
-  // Remove the session for a |sessionId| and delete the records of |webSessionId|.
-  // The |sessionId| is unique for each run of the application, which is only an
-  // identification of this remove behavior. It can be different from the |sessionId|
-  // that was passed to CreateSession().
-  void RemoveSession(uint32_t sessionId,
-                     NSString *webSessionId);
+  // Remove the session for a |sessionId|.
+  NSError *RemoveSession(NSString *sessionId);
 
   // Closes the |sessionIds| from previous calls to CreateSession.
   // TODO (seawardt): Add Support for Multiple Calls to error out gracefully.
@@ -116,55 +67,41 @@ class iOSCdmHost : public cdm::Host_4 {
   // Decrypts the |encypted| blob with |key_id| and |iv|.
   NSData* Decrypt(NSData *encrypted, NSData* key_id, NSData* iv);
 
-  // Host Implementation.  See go/wvcdm for documentation.
-  virtual cdm::Buffer* Allocate(uint32_t capacity);
+  // Generates a request based on |data|.
+  NSError *GenerateRequest(NSString *sessionId, NSData *initData);
 
-  virtual void SetTimer(int64_t delay_ms, void* context);
+  virtual void setTimeout(int64_t delay_ms,
+                          widevine::Cdm::ITimer::IClient* client,
+                          void* context) override final;
 
-  virtual double GetCurrentWallTimeInSeconds();
+  virtual void cancel(widevine::Cdm::ITimer::IClient* client) override final;
 
-  virtual void OnSessionCreated(uint32_t session_id,
-                                const char* web_session_id,
-                                uint32_t web_session_id_length);
+  virtual int64_t now() override final;
 
-  virtual void OnSessionMessage(uint32_t session_id,
-                                const char* message,
-                                uint32_t message_length,
-                                const char* destination_url,
-                                uint32_t destination_url_length);
+  virtual void onMessage(const std::string& session_id,
+                         widevine::Cdm::MessageType message_type,
+                         const std::string& message) override final;
 
-  virtual void OnSessionUpdated(uint32_t session_id);
+  virtual void onKeyStatusesChange(const std::string& session_id)
+      override final;
 
-  virtual void OnSessionClosed(uint32_t session_id);
+  virtual void onRemoveComplete(const std::string& session_id) override final;
 
-  virtual void OnSessionError(uint32_t session_id,
-                              cdm::Status error_code,
-                              uint32_t system_code);
+  virtual bool read(const std::string& name, std::string* data) override final;
 
-  virtual cdm::FileIO* CreateFileIO(cdm::FileIOClient* client);
+  virtual bool write(const std::string& name, const std::string& data)
+      override final;
 
- private:
-  static iOSCdmHost s_host;
-  cdm::ContentDecryptionModule_4* cdm_;
-  id<iOSCdmHandler> iOSCdmHandler_;
-};
+  virtual bool exists(const std::string& name) override final;
 
-class iOSCdmHost_FileIO : public cdm::FileIO {
- public:
-  iOSCdmHost_FileIO(cdm::FileIOClient* client,
-                    id<iOSCdmHandler> iOSCdmHandler)
-      : client_(client), iOSCdmHandler_(iOSCdmHandler) {}
-  virtual ~iOSCdmHost_FileIO() {}
+  virtual bool remove(const std::string& name) override final;
 
-  virtual void Open(const char* file_name, uint32_t file_name_size);
-  virtual void Read();
-  virtual void Write(const uint8_t* data, uint32_t data_size);
-  virtual void Close();
+  virtual int32_t size(const std::string& name) override final;
 
  private:
-  cdm::FileIOClient* client_;
-  NSString *file_name_;
+  widevine::Cdm* cdm_;
   id<iOSCdmHandler> iOSCdmHandler_;
+  NSMutableDictionary* timers_;
 };
 
 #endif // WIDEVINE_BASE_CDM_HOST_IOS_CDMHOST_H_

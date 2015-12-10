@@ -23,6 +23,7 @@ extern NSString *const kiOSCdmError;
 // The host delegate must call to either the given |destinationUrl| or its license
 // server URL (if |destinationUrl| is nil) with the |data| in the HTTP body and call
 // |completionBlock| with the results.
+// TODO: Remove toURL argument.
 - (void)iOSCdm:(iOSCdm *)iOSCdm
            sendData:(NSData *)data
             offline:(BOOL)isOffline
@@ -32,6 +33,7 @@ extern NSString *const kiOSCdmError;
 // Called when a session is created.  The |webId| can be stored and associated
 // with the |pssh|.  Future sessions will call webSessionForPssh with the same
 // |pssh|.
+// TODO: Remove webId.
 - (void)onSessionCreatedWithPssh:(NSData *)pssh webId:(NSString *)webId;
 
 // Reads a file saved with writeData.
@@ -39,10 +41,21 @@ extern NSString *const kiOSCdmError;
 
 // Asks the application to save |data| to |fileName| to persist it for a later
 // invokation of the application.
+// TODO: Rename to writeFile and return success value.
 - (void)writeData:(NSData *)data file:(NSString *)fileName;
+
+// Asks whether the given file exists (See writeData).
+- (BOOL)fileExists:(NSString *)fileName;
+
+// Asks the size of the file saved with writeData.
+- (int32_t)fileSize:(NSString *)fileName;
+
+// Removes the file saved with writeData.
+- (BOOL)removeFile:(NSString *)fileName;
 
 // Gets the webId previously stored in onSessionCreatedWithPssh:webId:.  Should
 // return nil if no webId exists for that |pssh|.
+// TODO: Remove.
 - (NSString *)webSessionForPssh:(NSData *)pssh;
 @end
 
@@ -76,7 +89,8 @@ extern NSString *const kiOSCdmError;
 
 // iOSCdmHandler methods forwarded to the iOSCdmDelegate.
 - (NSData *)readFile:(NSString *)fileName;
-- (void)writeData:(NSData *)data file:(NSString *)fileName;
-- (void)onSessionCreated:(uint32_t)sessionId webId:(NSString *)webId;
+- (int32_t)fileSize:(NSString *)fileName;
+- (BOOL)removeFile:(NSString *)fileName;
+- (void)onSessionCreated:(NSString *)sessionId;
 
 @end

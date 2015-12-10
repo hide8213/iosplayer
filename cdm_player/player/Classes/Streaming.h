@@ -17,13 +17,17 @@ extern NSString* kStreamingReadyNotification;
 // Contains a collection of Streams that provides the HLS playlist and TS segments that is
 // used by AVPlayer to playback the video.
 @interface Streaming : NSObject
+@property(strong) NSString* address;
+@property int httpPort;
 @property(strong) NSURL* manifestURL;
 @property BOOL offline;
 @property dispatch_queue_t streamingQ;
+- (id)initWithAirplay:(BOOL)isAirplayActive;
 - (NSURL *)manifestURL;
 - (void)parseManifest:(NSData *)manifest;
 - (void)setManifestURL:(NSURL *)url;
 - (void)stop;
+- (void)restart:(BOOL)isAirplayActive;
 - (void)streamReady:(Stream*)stream;
 
 // Returns a HTTPResponse for the webserver to return data for the |method| and |path|. |connection|

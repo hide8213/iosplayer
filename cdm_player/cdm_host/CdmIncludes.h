@@ -4,7 +4,7 @@
 #ifndef IPHONE_WIDEVINE_CDM_HOST_IOS_CDMINCLUDES_H_
 #define IPHONE_WIDEVINE_CDM_HOST_IOS_CDMINCLUDES_H_
 
-# import "content_decryption_module.h"
+# import "cdm.h"
 
 #endif  // IPHONE_WIDEVINE_CDM_HOST_IOS_CDMINCLUDES_H_
 

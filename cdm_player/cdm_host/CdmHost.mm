@@ -3,42 +3,75 @@
 #include "CdmWrapper.h"
 #include "iOSDeviceCert.h"
 
-using cdm::Buffer;
-using cdm::MediaKeyError;
+using widevine::Cdm;
 
 // Default values for testing content. Can be modified dynamically or here.
-static int kNumSamples = 1;
-static int kTimeStamp = 10;
 static int kLoopTimer = 1000.0;
 
-static const char kWidevineKeySystem[] = "com.widevine.alpha";
+@interface NSString (StdStringHelpers)
++ (NSString*)stringWithStdString:(const std::string&)str;
+- (std::string)stdString;
+@end
 
-iOSCdmHost iOSCdmHost::s_host;
+@implementation NSString (StdStringHelpers)
++ (NSString*)stringWithStdString:(const std::string&)str {
+  return [[NSString alloc] initWithBytes:str.c_str()
+                                  length:str.length()
+                                encoding:NSUTF8StringEncoding];
+}
+
+- (std::string)stdString {
+  std::string ret([self UTF8String],
+      [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+  return ret;
+}
+@end
 
 namespace {
-  NSString *kCertFilename = @"cert.bin";
 
-  void* host_callback(int host_interface_version, void* user_data) {
-    if (host_interface_version == cdm::Host_4::kVersion) {
-      return iOSCdmHost::GetHost();
-    } else {
-      return NULL;
-    }
+static NSString *kCertFilename = @"cert.bin";
+
+// Creates an NSError object from the given Status
+NSError* GetErrorFromStatus(Cdm::Status status, NSString *desc) {
+  if (status == Cdm::kSuccess) {
+    return nil;
+  } else {
+    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    [details setValue:desc forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:@"cdm" code:status userInfo:details];
   }
 }
 
-void iOSCdmHost::Initialize() {
+}  // namespace
+
+iOSCdmHost::iOSCdmHost()
+: cdm_(NULL), timers_([[NSMutableDictionary alloc] init]) {}
+
+NSError* iOSCdmHost::Initialize(const Cdm::ClientInfo& clientInfo,
+    Cdm::LogLevel verbosity) {
   iOSCdmHandler_ = NULL;
-  INITIALIZE_CDM_MODULE();
-  cdm_ = reinterpret_cast<cdm::ContentDecryptionModule_4*>(
-      CreateCdmInstance(cdm::ContentDecryptionModule_4::kVersion,
-      kWidevineKeySystem,
-      static_cast<uint32_t>(strlen(kWidevineKeySystem)), host_callback, 0));
+
+  Cdm::DeviceCertificateRequest request;
+  Cdm::Status ret = Cdm::initialize(
+      Cdm::kNoSecureOutput, clientInfo, this, this, this,
+      &request, verbosity);
+  if (ret != Cdm::kSuccess) {
+    return GetErrorFromStatus(ret, @"Error initializing the CDM.");
+  }
+  if (request.needed) {
+    return GetErrorFromStatus(Cdm::kUnexpectedError,
+        @"Error initializing the CDM.");
+  }
+
+  cdm_ = Cdm::create(this, true /* privacy_mode */);
+  return nil;
 }
 
 void iOSCdmHost::Deinitialize() {
-  cdm_->Destroy();
-  DeinitializeCdmModule();
+  if (cdm_) {
+    delete cdm_;
+    cdm_ = NULL;
+  }
 }
 
 void iOSCdmHost::SetiOSCdmHandler(id<iOSCdmHandler> handler) {
@@ -47,65 +80,68 @@ void iOSCdmHost::SetiOSCdmHandler(id<iOSCdmHandler> handler) {
   iOSCdmHandler_ = handler;
 }
 
-void iOSCdmHost::CreateSession(uint32_t sessionId,
-                               NSString *mimeType,
-                               NSData* pssh,
-                               cdm::SessionType sessionType) {
-  cdm_->CreateSession(sessionId,
-                      [mimeType UTF8String],
-                      (uint32_t)[mimeType length],
-                      reinterpret_cast<const uint8_t*>([pssh bytes]),
-                      (uint32_t)[pssh length],
-                      sessionType);
+NSError *iOSCdmHost::CreateSession(Cdm::SessionType sessionType,
+                                   NSString **sessionIdStr) {
+  std::string sessionId;
+  Cdm::Status code = cdm_->createSession(sessionType, &sessionId);
+  if (code != Cdm::kSuccess) {
+    return GetErrorFromStatus(code, @"Error creating session.");
+  }
+
+  *sessionIdStr = [NSString stringWithStdString:sessionId];
+  return nil;
 }
 
-void iOSCdmHost::LoadSession(uint32_t sessionId,
-                             NSString *webSessionId) {
-  cdm_->LoadSession(sessionId, [webSessionId UTF8String],
-                    static_cast<uint32_t>([webSessionId length]));
+NSError *iOSCdmHost::LoadSession(NSString *sessionId) {
+  return GetErrorFromStatus(cdm_->load([sessionId stdString]),
+      @"Error loading session.");
 }
 
-void iOSCdmHost::RemoveSession(uint32_t sessionId,
-                               NSString *webSessionId) {
-  cdm_->RemoveSession(sessionId, [webSessionId UTF8String],
-                      static_cast<uint32_t>([webSessionId length]));
+NSError *iOSCdmHost::RemoveSession(NSString *sessionId) {
+  return GetErrorFromStatus(cdm_->remove([sessionId stdString]),
+      @"Error removing session.");
 }
 
 void iOSCdmHost::CloseSessions(NSArray *sessionIds) {
-  for (NSNumber *sessionId in sessionIds) {
-    cdm_->ReleaseSession((uint32_t)sessionId.integerValue);
+  for (NSString *sessionId in sessionIds) {
+    cdm_->close([sessionId stdString]);
   }
 }
 
 NSData* iOSCdmHost::Decrypt(NSData *encrypted, NSData *key_id, NSData *iv) {
-  cdm::InputBuffer input;
+  Cdm::InputBuffer input;
   input.data = reinterpret_cast<const uint8_t*>([encrypted bytes]);
-  input.data_size = (uint32_t)[encrypted length];
+  input.data_length = (uint32_t)[encrypted length];
   input.key_id = reinterpret_cast<const uint8_t*>([key_id bytes]);
-  input.key_id_size = (uint32_t)[key_id length];
+  input.key_id_length = (uint32_t)[key_id length];
   input.iv = reinterpret_cast<const uint8_t*>([iv bytes]);
-  input.iv_size = (uint32_t)[iv length];
-  input.data_offset = 0;
-  cdm::SubsampleEntry sub(0, static_cast<uint32_t>([encrypted length]));
-  input.subsamples = &sub;
-  input.num_subsamples = kNumSamples;
-  input.timestamp = kTimeStamp;
-  DecryptedBlock decrypted;
-  cdm_->Decrypt(input, &decrypted);
-  return [NSData dataWithBytes:decrypted.DecryptedBuffer()->Data()
-                        length:decrypted.DecryptedBuffer()->Size()];
+  input.iv_length = (uint32_t)[iv length];
+  input.block_offset = 0;
+
+  Cdm::OutputBuffer decrypted;
+  decrypted.data = (uint8_t*)malloc(sizeof(uint8_t) * input.data_length);
+  decrypted.data_length = input.data_length;
+  if (cdm_->decrypt(input, decrypted) != Cdm::kSuccess) {
+    return nil;
+  }
+  return [NSData dataWithBytesNoCopy:decrypted.data
+                              length:decrypted.data_length];
 }
 
-Buffer* iOSCdmHost::Allocate(uint32_t capacity) {
-  return new MediaBuffer(capacity);
+NSError *iOSCdmHost::GenerateRequest(NSString *sessionId, NSData *initData) {
+  std::string sessionStr = [sessionId stdString];
+  std::string strData(
+      reinterpret_cast<const char*>([initData bytes]), [initData length]);
+  return GetErrorFromStatus(
+      cdm_->generateRequest(sessionStr, Cdm::kCenc, strData),
+      @"Error generating the request.");
 }
 
-struct iOSCdmHostTimerInfo {
-  void* context_;
-  iOSCdmHost* host_;
-};
-
-void iOSCdmHost::SetTimer(int64_t delay_ms, void* context) {
+void iOSCdmHost::setTimeout(int64_t delay_ms,
+                            Cdm::ITimer::IClient* client,
+                            void* context) {
+  NSValue* clientValue = [NSValue valueWithPointer:client];
+  __weak NSMutableDictionary* weakTimers = timers_;
   CFRunLoopTimerRef timer = CFRunLoopTimerCreateWithHandler(
       NULL,
       CFAbsoluteTimeGetCurrent() + static_cast<uint32_t>(delay_ms) / kLoopTimer,
@@ -113,106 +149,120 @@ void iOSCdmHost::SetTimer(int64_t delay_ms, void* context) {
       0,
       0,
       ^(CFRunLoopTimerRef runloop_timer) {
-        cdm_->TimerExpired(context);
+        NSValue* timerValue = [NSValue valueWithPointer:runloop_timer];
+        client->onTimerExpired(context);
+        [[weakTimers objectForKey:clientValue] removeObject:timerValue];
         CFRelease(runloop_timer);
       });
   CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopCommonModes);
+
+  NSValue* timerValue = [NSValue valueWithPointer:timer];
+  NSMutableArray* array = [timers_ objectForKey:clientValue];
+  if (!array) {
+    array = [[NSMutableArray alloc] init];
+    [timers_ setObject:array forKey:clientValue];
+  }
+
+  [array addObject:timerValue];
 }
 
-double iOSCdmHost::GetCurrentWallTimeInSeconds() {
+void iOSCdmHost::cancel(Cdm::ITimer::IClient* client) {
+  NSValue* clientValue = [NSValue valueWithPointer:client];
+  NSMutableArray* array = [timers_ objectForKey:clientValue];
+  for (NSValue* value in array) {
+    CFRunLoopTimerRef timer = reinterpret_cast<CFRunLoopTimerRef>(
+        [value pointerValue]);
+    CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopCommonModes);
+  }
+  [array removeAllObjects];
+}
+
+int64_t iOSCdmHost::now() {
   return [[NSDate date] timeIntervalSince1970];
 }
 
-void iOSCdmHost::OnSessionCreated(uint32_t session_id,
-                                  const char* web_session_id,
-                                  uint32_t web_session_id_length) {
-  [iOSCdmHandler_ onSessionCreated:session_id webId:[NSString stringWithUTF8String:web_session_id]];
-}
-
-void iOSCdmHost::OnSessionMessage(
-    uint32_t session_id,
-    const char* message, uint32_t message_length,
-    const char* destination_url, uint32_t destination_url_length) {
-
-  NSString *requestURL = [[NSString alloc] initWithBytes:destination_url
-                                                  length:destination_url_length
-                                                encoding:NSUTF8StringEncoding];
-  NSData *requestData = [NSData dataWithBytes:message length:message_length];
+void iOSCdmHost::onMessage(
+    const std::string& session_id,
+    Cdm::MessageType type,
+    const std::string& message) {
+  std::string local_session_id = session_id;
+  NSString *sessionIdStr = [NSString stringWithStdString:session_id];
+  NSData *messageData = [NSData dataWithBytes:message.c_str()
+                                       length:message.length()];
 
   id block = ^(NSData *data, NSError *error) {
     if (!error) {
-      cdm_->UpdateSession(session_id,
-                          reinterpret_cast<const uint8_t*>([data bytes]),
-                          (uint32_t)data.length);
+      std::string result(reinterpret_cast<const char*>([data bytes]),
+                         [data length]);
+      cdm_->update(local_session_id, result);
+      if (type != Cdm::kIndividualizationRequest) {
+        [iOSCdmHandler_ onSessionUpdated:sessionIdStr];
+      }
     } else {
-      [iOSCdmHandler_ onSessionFailed:session_id error:error];
+      [iOSCdmHandler_ onSessionFailed:sessionIdStr error:error];
     }
   };
 
-  [iOSCdmHandler_ onSessionMessage:session_id
-                   requestWithData:requestData
-                             toURL:requestURL
+  [iOSCdmHandler_ onSessionMessage:messageData
+                         sessionId:sessionIdStr
                    completionBlock:block];
 }
 
-void iOSCdmHost::OnSessionUpdated(uint32_t session_id) {
-  [iOSCdmHandler_ onSessionUpdated:session_id];
-}
+void iOSCdmHost::onKeyStatusesChange(const std::string& session_id) {}
 
-void iOSCdmHost::OnSessionClosed(uint32_t session_id) {
-  [iOSCdmHandler_ onSessionClosed:session_id];
-}
+void iOSCdmHost::onRemoveComplete(const std::string& session_id) {}
 
-void iOSCdmHost::OnSessionError(uint32_t session_id,
-                                cdm::Status error_code,
-                                uint32_t system_code) {
-  NSDictionary *userInfo = @{@"session_id" : @(session_id),
-                             @"error_code" : @(error_code),
-                             @"system_code" : @(system_code),
-                             };
-  NSError *error = [NSError errorWithDomain:kiOSCdmError
-                                       code:error_code
-                                   userInfo:userInfo];
-  [iOSCdmHandler_ onSessionFailed:session_id error:error];
-}
-
-void iOSCdmHost_FileIO::Open(const char* file_name, uint32_t file_name_size) {
-  file_name_ = [NSString stringWithUTF8String:file_name];
-  client_->OnOpenComplete(cdm::FileIOClient::kSuccess);
-}
-
-void iOSCdmHost_FileIO::Read() {
-  if ([file_name_ isEqualToString:kCertFilename]) {
-    client_->OnReadComplete(cdm::FileIOClient::kSuccess, kDeviceCert,
-                            static_cast<uint32_t>(kDeviceCertSize));
-    return;
-  }
-  if (![iOSCdmHandler_ respondsToSelector:@selector(readFile:)]) {
-    return;
+bool iOSCdmHost::read(const std::string& name, std::string* data) {
+  NSString *nameStr = [NSString stringWithStdString:name];
+  if ([nameStr isEqualToString:kCertFilename]) {
+    data->assign(reinterpret_cast<const char*>(kDeviceCert), kDeviceCertSize);
+    return true;
   }
 
-  NSData *data = [iOSCdmHandler_ readFile:file_name_];
-  if (!data) {
-    client_->OnReadComplete(cdm::FileIOClient::kError, nullptr, 0);
-  } else {
-    client_->OnReadComplete(cdm::FileIOClient::kSuccess,
-                            reinterpret_cast<const uint8_t *>([data bytes]),
-                            static_cast<uint32_t>([data length]));
+  NSData *output = [iOSCdmHandler_ readFile:nameStr];
+  if (!output ) {
+    return false;
   }
+
+  *data = std::string(reinterpret_cast<const char*>([output bytes]),
+                      [output length]);
+  return true;
 }
 
-void iOSCdmHost_FileIO::Write(const uint8_t* data, uint32_t data_size) {
-  if (![iOSCdmHandler_ respondsToSelector:@selector(writeData:file:)]) {
-    return;
+bool iOSCdmHost::write(const std::string& name, const std::string& data) {
+  NSString *nameStr = [NSString stringWithStdString:name];
+  if ([nameStr isEqualToString:kCertFilename]) {
+    return false;
   }
-  [iOSCdmHandler_ writeData:[NSData dataWithBytes:data length:data_size] file:file_name_];
-  client_->OnWriteComplete(cdm::FileIOClient::kSuccess);
+
+  NSData *dataObj = [NSData dataWithBytes:data.c_str()
+                                   length:data.length()];
+  return [iOSCdmHandler_ writeFile:dataObj file:nameStr];
 }
 
-void iOSCdmHost_FileIO::Close() {
-  delete this;
+bool iOSCdmHost::exists(const std::string& name) {
+  NSString *nameStr = [NSString stringWithStdString:name];
+  if ([nameStr isEqualToString:kCertFilename]) {
+    return true;
+  }
+
+  return [iOSCdmHandler_ fileExists:nameStr];
 }
 
-cdm::FileIO* iOSCdmHost::CreateFileIO(cdm::FileIOClient* client) {
-  return new iOSCdmHost_FileIO(client, iOSCdmHandler_);
+bool iOSCdmHost::remove(const std::string& name) {
+  NSString *nameStr = [NSString stringWithStdString:name];
+  if ([nameStr isEqualToString:kCertFilename]) {
+    return false;
+  }
+
+  return [iOSCdmHandler_ removeFile:nameStr];
+}
+
+int32_t iOSCdmHost::size(const std::string& name) {
+  NSString *nameStr = [NSString stringWithStdString:name];
+  if ([nameStr isEqualToString:kCertFilename]) {
+    return static_cast<int32_t>(kDeviceCertSize);
+  }
+
+  return [iOSCdmHandler_ fileSize:nameStr];
 }
