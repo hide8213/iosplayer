@@ -2,7 +2,7 @@ v3.0.3 (2015 December)
  - Clean up project layout
  - Upgrade CDM to v3 (See CDM docs for details)
  - Updated HOST files to handle CDM v3 API changes
- - UDT Fixes: Multiple MOOF per segement, Mutiple PSSHs
+ - UDT Fixes: Multiple MOOF per segment, Multiple PSSHs
  - Airplay Support
 
 v2.0.3 (2015 November)
