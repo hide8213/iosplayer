@@ -333,10 +333,10 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
   }
   const uint8_t *hlsSegment;
   size_t hlsSize;
-  DashToHlsStatus status = DashToHls_ConvertDashSegment(stream.session, segment,
-                                                        (const uint8_t *)[response_data bytes],
-                                                        [response_data length],
-                                                        &hlsSegment, &hlsSize);
+  DashToHlsStatus status = DashToHls_ConvertDashSegmentData(stream.session, segment,
+                                                           (const uint8_t *)[response_data bytes],
+                                                           [response_data length],
+                                                           &hlsSegment, &hlsSize);
   if (kDashToHlsStatus_OK == status) {
     NSData  *response_data = [NSData dataWithBytes:hlsSegment length:hlsSize];
     DashToHls_ReleaseHlsSegment(stream.session, segment);
