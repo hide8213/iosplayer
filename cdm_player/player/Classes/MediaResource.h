@@ -19,8 +19,7 @@
 
 - (instancetype)initWithName:(NSString *)name
                    thumbnail:(NSString *)thumbnail
-                         url:(NSURL *)url
-                     offline:(BOOL)offline;
+                         url:(NSURL *)url;
 
 - (BOOL)isDownloaded;
 

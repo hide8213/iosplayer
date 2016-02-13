@@ -5,8 +5,12 @@
 @optional
 - (void)updateDownloadProgress:(NSNumber *)progress file:(NSURL *)file;
 - (void)startDownloading:(Downloader *)downloader file:(NSURL *)file;
-- (void)finishedDownloading:(Downloader *)downloader file:(NSURL *)file initRange:(NSRange)range;
-- (void)failedDownloading:(Downloader *)downloader file:(NSURL *)file error:(NSError *)error;
+- (void)finishedDownloading:(Downloader *)downloader
+                       file:(NSURL *)file
+               initialRange:(NSDictionary *)initialRange;
+- (void)failedDownloading:(Downloader *)downloader
+                     file:(NSURL *)file
+                    error:(NSError *)error;
 @end
 
 @interface Downloader : NSObject<NSURLConnectionDataDelegate>
@@ -15,14 +19,16 @@
 
 + (instancetype)DownloaderWithUrl:(NSURL *)url
                              file:(NSURL *)file
-                        initRange:(NSRange)initRange
+                     initialRange:(NSDictionary *)initialRange
                          delegate:(id<DownloadDelegate>)delegate;
 + (void)DownloadWithUrl:(NSURL *)url
                    file:(NSURL *)file
-              initRange:(NSRange)initRange
+           initialRange:(NSDictionary *)initialRange
                delegate:(id<DownloadDelegate>)delegate;
 
 + (NSData *)downloadPartialData:(NSURL *)url
-                      range:(NSRange)range
-                 completion:(void(^)(NSData *data, NSError *error))completion;
+                   initialRange:(NSDictionary *)initialRange
+                     completion:(void(^)(NSData *data,
+                                         NSURLResponse *response,
+                                         NSError *error))completion;
 @end

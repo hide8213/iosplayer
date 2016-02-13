@@ -37,6 +37,7 @@ static DetailViewController *sDetailViewController;
 @end
 
 @interface DetailViewController (Player)
+- (void)assetFailedToPrepareForPlayback:(NSError *)error;
 - (BOOL)isPlaying;
 - (void)observeValueForKeyPath:(NSString *)path ofObject:(id)object
                         change:(NSDictionary *)change context:(void *)context;
@@ -79,7 +80,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
     _mediaUrl = mediaResource.url;
   }
   if ([_mediaUrl.pathExtension isEqualToString:@"mpd"]) {
-    _streaming.manifestURL = _mediaUrl;
+    [_streaming processMpd:_mediaUrl];
   }
 }
 

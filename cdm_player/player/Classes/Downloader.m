@@ -1,13 +1,14 @@
 #import "Downloader.h"
 
 #import "AppDelegate.h"
-#import "Mpd.h"
+#import "MpdParser.h"
+#import "Streaming.h"
 
 static NSMutableArray *sDownloaders;
 
 @interface Downloader()
 @property(nonatomic, strong) NSURLConnection *connection;
-@property(nonatomic) NSRange initRange;
+@property(nonatomic) NSDictionary *initialRange;
 @property(nonatomic, strong) NSURL *file;
 @property(nonatomic, strong) NSFileHandle *fileHandle;
 @property(nonatomic) BOOL isMpd;
@@ -21,13 +22,13 @@ static NSMutableArray *sDownloaders;
 
 + (instancetype)DownloaderWithUrl:(NSURL *)url
                              file:(NSURL *)file
-                        initRange:(NSRange)initRange
+                     initialRange:(NSDictionary *)initialRange
                          delegate:(id<DownloadDelegate>)delegate{
   Downloader *downloader = [[Downloader alloc] init];
   if (downloader) {
     downloader.delegate = delegate;
     downloader.url = url;
-    downloader.initRange = initRange;
+    downloader.initialRange = initialRange;
     downloader.file = file;
     NSString *fileString = [NSString stringWithUTF8String:file.fileSystemRepresentation];
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -55,17 +56,19 @@ static NSMutableArray *sDownloaders;
 
 + (void)DownloadWithUrl:(NSURL *)url
                    file:(NSURL *)file
-              initRange:(NSRange)initRange
+           initialRange:(NSDictionary *)initialRange
               delegate:(id<DownloadDelegate>)delegate {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     sDownloaders = [NSMutableArray array];
   });
-
+  if (!initialRange) {
+    initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:@"0", @"startRange", @"0", @"length", nil];
+  }
   @synchronized(sDownloaders) {
     [sDownloaders addObject:[Downloader DownloaderWithUrl:url
                                                      file:file
-                                                initRange:initRange
+                                             initialRange:initialRange
                                                  delegate:delegate]];
   }
 }
@@ -94,12 +97,12 @@ static NSMutableArray *sDownloaders;
 }
 
 - (void)downloadUrlArray:(NSArray *)urlArray {
-  for (MpdResult *mpdResult in urlArray) {
+  for (Stream *stream in urlArray) {
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:mpdResult.url.lastPathComponent];
-    [Downloader DownloadWithUrl:mpdResult.url
+        urlInDocumentDirectoryForFile:stream.url.lastPathComponent];
+    [Downloader DownloadWithUrl:stream.url
                            file:fileUrl
-                      initRange:mpdResult.initRange
+                   initialRange:stream.initialRange
                        delegate:_delegate];
   }
 }
@@ -107,11 +110,13 @@ static NSMutableArray *sDownloaders;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   [_fileHandle closeFile];
   if (_isMpd) {
-    NSData *mpd = [NSData dataWithContentsOfURL:_file];
-    [self downloadUrlArray:[Mpd parseMpd:mpd baseUrl:_url]];
+    NSData *mpdData = [NSData dataWithContentsOfURL:_file];
+    [self downloadUrlArray:[MpdParser parseMpdWithStreaming:nil
+                                                    mpdData:mpdData
+                                                    baseUrl:_url]];
   }
-  if ([_delegate respondsToSelector:@selector(finishedDownloading:file:initRange:)]) {
-    [_delegate finishedDownloading:self file:_file initRange:_initRange];
+  if ([_delegate respondsToSelector:@selector(finishedDownloading:file:initialRange:)]) {
+    [_delegate finishedDownloading:self file:_file initialRange:_initialRange];
   }
   @synchronized(sDownloaders) {
     [sDownloaders removeObject:self];
@@ -120,21 +125,27 @@ static NSMutableArray *sDownloaders;
 
 // completion can be nil and it will run sync.
 + (NSData *)downloadPartialData:(NSURL *)url
-                          range:(NSRange)range
-                     completion:(void(^)(NSData *data, NSError *error))completion {
+                   initialRange:(NSDictionary *)initialRange
+                     completion:(void(^)(NSData *data,
+                                         NSURLResponse *response,
+                                         NSError *error))completion {
   NSError *error = nil;
+  NSURLResponse *response = nil;
+  int startRange = [[initialRange objectForKey:@"startRange"] intValue];
+  int length = [[initialRange objectForKey:@"length"] intValue];
+
   if ([url isFileURL]) {
     NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:url error:&error];
     if (error) {
       if (completion) {
-        completion(nil, error);
+        completion(nil, response, error);
       }
       return nil;
     }
-    [fileHandle seekToFileOffset:range.location];
-    NSData *data = [fileHandle readDataOfLength:range.length];
+        [fileHandle seekToFileOffset:startRange];
+    NSData *data = [fileHandle readDataOfLength:length];
     if (completion) {
-      completion(data, nil);
+      completion(data, response, nil);
     }
     return data;
   } else {
@@ -142,9 +153,9 @@ static NSMutableArray *sDownloaders;
                                     requestWithURL:url
                                     cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                                     timeoutInterval:5];
-    NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%lu-%lu",
-                                 (unsigned long)range.location,
-                                 (unsigned long)(range.location + range.length)];
+    NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%d-%d",
+                                 startRange,
+                                 startRange + length];
     [request setValue:byteRangeString forHTTPHeaderField:@"Range"];
     if (completion) {
       [NSURLConnection sendAsynchronousRequest:request
@@ -152,7 +163,7 @@ static NSMutableArray *sDownloaders;
                              completionHandler:^(NSURLResponse *response,
                                                  NSData *data,
                                                  NSError *connectionError) {
-                               completion(data, connectionError);
+                               completion(data, response, connectionError);
                              }];
       return nil;
     }

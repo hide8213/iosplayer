@@ -1,4 +1,4 @@
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2015 Google Inc. All rights reserved.
 
 #import "Streaming.h"
 
@@ -15,20 +15,14 @@
 #import "HTTPResponse.h"
 #import "LicenseManager.h"
 #import "LocalWebServer.h"
-#import "Mpd.h"
+#import "MpdParser.h"
 #import "Stream.h"
-#import "TBXML.h"
 
 NSString *kStreamingReadyNotification = @"StreamingReadyNotificaiton";
 
 @implementation Streaming {
   LocalWebServer *_localWebServer;
-  NSUInteger _preloadCount;  // _streams is the mutex.
-  NSMutableArray *_streams;
-  NSString *_variantPlaylist;
 }
-
-@synthesize manifestURL = _manifestURL;
 
 static int kHttpPort = 8080;
 static float k90KRatio = 90000.0;
@@ -38,11 +32,17 @@ static NSString *const kLocalHost = @"localhost";
 static NSString *kAudioPlaylistFormat =
     @"#EXT-X-MEDIA:URI=\"%d.m3u8\",TYPE=AUDIO,GROUP-ID=\"audio\",NAME=\"audio%d\","
     @"DEFAULT=%@,AUTOSELECT=YES\n";
-
 static NSString *kAudioSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 
-static NSString *kPlaylist = @"#EXTM3U\n#EXT-X-VERSION:3\n%@"
-    @"#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:%lld\n%@#EXT-X-ENDLIST";
+static NSString *const kPlaylistVOD =
+    @"#EXTM3U\n"
+    @"#EXT-X-VERSION:3\n"
+    @"#EXT-X-MEDIA-SEQUENCE:%d\n"
+    @"#EXT-X-TARGETDURATION:%llu\n";
+
+static NSString *const kPlaylistVODEnd = @"#EXT-X-ENDLIST";
+
+static NSString *kVariantPlaylist = @"#EXTM3U\n#EXT-X-VERSION:3\n";
 
 static NSString *kVideoPlaylistFormat =
     @"#EXT-X-STREAM-INF:BANDWIDTH=%lu,CODECS=\"%@\",RESOLUTION=%.0lux%.0lu,AUDIO=\"audio\""
@@ -50,6 +50,7 @@ static NSString *kVideoPlaylistFormat =
 
 static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 
+// Create streaming object with local IP address if Airplay is off or network IP if on.
 - (id)initWithAirplay:(BOOL)isAirplayActive {
   self = [super init];
   if (self) {
@@ -61,14 +62,13 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
     NSError *error = nil;
     _httpPort = kHttpPort;
     [_localWebServer start:&error];
-
     _streamingQ = dispatch_queue_create("Streaming", NULL);
     _streams = [NSMutableArray array];
-    _variantPlaylist = @"#EXTM3U\n#EXT-X-VERSION:3\n";
   }
   return self;
 }
 
+// Recreates the streaming object with a different IP address.
 - (void)restart:(BOOL)isAirplayActive {
   if (isAirplayActive) {
     _address = [self getIPAddress];
@@ -80,29 +80,12 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
   [_localWebServer start:&error];
 }
 
+// Stops the local web server.
 - (void)stop {
   [_localWebServer stop];
 }
 
-- (NSURL*)manifestURL {
-  return _manifestURL;
-}
-
-- (void)setManifestURL:(NSURL *)url {
-  _manifestURL = url;
-  dispatch_async(_streamingQ, ^{
-    NSError *error = nil;
-    NSData *data = [NSData dataWithContentsOfURL:_manifestURL
-                                         options:NSDataReadingUncached
-                                           error:&error];
-    if (error) {
-      NSLog(@"Error reading %@ %@", _manifestURL, error);
-    } else {
-      [self parseManifest:data];
-    }
-  });
-}
-
+// Finds external facing IP address to use for Airplay streaming.
 - (NSString *)getIPAddress {
   NSString *address;
   struct ifaddrs *interfaces = NULL;
@@ -130,67 +113,98 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
   return address;
 }
 
+// Downloads MPD and creates HLS Playlists.
+- (void)processMpd:(NSURL *)mpdUrl {
+  NSLog(@"\n::INFO::Processing: %@", mpdUrl);
+  dispatch_async(_streamingQ, ^{
+    NSError *error = nil;
+    NSData *mpdData = [NSData dataWithContentsOfURL:mpdUrl
+                                         options:NSDataReadingUncached
+                                           error:&error];
+    if (error) {
+      NSLog(@"Error reading %@ %@", mpdUrl, error);
+    } else {
+      _streams = [[MpdParser alloc] initWithStreaming:self mpdData:mpdData baseUrl:mpdUrl].streams;
+      _preloadCount = _streams.count;
+      _variantPlaylist = [self buildVariantPlaylist:_streams];
+      [_streams enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        [self loadStream:obj];
+      }];
+    }
+  });
+}
+
+// Sends global notification that the streams are ready to start playback.
 - (void)startVideoPlayer {
   [[NSNotificationCenter defaultCenter] postNotificationName:kStreamingReadyNotification
                                                       object:self];
 }
 
-- (void)buildVariantPlaylist {
+// Create Variant playlist that contains all video and audio streams.
+- (NSString *)buildVariantPlaylist:(NSArray *)parsedMpd {
   Stream *stream = nil;
+  NSString *playlist = kVariantPlaylist;
   NSString *defaultAudioString = @"YES";
-  for (stream in _streams) {
+  for (stream in parsedMpd) {
     if (stream.isVideo) {
-      _variantPlaylist = [_variantPlaylist
-                          stringByAppendingString:[NSString stringWithFormat:kVideoPlaylistFormat,
-                                                   stream.bandwidth, stream.codec,
-                                                   stream.width, stream.height,
-                                                   stream.index]];
+      playlist = [playlist stringByAppendingString:[NSString stringWithFormat:kVideoPlaylistFormat,
+                                                    stream.bandwidth, stream.codecs, stream.width,
+                                                    stream.height, stream.indexValue]];
     } else {
-      _variantPlaylist = [_variantPlaylist
-                          stringByAppendingString:[NSString stringWithFormat:kAudioPlaylistFormat,
-                                                   stream.index, stream.index,
-                                                   defaultAudioString]];
+      playlist = [playlist stringByAppendingString:[NSString stringWithFormat:kAudioPlaylistFormat,
+                                                    stream.indexValue, stream.indexValue,
+                                                    defaultAudioString]];
       defaultAudioString = @"NO";
     }
   }
+  return playlist;
 }
 
-- (void)buildChildPlaylist:(Stream *)stream {
+// Creates the TS playlist with segments and durations.
+- (NSData *)buildChildPlaylist:(Stream *)stream {
   NSMutableString *segments = [NSMutableString string];
-  DashToHlsIndex *index = stream.dashIndex;
-  uint64_t max_duration = 0;
-  uint64_t timescale = (index->index_count > 0) ? index->segments[0].timescale:90000;
-  for (uint64_t count = 0; count < index->index_count; ++count) {
-    if (index->segments[count].duration > max_duration) {
-      max_duration = index->segments[count].duration;
+  DashToHlsIndex *dashIndex = stream.dashIndex;
+  uint64_t maxDuration = 0;
+  uint64_t timescale = (dashIndex->index_count > 0) ? dashIndex->segments[0].timescale:90000;
+  for (uint64_t count = 0; count < dashIndex->index_count; ++count) {
+    if (dashIndex->segments[count].duration > maxDuration) {
+      maxDuration = dashIndex->segments[count].duration;
     }
-    [segments appendFormat:stream.isVideo ? kVideoSegmentFormat:kAudioSegmentFormat,
-      ((float)index->segments[count].duration / (float)timescale),
-     stream.index, count, NULL];
   }
-  stream.m3u8 = [[NSString stringWithFormat:kPlaylist, GetKeyUrl(stream.session),
-                  (max_duration/timescale) + 1, segments]
-                     dataUsingEncoding:NSUTF8StringEncoding];
+  NSMutableString *playlist = [NSMutableString stringWithFormat:kPlaylistVOD,
+                               0, (maxDuration/timescale) + 1];
+  [playlist appendString:GetKeyUrl(stream.session)];
+
+  for (uint64_t count = 0; count < dashIndex->index_count; ++count) {
+    [playlist appendFormat:stream.isVideo ? kVideoSegmentFormat:kAudioSegmentFormat,
+     ((float)dashIndex->segments[count].duration / (float)timescale),
+     stream.indexValue, count, NULL];
+  }
+  [playlist appendString:kPlaylistVODEnd];
+  return [playlist dataUsingEncoding:NSUTF8StringEncoding];
 }
 
-
+// Downloads requested byte range for the stream.
 // Called on _streamingQ.
 - (void)loadStream:(Stream *)stream {
   [Downloader downloadPartialData:stream.url
-                            range:stream.initializationRange
-                       completion:^(NSData *data, NSError *connectionError) {
-               dispatch_async(_streamingQ, ^() {
-                 if (!data) {
-                   NSLog(@"Did not download %@", connectionError);
-                 }
-                 if (![stream initialize:data]) {
-                   return;
-                 }
-                 [self buildChildPlaylist:stream];
-               });
-             }];
+                     initialRange:stream.initialRange
+                       completion:^(NSData *data,
+                                    NSURLResponse *response,
+                                    NSError *connectionError) {
+                         dispatch_async(_streamingQ, ^() {
+                           if (!data) {
+                             NSLog(@"Did not download %@", connectionError);
+                           }
+                           if (![stream initialize:data]) {
+                             return;
+                           }
+                           stream.m3u8 = [self buildChildPlaylist:stream];
+                         });
+  }];
 }
 
+// Validates that all streams are complete and playback is ready.
 - (void)streamReady:(Stream*)stream {
   stream.done = YES;
   --_preloadCount;
@@ -205,138 +219,32 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
   }
 }
 
-- (void)parseManifest:(NSData *)manifest {
-  NSError *error;
-  int stream_count = 0;
-  NSString *rootUrl = nil;
-
-  NSURLComponents *urlComponents = [[NSURLComponents alloc] initWithURL:_manifestURL
-                                                resolvingAgainstBaseURL:NO];
-  urlComponents.query = nil;
-  urlComponents.fragment = nil;
-  _manifestURL = urlComponents.URL;
-  NSString *url_prefix = [[_manifestURL URLByDeletingLastPathComponent] absoluteString];
-
-  TBXML *manifest_xml = [TBXML tbxmlWithXMLData:manifest error:&error];
-  if (error) {
-    NSLog(@"Error: %@\n", error);
-    EXIT_FAILURE;
-  }
-
-  // Create TBXML Elements and walk the DOM to find the necessary values
-  TBXMLElement *mpdXML = manifest_xml.rootXMLElement;
-  TBXMLElement *periodXML = [TBXML childElementNamed:kDashPeriod
-                                       parentElement:mpdXML
-                                               error:&error];
-  TBXMLElement *rootUrlXML = [TBXML childElementNamed:kDashRepresentationBaseUrl
-                                        parentElement:periodXML
-                                                error:&error];
-  // Handles segments being stored on separate server than MPD
-  if (rootUrlXML) {
-    rootUrl = [TBXML textForElement:rootUrlXML error:&error];
-    // The root URL can start with // as opposed to a scheme, appends http(s)
-    if ([rootUrl rangeOfString:@"http"].location == NSNotFound) {
-      rootUrl = [_manifestURL.scheme stringByAppendingFormat:@":%@", rootUrl];
-    }
-  }
-
-  TBXMLElement *adaptationXML = [TBXML childElementNamed:kDashAdaptationSet
-                                           parentElement:periodXML
-                                                   error:&error];
-  do {
-    // Extract Segment specific details: URL, Bandwidth, byte ranges, etc...
-    TBXMLElement *representationXML = [TBXML childElementNamed:kDashRepresentation
-                                                 parentElement:adaptationXML
-                                                         error:&error];
-    do {
-      Stream *stream = [[Stream alloc] initWithStreaming:self];
-      stream.isVideo = NO;
-      stream.bandwidth = [[TBXML valueOfAttributeNamed:kDashRepresentationBW
-                                            forElement:representationXML
-                                                 error:&error]
-                          integerValue];
-      stream.codec = [TBXML valueOfAttributeNamed:kDashRepresentationCodec
-                                       forElement:representationXML
-                                            error:&error];
-      stream.mimeType = [TBXML valueOfAttributeNamed:kDashRepresentationMime
-                                          forElement:representationXML
-                                               error:&error];
-      if ([stream.mimeType isEqual: @""]) {
-        stream.mimeType = [TBXML valueOfAttributeNamed:kDashRepresentationMime
-                                            forElement:adaptationXML
-                                                 error:&error];
-      }
-      TBXMLElement *baseUrlXML = [TBXML childElementNamed:kDashRepresentationBaseUrl
-                                            parentElement:representationXML
-                                                    error:&error];
-      NSString *baseUrl = [TBXML textForElement:baseUrlXML error:&error];
-      TBXMLElement *segmentBaseXML = [TBXML childElementNamed:kDashSegmentBase
-                                                parentElement:representationXML
-                                                        error:&error];
-      NSString *url_string = [baseUrl stringByReplacingOccurrencesOfString:@"&amp;"
-                                                                withString:@"&"];
-      // Handle relative file name paths by appending Manifest URL
-      if (rootUrl) {
-        url_string = [rootUrl stringByAppendingString:url_string];
-      } else if (![url_string hasPrefix:@"http://"] && ![url_string hasPrefix:@"https://"]) {
-        url_string = [url_prefix stringByAppendingString:url_string];
-      }
-      stream.url = [NSURL URLWithString:url_string];
-      if (_offline) {
-        stream.url = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                      urlInDocumentDirectoryForFile:stream.url.lastPathComponent];
-      }
-      // Set values into stream object to prep for m3u8 creation
-      if ([stream.mimeType rangeOfString:@"video"].location != NSNotFound) {
-        stream.isVideo = YES;
-        stream.height = [[TBXML valueOfAttributeNamed:kDashRepresentationHeight
-                                           forElement:representationXML
-                                                error:&error]
-                         integerValue];
-        stream.width = [[TBXML valueOfAttributeNamed:kDashRepresentationWidth
-                                          forElement:representationXML
-                                               error:&error]
-                        integerValue];
-      }
-      stream.done = NO;
-      stream.initializationRange = [Mpd getInitRangeFromElement:segmentBaseXML];
-      stream.index = _streams.count;
-      stream_count++;
-      [_streams addObject:stream];
-      // END Representation Loop
-    } while ((representationXML = representationXML->nextSibling));
-    // END AdaptionSet Loop
-  } while ((adaptationXML = adaptationXML->nextSibling));
-  _preloadCount = stream_count;
-  [self buildVariantPlaylist];
-  [_streams enumerateObjectsUsingBlock:^(id obj,
-                                         NSUInteger idx,
-                                         BOOL *stop) {
-    [self loadStream:obj];
-  }];
-}
-
+// Creates TS segments based on downloading a specific byte range.
 - (NSData *)tsDataForIndex:(int)index segment:(int)segment {
   Stream *stream = _streams[index];
   NSMutableURLRequest *request =
       [NSMutableURLRequest requestWithURL:stream.url
                               cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                           timeoutInterval:5];
-
-  NSRange range = NSMakeRange(stream.dashIndex->segments[segment].location,
-                              stream.dashIndex->segments[segment].length);
-  NSData *response_data = [Downloader downloadPartialData:stream.url range:range completion:nil];
-
+  NSNumber *startRange =
+      [NSNumber numberWithUnsignedLongLong:stream.dashIndex->segments[segment].location];
+  NSNumber *length =
+      [NSNumber numberWithUnsignedLongLong:stream.dashIndex->segments[segment].length];
+  NSDictionary *initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:startRange,
+                                @"startRange", length, @"length", nil];
+  NSData *response_data = [Downloader downloadPartialData:stream.url
+                                             initialRange:initialRange
+                                               completion:nil];
   if (!response_data) {
     NSLog(@"Could not initialize session url=%@", stream.url);
     return nil;
   }
   const uint8_t *hlsSegment;
   size_t hlsSize;
-  DashToHlsStatus status = DashToHls_ConvertDashSegmentData(stream.session, segment,
-                                                           (const uint8_t *)[response_data bytes],
-                                                           [response_data length],
-                                                           &hlsSegment, &hlsSize);
+  DashToHlsStatus status = UDT_ConvertDash(stream.session, segment,
+                                           (const uint8_t *)[response_data bytes],
+                                           [response_data length],
+                                           &hlsSegment, &hlsSize);
   if (kDashToHlsStatus_OK == status) {
     NSData  *response_data = [NSData dataWithBytes:hlsSegment length:hlsSize];
     DashToHls_ReleaseHlsSegment(stream.session, segment);
@@ -345,16 +253,18 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
   return nil;
 }
 
+// Intercept HTTP response for M3U8 and TS files and respond with created data.
 - (NSObject<HTTPResponse> *)responseForMethod:(NSString *)method
                                          path:(NSString *)path
                                    connection:(HTTPConnection *)connection {
-  NSLog(@"response %@", path);
   NSData *response_data = nil;
   // Check for incoming filename and return appropriate data.
   if ([path.lastPathComponent isEqualToString:kLocalPlaylist]) {
+    NSLog(@"\n::INFO::Requesting: %@", path);
     // kDashPlaylist is pre-assigned name in ViewController to ensure variant playlist creation.
     response_data = [_variantPlaylist dataUsingEncoding:NSUTF8StringEncoding];
   } else if ([path.pathExtension isEqualToString:@"m3u8"]) {
+    NSLog(@"\n::INFO::Requesting: %@", path);
     // Catches children playlist requests and provides the appropriate data in place of m3u8.
     NSScanner *scanner = [NSScanner scannerWithString:path];
     int index = 0;
@@ -383,4 +293,3 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 }
 
 @end
-

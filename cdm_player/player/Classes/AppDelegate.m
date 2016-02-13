@@ -2,7 +2,6 @@
 
 #import "AppDelegate.h"
 
-#import "DashToHlsApiAVFramework.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 #import "LicenseManager.h"
@@ -38,7 +37,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
   [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:NO];
   [LicenseManager startup];
-  DashToHls_InitializeEncryption();
   return YES;
 }
 

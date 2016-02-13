@@ -2,8 +2,3 @@ CocoaHTTPServer - v2.3 (6740652)
   Local HTTP Server.
   BSD License.
   https://github.com/robbiehanson/CocoaHTTPServer
-
-TBXML - v1.5 (47ab60d)
-  XML Parser for DASH Manifests (MPD).
-  MIT License.
-  https://github.com/71squared/TBXML

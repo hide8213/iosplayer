@@ -13,6 +13,7 @@
 		782D3BE5BA64D9FC83728775 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
 		8FA1C729D572390720479B7E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
 		A49F4DB3F710C45C29E75732 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
+		E319C0541C6EA9CE001DDC88 /* MpdParser.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C0531C6EA9CE001DDC88 /* MpdParser.m */; };
 		E353B9C21C21DFF400233332 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */; };
 		E36F58D81AFC6DC100DEEE20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
 		E38C2B751B703FBB008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E38C2B731B703FAE008700FB /* oemcrypto_tfit2-eit_dev_dylib.framework */; };
@@ -35,14 +36,12 @@
 		E3C9DC161BE94D6D00593C6F /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 688EE9F49558E65235EEC34E /* MasterViewController.m */; };
 		E3C9DC171BE94D6D00593C6F /* MediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D431BD58DD90018A2E4 /* MediaCell.m */; };
 		E3C9DC181BE94D6D00593C6F /* MediaResource.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D451BD58DD90018A2E4 /* MediaResource.m */; };
-		E3C9DC191BE94D6D00593C6F /* Mpd.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */; };
 		E3C9DC1A1BE94D6D00593C6F /* PlaybackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C99ABA0498D603BF32587C9 /* PlaybackView.m */; };
 		E3C9DC1B1BE94D6D00593C6F /* PlayerControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */; };
 		E3C9DC1C1BE94D6D00593C6F /* PlayerScrubberView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */; };
 		E3C9DC1D1BE94D6D00593C6F /* Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AD38975B118A3FAC18FAD2 /* Stream.m */; };
 		E3C9DC1E1BE94D6D00593C6F /* Streaming.mm in Sources */ = {isa = PBXBuildFile; fileRef = FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */; };
 		E3C9DC1F1BE94D6D00593C6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EA175CCA2CEE5F83A658681 /* main.m */; };
-		E3C9DC401BE95D3400593C6F /* libTBXML-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */; };
 		E3C9DC4A1BE95ED700593C6F /* ico_download_after.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */; };
 		E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
 		E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
@@ -65,20 +64,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 9BB11FE1284BB55356E02F47;
 			remoteInfo = CocoaHTTPServer;
-		};
-		E3C9DC3B1BE95D1B00593C6F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 829FA09C14D5B52A00D18697;
-			remoteInfo = TBXML;
-		};
-		E3C9DC3D1BE95D1B00593C6F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8290352514D9F5B200ACF7E4;
-			remoteInfo = "TBXML-iOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -124,6 +109,8 @@
 		CEC6EFA8FBF6FD21F52904AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		CF23949319E471FB0F7FED76 /* LocalWebServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalWebServer.h; sourceTree = "<group>"; };
 		DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		E319C0531C6EA9CE001DDC88 /* MpdParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MpdParser.m; sourceTree = "<group>"; };
+		E319C0551C6EA9E3001DDC88 /* MpdParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MpdParser.h; sourceTree = "<group>"; };
 		E367BDCF1AF2C37200BF7D6C /* CdmHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHandler.h; sourceTree = "<group>"; };
 		E367BDD01AF2C37200BF7D6C /* CdmHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHost.h; sourceTree = "<group>"; };
 		E367BDD11AF2C37200BF7D6C /* CdmHost.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CdmHost.mm; sourceTree = "<group>"; };
@@ -137,8 +124,6 @@
 		E3A59D3B1BD58DAA0018A2E4 /* PlayerScrubberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerScrubberView.h; sourceTree = "<group>"; };
 		E3A59D3C1BD58DAA0018A2E4 /* Downloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Downloader.h; sourceTree = "<group>"; };
 		E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Downloader.m; sourceTree = "<group>"; };
-		E3A59D3E1BD58DAA0018A2E4 /* Mpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mpd.h; sourceTree = "<group>"; };
-		E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mpd.m; sourceTree = "<group>"; };
 		E3A59D421BD58DD90018A2E4 /* MediaCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaCell.h; sourceTree = "<group>"; };
 		E3A59D431BD58DD90018A2E4 /* MediaCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaCell.m; sourceTree = "<group>"; };
 		E3A59D441BD58DD90018A2E4 /* MediaResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaResource.h; sourceTree = "<group>"; };
@@ -155,7 +140,6 @@
 		E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaAsyncSocket_ios.xcodeproj; sourceTree = "<group>"; };
 		E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaHTTPServer_ios.xcodeproj; sourceTree = "<group>"; };
-		E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "TBXML-WV.xcodeproj"; sourceTree = "<group>"; };
 		E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		F86EA198D6632F06B8ECE658 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Streaming.mm; sourceTree = "<group>"; };
@@ -167,7 +151,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E3F1DF961C1A3DFA008CDE56 /* MediaPlayer.framework in Frameworks */,
-				E3C9DC401BE95D3400593C6F /* libTBXML-iOS.a in Frameworks */,
 				E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */,
 				E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */,
 				310871D975AC584DE2576C48 /* AVFoundation.framework in Frameworks */,
@@ -207,8 +190,8 @@
 				E3A59D431BD58DD90018A2E4 /* MediaCell.m */,
 				E3A59D441BD58DD90018A2E4 /* MediaResource.h */,
 				E3A59D451BD58DD90018A2E4 /* MediaResource.m */,
-				E3A59D3E1BD58DAA0018A2E4 /* Mpd.h */,
-				E3A59D3F1BD58DAA0018A2E4 /* Mpd.m */,
+				E319C0551C6EA9E3001DDC88 /* MpdParser.h */,
+				E319C0531C6EA9CE001DDC88 /* MpdParser.m */,
 				9D83446E14317C30391A4A86 /* PlaybackView.h */,
 				3C99ABA0498D603BF32587C9 /* PlaybackView.m */,
 				E3A59D3A1BD58DAA0018A2E4 /* PlayerControlsView.h */,
@@ -272,7 +255,6 @@
 			isa = PBXGroup;
 			children = (
 				E3C9DA541BE94D1800593C6F /* CocoaHTTPServer-2.3 */,
-				E3C9DA1A1BE94CC200593C6F /* TBXML-1.5 */,
 			);
 			name = Projects;
 			path = cdm_player/third_party;
@@ -313,14 +295,6 @@
 			path = cdm_player/cdm;
 			sourceTree = "<group>";
 		};
-		E3C9DA1A1BE94CC200593C6F /* TBXML-1.5 */ = {
-			isa = PBXGroup;
-			children = (
-				E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */,
-			);
-			path = "TBXML-1.5";
-			sourceTree = "<group>";
-		};
 		E3C9DA541BE94D1800593C6F /* CocoaHTTPServer-2.3 */ = {
 			isa = PBXGroup;
 			children = (
@@ -346,20 +320,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E3C9DC371BE95D1B00593C6F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E3C9DC3C1BE95D1B00593C6F /* libTBXML.a */,
-				E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FBB0EF706389D1AF4E5FED57 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */,
 				E3C9DA001BE94B8000593C6F /* CDM */,
+				E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */,
 				E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */,
 				A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */,
 				DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */,
@@ -422,10 +387,6 @@
 					ProductGroup = E3C9DA5B1BE94D1800593C6F /* Products */;
 					ProjectRef = E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */;
 				},
-				{
-					ProductGroup = E3C9DC371BE95D1B00593C6F /* Products */;
-					ProjectRef = E3C9DC361BE95D1B00593C6F /* TBXML-WV.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -447,20 +408,6 @@
 			fileType = archive.ar;
 			path = libCocoaHTTPServer.a;
 			remoteRef = E3C9DBE81BE94D1B00593C6F /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E3C9DC3C1BE95D1B00593C6F /* libTBXML.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libTBXML.a;
-			remoteRef = E3C9DC3B1BE95D1B00593C6F /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E3C9DC3E1BE95D1B00593C6F /* libTBXML-iOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libTBXML-iOS.a";
-			remoteRef = E3C9DC3D1BE95D1B00593C6F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -488,6 +435,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E319C0541C6EA9CE001DDC88 /* MpdParser.m in Sources */,
 				E3C9DC0E1BE94D6C00593C6F /* CdmHost.mm in Sources */,
 				E3C9DC0F1BE94D6C00593C6F /* CdmWrapper.mm in Sources */,
 				E3C9DC101BE94D6C00593C6F /* AppDelegate.m in Sources */,
@@ -499,7 +447,6 @@
 				E3C9DC161BE94D6D00593C6F /* MasterViewController.m in Sources */,
 				E3C9DC171BE94D6D00593C6F /* MediaCell.m in Sources */,
 				E3C9DC181BE94D6D00593C6F /* MediaResource.m in Sources */,
-				E3C9DC191BE94D6D00593C6F /* Mpd.m in Sources */,
 				E3C9DC1A1BE94D6D00593C6F /* PlaybackView.m in Sources */,
 				E3C9DC1B1BE94D6D00593C6F /* PlayerControlsView.m in Sources */,
 				E3C9DC1C1BE94D6D00593C6F /* PlayerScrubberView.m in Sources */,

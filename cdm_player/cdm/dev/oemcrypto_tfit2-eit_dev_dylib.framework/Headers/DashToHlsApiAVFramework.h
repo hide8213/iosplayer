@@ -18,15 +18,16 @@ iOS and OSX require extra care to make sure that only the AVPlayer in the
 current application has access to the content in the clear.  To solve that
 we use the resource loader to serve a random key.
 
-As reencryption is assuming there is a CDM the format of the function matches
-the built in OEMCrypto_GetRandom.
+InitializeEncryption calls SecCopyRandomBytes to create random bytes to build
+a key on the fly to encrypt the output TS segments. An error will occur if
+attempting to encrypt the output without calling InitializeEncryption first.
 
 When building any m3u8 manifests GetKeyUrl returns the m3u8 text that must be
 placed in the m3u8 as is.  It has the full line of text describing the key
 and url with IV encoded.
 
 Finally DashToHls_SetAVURLAsset needs to be called on all AVURLAssets need to
-set up the AVResourceLoaderDelegate.  An optional 
+set up the AVResourceLoaderDelegate.  An optional
 AVAssetResourceLoaderDelegate can be passed in as |assetDelegate|.  This will
 be called on all AVAssetResourceLoaderDelegate not handled by the UDT.
 */
@@ -42,7 +43,7 @@ be called on all AVAssetResourceLoaderDelegate not handled by the UDT.
 extern "C" {
 #endif  // __cplusplus
 
-void DashToHls_InitializeEncryption();
+void DashToHls_InitializeEncryption(struct DashToHlsSession* session);
 
 DashToHlsStatus DashToHls_SetAVURLAsset(AVURLAsset* asset,
                                         id<AVAssetResourceLoaderDelegate> assetDelegate,

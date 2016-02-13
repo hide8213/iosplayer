@@ -72,37 +72,37 @@ NSString *kLicenseUrlString = @"https://widevine-proxy.appspot.com/proxy";
 
 - (void)writeData:(NSData *)data file:(NSString *)fileName {
   NSError *error = nil;
-  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
-  [data writeToURL:fileURL options:NSDataWritingAtomic error:&error];
+  NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
+  [data writeToFile:filePath options:NSDataWritingAtomic error:&error];
   if (error) {
     NSLog(@"Could not write data to %@ because %@", fileName, error);
   }
 }
 
 - (BOOL)fileExists:(NSString *)fileName {
-  NSError *error;
-  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
-  return [fileURL checkResourceIsReachableAndReturnError:&error];
+  NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
+  return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 
 - (int32_t)fileSize:(NSString *)fileName {
   NSError *error;
-  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
+  NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
   NSDictionary *fileAttributes = [[NSFileManager defaultManager]
-      attributesOfItemAtPath:[fileURL absoluteString] error:&error];
+      attributesOfItemAtPath:filePath error:&error];
   if (error) {
     return -1;
   }
-
   NSNumber *sizeNumber = [fileAttributes objectForKey:NSFileSize];
   return [sizeNumber intValue];
 }
 
 - (BOOL)removeFile:(NSString *)fileName {
   NSError *error;
-  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
-  NSString *pathToFile = [fileURL absoluteString];
-  [[NSFileManager defaultManager] removeItemAtPath:pathToFile error:&error];
+  NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
+  [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+  if (error) {
+    NSLog(@"Could not remove %@ due to %@", fileName, error);
+  }
   return error == nil;
 }
 

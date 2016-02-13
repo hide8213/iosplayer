@@ -4,8 +4,6 @@
 #import "CdmWrapper.h"
 #import "DashToHlsApi.h"
 #import "Downloader.h"
-#import "LicenseManager.h"
-#import "Stream.h"
 
 static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 NSString *kMimeType = @"video/mp4";
@@ -36,39 +34,45 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 @implementation MediaResource
 - (instancetype)initWithName:(NSString *)name
                    thumbnail:(NSString *)thumbnail
-                         url:(NSURL *)url
-                     offline:(BOOL)offline {
+                         url:(NSURL *)url {
   self = [super init];
   NSPointerFunctionsOptions options = NSPointerFunctionsStrongMemory;
   if (self) {
     _name = [name copy];
     _thumbnail = [UIImage imageNamed:thumbnail];
     _url = url;
-    _offline = offline;
-    _downloadQ = dispatch_queue_create("Downloading", NULL);
     _offlinePath = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
                     urlInDocumentDirectoryForFile:[_url lastPathComponent]];
+    if ([self isDownloaded]) {
+      _offline = YES;
+    }
+    _downloadQ = dispatch_queue_create("Downloading", NULL);
+
     _filesBeingDownloaded = [NSMutableArray array];
     _downloads = [NSMapTable mapTableWithKeyOptions:options valueOptions:options];
   }
   return self;
 }
 
-- (void)finishedDownloading:(Downloader *)downloader file:(NSURL *)file initRange:(NSRange)range {
+- (void)finishedDownloading:(Downloader *)downloader
+                       file:(NSURL *)file
+               initialRange:(NSDictionary *)initialRange {
   [_filesBeingDownloaded removeObject:file];
   _offline = YES;
   if (![file.pathExtension isEqualToString:@"mpd"]) {
-    [self getLicenseFromFile:file range:range];
+    [self getLicenseFromFile:file initialRange:initialRange];
   }
   if (_filesBeingDownloaded.count == 0) {
     [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
                                                         object:self];
   }
+  NSLog(@"\n::INFO::Download Complete: %@", file);
 }
 
 - (void)failedDownloading:(Downloader *)downloader file:(NSURL *)file error:(NSError *)error {
   UIAlertView* alert;
-  NSString *errorMessage = [NSString stringWithFormat:@"Download Failed! \n %@: %@", file, error];
+  NSString *errorMessage = [NSString stringWithFormat:@"\n::ERROR::Download Failed! \n %@: %@",
+                            file, error];
 
   alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                      message:errorMessage
@@ -109,14 +113,14 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
   struct DashToHlsSession *session = NULL;
   DashToHlsStatus status = DashToHls_CreateSession(&session);
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not initialize session url=%@", _url);
+    NSLog(@"\n::ERROR::Could not initialize session url=%@", _url);
     return NO;
   }
   status = DashToHls_SetCenc_PsshHandler(session,
                                          nil,
                                          mediaResourcePsshHandler);
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set PSSH Handler url=%@", _url);
+    NSLog(@"\n::ERROR::Could not set PSSH Handler url=%@", _url);
     return NO;
   }
   status = DashToHls_SetCenc_DecryptSample(session,
@@ -124,7 +128,7 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
                                            mediaResourceDecryptionHandler,
                                            false);
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set Decrypt Handler url=%@", _url);
+    NSLog(@"\n::ERROR::Could not set Decrypt Handler url=%@", _url);
     return NO;
   }
   if (_offline) {
@@ -134,20 +138,20 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
     if (status == kDashToHlsStatus_ClearContent) {
     } else if (status == kDashToHlsStatus_OK) {
     } else {
-      NSLog(@"Could not parse dash url=%@", _url);
+      NSLog(@"\n::ERROR::Could not parse dash url=%@", _url);
       return NO;
     }
   }
   return YES;
 }
 
-- (void)getLicenseFromFile:(NSURL *)file range:(NSRange)range {
+- (void)getLicenseFromFile:(NSURL *)file initialRange:(NSDictionary *)initialRange {
   [Downloader downloadPartialData:file
-                            range:range
-                       completion:^(NSData *data, NSError *connectionError) {
+                     initialRange:initialRange
+                       completion:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
                          dispatch_async(_downloadQ, ^() {
                            if (!data) {
-                             NSLog(@"Did not download %@", connectionError);
+                             NSLog(@"\n::ERROR::Did not download %@", connectionError);
                            }
                            if (![self findPssh:data]) {
                              return;
