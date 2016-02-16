@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+// Copyright 2015 Google Inc. All rights reserved.
 
 #import "AppDelegate.h"
 #import "Stream.h"
@@ -11,9 +11,9 @@
                 baseUrl:(NSURL *)baseUrl;
 
 + (void)deleteFilesInMpd:(NSURL *)mpdUrl;
-+ (NSMutableArray *)parseMpdWithStreaming:(Streaming *)streaming
-                                  mpdData:(NSData *)mpdData
-                                  baseUrl:(NSURL *)baseUrl;
++ (NSArray *)parseMpdWithStreaming:(Streaming *)streaming
+                           mpdData:(NSData *)mpdData
+                           baseUrl:(NSURL *)baseUrl;
 @end
 
 

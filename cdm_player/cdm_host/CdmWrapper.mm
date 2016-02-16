@@ -97,16 +97,8 @@ static NSUInteger kWidevineSystemIdOffset = 12;
         });
         return;
       }
-      _psshKeysToIds[psshKey] = sessionId;
+
       _offlineSessions[sessionId] = @YES;
-      NSMutableArray *blocks = _sessionIdsToBlocks[sessionIdForKey];
-      if (blocks) {
-        [blocks addObject:[completionBlock copy]];
-      } else if (queue) {
-        dispatch_async(queue, ^{
-          completionBlock(nil);
-        });
-      }
     } else {
       error  = iOSCdmHost::GetHost()->CreateSession(
           isOfflineVod ? widevine::Cdm::kPersistent :
@@ -134,6 +126,7 @@ static NSUInteger kWidevineSystemIdOffset = 12;
         iOSCdmHost::GetHost()->CloseSessions(@[sessionId]);
         return;
       }
+
       _psshKeysToIds[psshKey] = sessionId;
       [self onSessionCreated:sessionId];
     }

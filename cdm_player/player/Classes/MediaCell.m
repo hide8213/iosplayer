@@ -1,3 +1,5 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "MediaCell.h"
 
 static NSString *const kNormalStateIconName = @"ico_download_before.png";
@@ -6,6 +8,7 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
 @implementation MediaCell {
   UILabel *_downloadPercentLabel;
   UIButton *_offlineButton;
+  UIImageView *_thumbnailView;
   UITapGestureRecognizer *_tap;
 }
 
@@ -15,11 +18,13 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
   if (self) {
     _downloadPercentLabel = [[UILabel alloc] init];
     _offlineButton = [[UIButton alloc] init];
+    _thumbnailView = [[UIImageView alloc] init];
     _tap = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                    action:@selector(didPressPlay)];
     [self.textLabel setUserInteractionEnabled:YES];
     [self addSubview:_downloadPercentLabel];
     [self addSubview:_offlineButton];
+    [self addSubview:_thumbnailView];
   }
   return self;
 }
@@ -64,7 +69,23 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
            forControlEvents:UIControlEventTouchUpInside];
 }
 
+- (void)loadThumbnail {
+  if (_thumbnail) {
+    // Resize and scale downloaded image, then add to ImageView
+    CGSize size = CGSizeMake(40, 40);
+    UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+    [_thumbnail drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *thumb = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    self.imageView.image = thumb;
+    self.imageView.layer.cornerRadius=4;
+  }
+}
+
 - (void)layoutSubviews {
+  if (!self.imageView.image) {
+    [self loadThumbnail];
+  }
   [super layoutSubviews];
   [self.contentView setNeedsLayout];
   [self.contentView layoutIfNeeded];
@@ -76,9 +97,9 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
   [self setConstraints:_downloadPercentLabel attribute:NSLayoutAttributeTrailing constant:-45];
 }
 
-- (void) setConstraints:(UIView *)element
-              attribute:(NSLayoutAttribute *)attribute
-               constant:(CGFloat)constant {
+- (void)setConstraints:(UIView *)element
+             attribute:(NSLayoutAttribute)attribute
+              constant:(CGFloat)constant {
   [element setTranslatesAutoresizingMaskIntoConstraints:NO];
   [self addConstraint:[NSLayoutConstraint constraintWithItem:element
                                                    attribute:attribute
@@ -98,9 +119,9 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
 
 - (UIColor *)offlineColor {
   return [UIColor colorWithRed:255.0/255.0
-                  green:127.0/255.0
-                   blue:0.0
-                  alpha:1.0];
+                         green:127.0/255.0
+                          blue:0.0
+                         alpha:1.0];
 
 
 }

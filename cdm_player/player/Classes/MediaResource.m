@@ -1,3 +1,5 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "MediaResource.h"
 
 #import "AppDelegate.h"
@@ -33,13 +35,13 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 
 @implementation MediaResource
 - (instancetype)initWithName:(NSString *)name
-                   thumbnail:(NSString *)thumbnail
+                   thumbnail:(NSURL *)thumbnail
                          url:(NSURL *)url {
   self = [super init];
   NSPointerFunctionsOptions options = NSPointerFunctionsStrongMemory;
   if (self) {
     _name = [name copy];
-    _thumbnail = [UIImage imageNamed:thumbnail];
+    _thumbnail = thumbnail;
     _url = url;
     _offlinePath = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
                     urlInDocumentDirectoryForFile:[_url lastPathComponent]];
@@ -47,7 +49,6 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
       _offline = YES;
     }
     _downloadQ = dispatch_queue_create("Downloading", NULL);
-
     _filesBeingDownloaded = [NSMutableArray array];
     _downloads = [NSMapTable mapTableWithKeyOptions:options valueOptions:options];
   }
@@ -89,7 +90,7 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 - (void)updateDownloadProgress:(NSNumber *)progress file:(NSURL *)file {
   NSEnumerator *enumerator = [_downloads objectEnumerator];
   id value;
-  float valueTotal;
+  float valueTotal = 0.f;
   if (![file.pathExtension isEqualToString:@"mpd"]) {
     [_downloads setObject:progress forKey:file];
     while ((value = [enumerator nextObject])) {
@@ -145,13 +146,17 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
   return YES;
 }
 
-- (void)getLicenseFromFile:(NSURL *)file initialRange:(NSDictionary *)initialRange {
+- (void)getLicenseFromFile:(NSURL *)file
+              initialRange:(NSDictionary *)initialRange {
   [Downloader downloadPartialData:file
                      initialRange:initialRange
-                       completion:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
+                       completion:^(NSData *data,
+                                    NSURLResponse *response,
+                                    NSError *connectionError) {
                          dispatch_async(_downloadQ, ^() {
                            if (!data) {
-                             NSLog(@"\n::ERROR::Did not download %@", connectionError);
+                             NSLog(@"\n::ERROR::Did not download %@",
+                                   connectionError);
                            }
                            if (![self findPssh:data]) {
                              return;

@@ -2,11 +2,13 @@
 
 ### Software Requirements
 
-The following software must be installed on your development machine:
+###### The following software must be installed on your development machine:
+
 * OSX 10.9 or higher
 * XCode 6.3 or higher
 
-The following iOS targets are supported:
+###### The following iOS targets are supported:
+
 * iOS 8
 * iOS 9
 
@@ -16,7 +18,8 @@ The following iOS targets are supported:
 * Reference Player
 * CDM Dynamic Library
 
-In addition, the following XCode project files will be included:
+###### In addition, the following XCode project files will be included:
+
 * Cocoa HTTP Server
 
 ### Steps

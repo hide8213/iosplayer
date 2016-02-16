@@ -1,15 +1,15 @@
 [{
   "name": "Short",
-  "thumbnail": "",
+  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
   "url": "http://storage.googleapis.com/wvmedia/cenc/tears.mpd"
 },
 {
   "name": "Long",
-  "thumbnail": "",
+  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/valkaama.jpg",
   "url": "http://storage.googleapis.com/wvmedia/cenc/valkaama.mpd"
 },
 {
   "name": "Clear",
-  "thumbnail": "",
+  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/nexusq.png",
   "url": "http://yt-dash-mse-test.commondatastorage.googleapis.com/media/oops-20120802-manifest.mpd"
 }]

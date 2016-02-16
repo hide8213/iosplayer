@@ -1,3 +1,5 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "LicenseManager.h"
 
 #import "Streaming.h"

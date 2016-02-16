@@ -4,6 +4,7 @@
 
 #import "AppDelegate.h"
 #import "DetailViewController.h"
+#import "Downloader.h"
 #import "LicenseManager.h"
 #import "MediaCell.h"
 #import "MediaResource.h"
@@ -35,7 +36,6 @@ static NSString *kPlaylistTitle = @"Playlist";
     NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources"
                                                          ofType:@"json"];
     NSData *jsonData = [NSData dataWithContentsOfFile:jsonPath];
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSError *error = nil;
     NSArray *mediaResources =
         [NSJSONSerialization JSONObjectWithData:jsonData
@@ -48,7 +48,7 @@ static NSString *kPlaylistTitle = @"Playlist";
         NSString *url = [mediaResource objectForKey:@"url"];
         [self.mediaResources
              addObject:[[MediaResource alloc] initWithName:name
-                                                 thumbnail:nil
+                                                 thumbnail:[NSURL URLWithString:thumbnail]
                                                        url:[NSURL URLWithString:url]]];
       }
     }
@@ -89,6 +89,13 @@ static NSString *kPlaylistTitle = @"Playlist";
   mediaCell.isDownloaded = mediaResource.isDownloaded;
   mediaCell.filesBeingDownloaded = mediaResource.filesBeingDownloaded;
   mediaCell.percentage = mediaResource.percentage;
+  dispatch_async(mediaResource.downloadQ, ^() {
+    mediaCell.thumbnail =
+        [UIImage imageWithData:[NSData dataWithContentsOfURL:mediaResource.thumbnail]];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      [mediaCell layoutSubviews];
+    });
+  });
   mediaCell.delegate = self;
   [mediaCell updateDisplay];
 
@@ -97,6 +104,7 @@ static NSString *kPlaylistTitle = @"Playlist";
 
 #pragma mark - Private Methods
 
+// TODO(seawardt): Add Reachability in place of basic check (b/27264396).
 - (BOOL)isInternetConnectionAvailable {
   NSURL *scriptUrl = [NSURL URLWithString:@"http://www.google.com"];
   NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
@@ -143,9 +151,10 @@ static NSString *kPlaylistTitle = @"Playlist";
     MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
                           urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
-    [Downloader DownloadWithUrl:mediaResource.url file:fileUrl
-                   initialRange:nil
-                       delegate:mediaResource];
+    [Downloader initDownloaderWithUrl:mediaResource.url
+                                 file:fileUrl
+                         initialRange:nil
+                             delegate:mediaResource];
   } else {
     [self connectionErrorAlert];
   }

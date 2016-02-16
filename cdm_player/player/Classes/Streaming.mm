@@ -4,8 +4,9 @@
 
 #import <arpa/inet.h>
 #import <ifaddrs.h>
-#import <Responses/HTTPDataResponse.h>
 #import <string.h>
+
+#import <Responses/HTTPDataResponse.h>
 
 #import "AppDelegate.h"
 #import "DashToHlsApi.h"
@@ -25,7 +26,6 @@ NSString *kStreamingReadyNotification = @"StreamingReadyNotificaiton";
 }
 
 static int kHttpPort = 8080;
-static float k90KRatio = 90000.0;
 static NSString *const kLocalPlaylist = @"dash2hls.m3u8";
 static NSString *const kLocalHost = @"localhost";
 
@@ -162,7 +162,6 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 
 // Creates the TS playlist with segments and durations.
 - (NSData *)buildChildPlaylist:(Stream *)stream {
-  NSMutableString *segments = [NSMutableString string];
   DashToHlsIndex *dashIndex = stream.dashIndex;
   uint64_t maxDuration = 0;
   uint64_t timescale = (dashIndex->index_count > 0) ? dashIndex->segments[0].timescale:90000;
@@ -222,10 +221,6 @@ static NSString *kVideoSegmentFormat = @"#EXTINF:%0.06f,\n%d-%d.ts\n";
 // Creates TS segments based on downloading a specific byte range.
 - (NSData *)tsDataForIndex:(int)index segment:(int)segment {
   Stream *stream = _streams[index];
-  NSMutableURLRequest *request =
-      [NSMutableURLRequest requestWithURL:stream.url
-                              cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                          timeoutInterval:5];
   NSNumber *startRange =
       [NSNumber numberWithUnsignedLongLong:stream.dashIndex->segments[segment].location];
   NSNumber *length =

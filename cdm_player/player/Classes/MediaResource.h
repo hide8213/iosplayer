@@ -1,3 +1,6 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
+#import "Downloader.h"
 #import "MasterViewController.h"
 
 @class MasterViewController;
@@ -10,15 +13,15 @@
 @property(nonatomic, strong) NSURL *keyStoreURL;
 @property(nonatomic, assign) int percentage;
 @property(nonatomic, strong) NSString *name;
-@property(nonatomic, assign) BOOL *offline;
+@property(nonatomic, assign) BOOL offline;
 @property(nonatomic, strong) NSURL *offlinePath;
-@property(nonatomic, strong) UIImage *thumbnail;
+@property(nonatomic, strong) NSURL *thumbnail;
 @property(nonatomic, strong) NSURL *url;
 @property dispatch_queue_t downloadQ;
 @property(nonatomic) NSRange initRange;
 
 - (instancetype)initWithName:(NSString *)name
-                   thumbnail:(NSString *)thumbnail
+                   thumbnail:(NSURL *)thumbnail
                          url:(NSURL *)url;
 
 - (BOOL)isDownloaded;

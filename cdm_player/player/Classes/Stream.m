@@ -27,7 +27,6 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
                                              size_t iv_length, const uint8_t *key_id,
                                              struct SampleEntry *sampleEntry,
                                              size_t sampleEntrySize) {
-  Stream *stream = (__bridge Stream *)(context);
   NSData *decrypted = [[iOSCdm sharedInstance]
                        decrypt:[NSData dataWithBytes:encrypted length:length]
                          keyId:[NSData dataWithBytes:key_id length:16]
@@ -44,9 +43,8 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
 - (id)initWithStreaming:(Streaming *)streaming {
   self = [super init];
   if (self) {
-    if (streaming) {
-      _streaming = streaming;
-    }
+    _streaming = streaming;
+
   }
   return self;
 }
@@ -75,12 +73,9 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
     NSLog(@"Could not set Decrypt Handler url=%@", _url);
     return NO;
   }
-
-  struct DashToHlsIndex *index = NULL;
   status = DashToHls_ParseDash(_session,
                                (const uint8_t *)[initializationData bytes],
                                [initializationData length], &_dashIndex);
-  //  _dashIndex = index;
   if (status == kDashToHlsStatus_ClearContent) {
     [_streaming streamReady:self];
   } else if (status == kDashToHlsStatus_OK) {

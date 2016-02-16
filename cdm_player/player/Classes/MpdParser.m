@@ -1,3 +1,5 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "MpdParser.h"
 
 #import <objc/message.h>
@@ -32,6 +34,22 @@ NSString *const kAttrNumChannels = @"numChannels";
 NSString *const kAttrSampleRate = @"sampleRate";
 NSString *const kAttrWidth = @"width";
 
+NSString *const kBoolNo = @"NO";
+NSString *const kBoolYes = @"YES";
+NSString *const kDashToHlsString = @"DashToHls";
+NSString *const kDashSeparator = @"-";
+NSString *const kHttpString = @"http";
+NSString *const kIsVideoString = @"isVideo";
+NSString *const kRootUrl = @"rootUrl";
+NSString *const kRangeLength = @"length";
+NSString *const kRangeStart = @"startRange";
+NSString *const kSlashesString = @"//";
+NSString *const kStreamingString = @"Streaming";
+NSString *const kVideoString = @"video";
+
+
+
+
 @implementation MpdParser {
   NSString *_currentElement;
   NSXMLParser *_parser;
@@ -60,19 +78,14 @@ NSString *const kAttrWidth = @"width";
   if (_parser) {
     [_parser setDelegate:self];
     [_parser parse];
-  } else {
-    self = nil;
   }
   return self;
 }
 
-+ (NSMutableArray *)parseMpdWithStreaming:(Streaming *)streaming
-                                  mpdData:(NSData *)mpdData
-                                  baseUrl:(NSURL *)baseUrl {
-  MpdParser *mpdParser = [[MpdParser alloc] initWithStreaming:streaming
-                                                      mpdData:mpdData
-                                                      baseUrl:baseUrl];
-  return mpdParser.streams;
++ (NSArray *)parseMpdWithStreaming:(Streaming *)streaming
+                           mpdData:(NSData *)mpdData
+                           baseUrl:(NSURL *)baseUrl {
+  return [[MpdParser alloc] initWithStreaming:streaming mpdData:mpdData baseUrl:baseUrl].streams;
 }
 
 #pragma mark NSXMLParser methods -- start
@@ -88,27 +101,26 @@ NSString *const kAttrWidth = @"width";
          attributes:(NSDictionary *)attributeDict {
   _currentElement = elementName;
   for (id key in attributeDict) {
-    NSString *value = [attributeDict objectForKey:key];
+    NSString *value = [[attributeDict objectForKey:key]
+                           stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     // Check that value isnt blank.
-    if (![[value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
-         length] == 0) {
+    if (![value length] == 0) {
       [_mpdDict setValue:value forKey:key];
-      if ([key isEqualToString:@"mimeType"]) {
-         if ([value containsString:@"video"]) {
-           [_mpdDict setValue:@"YES" forKey:@"isVideo"];
+      if ([key isEqualToString:kDashRepresentationMime]) {
+         if ([value containsString:kVideoString]) {
+           [_mpdDict setValue:kBoolYes forKey:kIsVideoString];
          } else {
-           [_mpdDict setValue:@"NO" forKey:@"isVideo"];
+           [_mpdDict setValue:kBoolNo forKey:kIsVideoString];
          }
       }
     }
   }
 }
 
-- (void)parser:(NSXMLParser *)parser
-    foundCharacters:(NSString *)string {
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
   if (string) {
-    if ([string hasPrefix:@"//"]) {
-      [_mpdDict setValue:string forKey:@"rootUrl"];
+    if ([string hasPrefix:kSlashesString]) {
+      [_mpdDict setValue:string forKey:kRootUrl];
     }
     if (![string containsString:@"\n "]) {
       [_mpdDict setValue:string forKey:_currentElement];
@@ -137,46 +149,16 @@ NSString *const kAttrWidth = @"width";
 
 #pragma mark NSXMLParser methods -- end
 
-static const char *getPropertyType(objc_property_t property) {
-  const char *attributes = property_getAttributes(property);
-  char buffer[1 + strlen(attributes)];
-  strcpy(buffer, attributes);
-  char *state = buffer, *attribute;
-  while ((attribute = strsep(&state, ",")) != NULL) {
-    if (attribute[0] == 'T' && attribute[1] != '@') {
-      NSString *name = [[NSString alloc] initWithBytes:attribute + 1 length:strlen(attribute) - 1 encoding:NSASCIIStringEncoding];
-      return (const char *)[name cStringUsingEncoding:NSASCIIStringEncoding];
-    }
-    else if (attribute[0] == 'T' && attribute[1] == '@' && strlen(attribute) == 2) {
-      // it's an ObjC id type:
-      return "id";
-    }
-    else if (attribute[0] == 'T' && attribute[1] == '@') {
-      // it's another ObjC object type:
-      NSString *name = [[NSString alloc] initWithBytes:attribute + 3 length:strlen(attribute) - 4 encoding:NSASCIIStringEncoding];
-      return (const char *)[name cStringUsingEncoding:NSASCIIStringEncoding];
-    }
-  }
-  return "";
-}
-
 // Look up aviailable properties from Stream object and populate the required values.
 - (BOOL)setStreamProperties:(NSString *)elementName {
   Stream *stream = [[Stream alloc] initWithStreaming:_streaming];
-  NSMutableDictionary *results = [[NSMutableDictionary alloc] init];
 
-  unsigned int numberOfProperties, i;
+  unsigned int numberOfProperties = 0;
+  unsigned int propertyIndex = 0;
   objc_property_t *properties = class_copyPropertyList([Stream class], &numberOfProperties);
-  for (i = 0; i < numberOfProperties; i++) {
-    objc_property_t property = properties[i];
-    const char *propName = property_getName(property);
-    if (propName) {
-      const char *propType = getPropertyType(property);
-      NSString *propertyName = [NSString stringWithUTF8String:propName];
-      NSString *propertyType = [NSString stringWithUTF8String:propType];
-      [results setObject:propertyType forKey:propertyName];
-      [self setProperty:stream name:propertyName type:propertyType];
-    }
+  for (propertyIndex = 0; propertyIndex < numberOfProperties; propertyIndex++) {
+    objc_property_t property = properties[propertyIndex];
+    [self setProperty:stream property:property];
   }
   // Stream Complete
   [_streams addObject:stream];
@@ -187,70 +169,110 @@ static const char *getPropertyType(objc_property_t property) {
   return NO;
 }
 
-// Uses available property in Stream object and value when property and key match.
-- (void)setProperty:(Stream *)stream name:(NSString *)name type:(NSString *)type {
-  NSString *selectorName = [NSString stringWithFormat:@"set%@%@:",
-                            [[name substringToIndex:1] uppercaseString],
-                            [name substringFromIndex:1]];
-  SEL selector = NSSelectorFromString(selectorName);
-  if ([stream respondsToSelector:selector]) {
-    IMP imp = [stream methodForSelector:selector];
-    // TODO(seawardt): Improve setProperty to be more efficient and cleaner.
-    if ([type isEqualToString:@"NSString"]) {
-      // Property type is NSString.
-      NSString *value = [_mpdDict objectForKey:name];
-      void (*func)(id, SEL, NSString *) = (void *)imp;
-      func(stream, selector, value);
-    } else if ([type isEqualToString:@"Q"] || [type isEqualToString:@"I"]) {
-      // Property type is Integer (aka Q).
-      [_mpdDict setValue:[NSNumber numberWithInteger:_streamCount] forKey:@"indexValue"];
-      NSUInteger value = [[_mpdDict objectForKey:name] integerValue];
-      void (*func)(id, SEL, NSUInteger) = (void *)imp;
-      func(stream, selector, value);
-    } else if ([type isEqualToString:@"B"] || [type isEqualToString:@"c"]) {
-      // Property type is BOOL (aka c).
-      [_mpdDict setValue:@"NO" forKey:@"done"];
-      BOOL value = [[_mpdDict objectForKey:name] boolValue];
-      void (*func)(id, SEL, BOOL) = (void *)imp;
-      func(stream, selector, value);
-    } else if ([type isEqualToString:@"NSURL"]) {
-      // Property type is NSURL.
-      NSURL *value = [self setStreamUrl];
-      void (*func)(id, SEL, NSURL *) = (void *)imp;
-      func(stream, selector, value);
-    } else if ([type isEqualToString:@"NSDictionary"]) {
-      // Property type is NSDictionary.
-      NSDictionary *value = [self setInitRange];
-      void (*func)(id, SEL, NSDictionary *) = (void *)imp;
-      func(stream, selector, value);
-    } else if ([type isEqualToString:@"NSData"]) {
-      // Property type is NSData.
-      NSData *value = [[NSData alloc] init];
-      void (*func)(id, SEL, NSData *) = (void *)imp;
-      func(stream, selector, value);
-    } 
+- (NSString *)getPropertyType:(objc_property_t)property {
+  const char *attribute = property_getAttributes(property);
+  NSString *attributeString = [NSString stringWithUTF8String:attribute];
+  NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
+  NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
+                                     stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+
+  switch(attribute[1]) {
+    case '@' : // NSString
+      attributeString = [attributeStripped substringFromIndex:1];
+      break;
+    case 'I' : // NSUinteger 32-bit
+    case 'Q' : // NSUinteger 64-bit
+      attributeString = @"NSUInteger";
+      break;
+    case 'c' : // BOOL 32-bit
+    case 'B' : // BOOL 64-bit
+      attributeString = @"BOOL";
+      break;
+    case '^' : // Special Class
+      attributeString = [[[attributeStripped substringFromIndex:2]
+                              componentsSeparatedByString:@"="] firstObject];
+      break;
+    default:
+      NSLog(@"No Property Matched");
+      attributeString = nil;
+      break;
   }
+  return attributeString;
+}
+
+
+// Uses available property in Stream object and value when property and key match.
+- (void)setProperty:(Stream *)stream property:(objc_property_t)property {
+  NSString *propertyName = [NSString stringWithUTF8String:property_getName(property)];
+  const char *attribute = property_getAttributes(property);
+  NSString *attributeString = [NSString stringWithUTF8String:attribute];
+  NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
+  NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
+                                 stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+
+  NSString *propertyType = [attributeStripped substringFromIndex:1];
+  switch(attribute[1]) {
+    case '@' : // Char
+      if ([propertyType isEqualToString:@"NSURL"]) {
+        NSURL *value = [self setStreamUrl];
+        [stream setValue:value forKey:propertyName];
+      }
+      if ([propertyType isEqualToString:@"NSDictionary"]) {
+        NSDictionary *value = [self setInitRange];
+        [stream setValue:value forKey:propertyName];
+      }
+      if ([propertyType isEqualToString:@"NSData"]) {
+        NSData *value = [[NSData alloc] init];
+        [stream setValue:value forKey:propertyName];
+      }
+      if ([propertyType isEqualToString:@"NSString"]) {
+        NSString *value = [_mpdDict objectForKey:propertyName];
+        [stream setValue:value forKey:propertyName];
+      }
+      break;
+    case 'I' : // NSUinteger 32-bit
+    case 'Q' : // NSUinteger 64-bit
+      if ([propertyName isEqualToString:@"indexValue"]) {
+        [stream setValue:[NSNumber numberWithInteger:_streamCount] forKey:propertyName];
+      } else {
+        NSUInteger value = [[_mpdDict objectForKey:propertyName] integerValue];
+        [stream setValue:[NSNumber numberWithInteger:value] forKey:propertyName];
+      }
+      break;
+    case 'c' : // BOOL 32-bit
+    case 'B' : // BOOL 64-bit
+      if (propertyName) {
+        BOOL value = [[_mpdDict objectForKey:propertyName] boolValue];
+        [stream setValue:[NSNumber numberWithBool:value] forKey:propertyName];
+      }
+      break;
+    case '^' : // Special Class
+      break;
+    default:
+      NSLog(@"No Property Matched");
+      attributeString = nil;
+      break;
+  }
+
 }
 
 // Ensure all properties are populated from the MPD, otherwise return false.
 - (BOOL)validateStreamAttributes:(Stream *)stream {
   BOOL attributeExists = YES;
-  NSMutableDictionary *results = [[NSMutableDictionary alloc] init];
   unsigned int numberOfProperties, i;
   objc_property_t *properties = class_copyPropertyList([Stream class], &numberOfProperties);
   for (i = 0; i < numberOfProperties; i++) {
     objc_property_t property = properties[i];
     const char *propName = property_getName(property);
     if (propName) {
-      const char *propType = getPropertyType(property);
       NSString *propertyName = [NSString stringWithUTF8String:propName];
-      NSString *propertyType = [NSString stringWithUTF8String:propType];
-      if (![propertyType containsString:@"DashToHls"]) {
-        if (![propertyType isEqualToString:@"Streaming"]) {
+      NSString *propertyType = [self getPropertyType:property];
+      if (![propertyType containsString:kDashToHlsString]) {
+        if (![propertyType isEqualToString:kStreamingString]) {
           NSString *propertyValue = [stream valueForKey:propertyName];
           if (!propertyValue) {
             NSLog(@"\n::ERROR::Property Not Set for Stream\n"
-                  @"Name: %@ | Type: %@ | Value: %@", propertyName, propertyType, propertyValue);
+                  @"  Name: %@ | Type: %@ | Value: %@", propertyName, propertyType, propertyValue);
             attributeExists = NO;
           }
         }
@@ -262,20 +284,21 @@ static const char *getPropertyType(objc_property_t property) {
 
 // Extract ranges from Dictionary, then parse and create Initialization Range.
 - (NSDictionary *)setInitRange {
-  NSString *range = [_mpdDict objectForKey:@"range"];
-  [_mpdDict removeObjectForKey:@"range"];
-  NSArray *rangeValues = [range componentsSeparatedByString:@"-"];
+  NSString *range = [_mpdDict objectForKey:kDashSegmentBaseInitializationRange];
+  [_mpdDict removeObjectForKey:kDashSegmentBaseInitializationRange];
+  NSArray *rangeValues = [range componentsSeparatedByString:kDashSeparator];
   NSNumber *startRange = [NSNumber numberWithInteger:[rangeValues[0] intValue]];
-  NSString *indexRange = [_mpdDict objectForKey:@"indexRange"];
-  [_mpdDict removeObjectForKey:@"indexRange"];
-  NSArray *indexRangeValues = [indexRange componentsSeparatedByString:@"-"];
+  NSString *indexRange = [_mpdDict objectForKey:kAttrIndexRange];
+  [_mpdDict removeObjectForKey:kAttrIndexRange];
+  NSArray *indexRangeValues = [indexRange componentsSeparatedByString:kDashSeparator];
   if (!indexRangeValues || !rangeValues) {
     return nil;
   }
   // Add 1 to avoid overlap in bytes to the length.
   NSNumber *length = [NSNumber numberWithInteger:([indexRangeValues[1] intValue] + 1)];
   if ([startRange intValue] >= [length intValue]) {
-    NSLog(@"\n::ERROR::Start Range is greater than Length: %d, %d", [startRange intValue], [length intValue]);
+    NSLog(@"\n::ERROR::Start Range is greater than Length: %d, %d", [startRange intValue],
+                                                                    [length intValue]);
     return nil;
   }
   if ([length intValue] == 0) {
@@ -283,26 +306,25 @@ static const char *getPropertyType(objc_property_t property) {
     return nil;
   }
   NSDictionary *initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:startRange,
-                                    @"startRange", length, @"length", nil];
+                                    kRangeStart, length, kRangeLength, nil];
   return initialRange;
 }
 
 // Adds a complete URL for each stream.
 - (NSURL *)setStreamUrl {
-  NSURL *url = nil;
-  NSString *string = [_mpdDict objectForKey:@"BaseURL"];
+  NSString *string = [_mpdDict objectForKey:kDashRepresentationBaseUrl];
   if (_offline) {
     return [(AppDelegate *)[[UIApplication sharedApplication] delegate]
             urlInDocumentDirectoryForFile:string.lastPathComponent];
   }
   // URL is already complete. Move on.
-  if ([string containsString:@"http"]) {
+  if ([string containsString:kHttpString]) {
     return [[NSURL alloc] initWithString:string];
   }
-  NSString *rootUrl = [_mpdDict objectForKey:@"rootUrl"];
+  NSString *rootUrl = [_mpdDict objectForKey:kRootUrl];
   if (rootUrl) {
     // The root URL can start with // as opposed to a scheme, appends http(s)
-    if ([rootUrl rangeOfString:@"http"].location == NSNotFound) {
+    if ([rootUrl rangeOfString:kHttpString].location == NSNotFound) {
       rootUrl = [_mpdUrl.scheme stringByAppendingFormat:@":%@", rootUrl];
     }
     return [[[NSURL alloc] initWithString:rootUrl] URLByAppendingPathComponent:string];
@@ -323,9 +345,9 @@ static const char *getPropertyType(objc_property_t property) {
     return;
   }
   NSError *error = nil;
-  NSMutableArray *remoteUrls = [MpdParser parseMpdWithStreaming:nil
-                                                        mpdData:mpdData
-                                                        baseUrl:mpdUrl];
+  NSArray *remoteUrls = [MpdParser parseMpdWithStreaming:nil
+                                                 mpdData:mpdData
+                                                 baseUrl:mpdUrl];
   NSFileManager *defaultFileManager = [NSFileManager defaultManager];
   for (Stream *stream in remoteUrls) {
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
