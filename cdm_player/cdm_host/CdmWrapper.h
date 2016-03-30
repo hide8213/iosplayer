@@ -23,18 +23,15 @@ extern NSString *const kiOSCdmError;
 // The host delegate must call to either the given |destinationUrl| or its license
 // server URL (if |destinationUrl| is nil) with the |data| in the HTTP body and call
 // |completionBlock| with the results.
-// TODO: Remove toURL argument.
 - (void)iOSCdm:(iOSCdm *)iOSCdm
            sendData:(NSData *)data
             offline:(BOOL)isOffline
-              toURL:(NSString *)destinationUrl
     completionBlock:(void (^)(NSData *, NSError *))completionBlock;
 
-// Called when a session is created.  The |webId| can be stored and associated
-// with the |pssh|.  Future sessions will call webSessionForPssh with the same
+// Called when a session is created.  The |sessionId| can be stored and associated
+// with the |pssh|.  Future sessions will call sessionIdFromPssh with the same
 // |pssh|.
-// TODO: Remove webId.
-- (void)onSessionCreatedWithPssh:(NSData *)pssh webId:(NSString *)webId;
+- (void)onSessionCreatedWithPssh:(NSData *)pssh sessionId:(NSString *)sessionId;
 
 // Reads a file saved with writeData.
 - (NSData *)readFile:(NSString *)fileName;
@@ -53,10 +50,9 @@ extern NSString *const kiOSCdmError;
 // Removes the file saved with writeData.
 - (BOOL)removeFile:(NSString *)fileName;
 
-// Gets the webId previously stored in onSessionCreatedWithPssh:webId:.  Should
-// return nil if no webId exists for that |pssh|.
-// TODO: Remove.
-- (NSString *)webSessionForPssh:(NSData *)pssh;
+// Gets the sessionId previously stored in onSessionCreatedWithPssh:sessionId:.  Should
+// return nil if no sessionId exists for that |pssh|.
+- (NSString *)sessionIdFromPssh:(NSData *)pssh;
 @end
 
 // This class is the ObjectiveC wrapper around the C++ interface.
@@ -75,7 +71,6 @@ extern NSString *const kiOSCdmError;
 // Given a |psshKey|, |completionBlock| will be called
 // once the license data has been added.
 - (void)processPsshKey:(NSData *)psshKey
-              mimeType:(NSString *)mimeType
           isOfflineVod:(BOOL)isOfflineVod
        completionBlock:(void(^)(NSError *))completionBlock;
 

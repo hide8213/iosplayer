@@ -1,8 +1,27 @@
+v3.0.5 (2016 April)
+ - Upgrade CDM to use latest interfaces
+ - Multiple bugs in Transmuxer stability/support
+ - Improved Sync
+ - Resolved long playback crash
+ - Refactor multiple methods in Reference App
+ - Extend Tests for Reference App
+ - Rename Dynamic Libs from oemcrypto -> widevine cdm sdk
+ - Add ability to use unique certs (included in app, not baked in)
+ - Add documentation to GIT repo
+
+v3.0.4 (2016 February)
+ - Resolve Sync bug in Transmuxer
+ - Create new API for Converting Dash (UDT_ConvertDash)
+ - Add NSXMLParser to replace deprecated TBXML
+ - Refactor and clean up throughout code base
+ - Add Unit Tests for external testing
+ - Update UDT to support Azure and FFMpeg encodes
+
 v3.0.3 (2015 December)
  - Clean up project layout
  - Upgrade CDM to v3 (See CDM docs for details)
  - Updated HOST files to handle CDM v3 API changes
- - UDT Fixes: Multiple MOOF per segment, Multiple PSSHs
+ - UDT Fixes: Multiple MOOF per segement, Mutiple PSSHs
  - Airplay Support
 
 v2.0.3 (2015 November)

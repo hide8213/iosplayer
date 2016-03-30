@@ -1,13 +1,22 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "Downloader.h"
 
 #import "AppDelegate.h"
-#import "Mpd.h"
+#import "MpdParser.h"
+#import "Streaming.h"
 
 static NSMutableArray *sDownloaders;
 
+NSString *const kMpdString = @"mpd";
+NSString *const kLengthString = @"length";
+NSString *const kRangeHeaderString = @"Range";
+NSString *const kStartString = @"startRange";
+NSString *const kZeroString = @"0";
+
 @interface Downloader()
 @property(nonatomic, strong) NSURLConnection *connection;
-@property(nonatomic) NSRange initRange;
+@property(nonatomic) NSDictionary *initialRange;
 @property(nonatomic, strong) NSURL *file;
 @property(nonatomic, strong) NSFileHandle *fileHandle;
 @property(nonatomic) BOOL isMpd;
@@ -19,22 +28,29 @@ static NSMutableArray *sDownloaders;
   NSUInteger _receivedBytes;
 }
 
-+ (instancetype)DownloaderWithUrl:(NSURL *)url
-                             file:(NSURL *)file
-                        initRange:(NSRange)initRange
-                         delegate:(id<DownloadDelegate>)delegate{
++ (instancetype)initDownloaderWithUrl:(NSURL *)url
+                                 file:(NSURL *)file
+                         initialRange:(NSDictionary *)initialRange
+                             delegate:(id<DownloadDelegate>)delegate{
   Downloader *downloader = [[Downloader alloc] init];
   if (downloader) {
     downloader.delegate = delegate;
     downloader.url = url;
-    downloader.initRange = initRange;
+    if (!initialRange) {
+      initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:kZeroString,
+                      kStartString,
+                      kZeroString,
+                      kLengthString,
+                      nil];
+    }
+    downloader.initialRange = initialRange;
     downloader.file = file;
     NSString *fileString = [NSString stringWithUTF8String:file.fileSystemRepresentation];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager createFileAtPath:fileString contents:[NSData data] attributes:nil]) {
       NSLog(@"Error was code: %d - message: %s", errno, strerror(errno));
     }
-    downloader.isMpd = [file.pathExtension isEqualToString:@"mpd"];
+    downloader.isMpd = [file.pathExtension isEqualToString:kMpdString];
     downloader.fileHandle = [NSFileHandle fileHandleForWritingAtPath:fileString];
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url
@@ -53,25 +69,8 @@ static NSMutableArray *sDownloaders;
   return downloader;
 }
 
-+ (void)DownloadWithUrl:(NSURL *)url
-                   file:(NSURL *)file
-              initRange:(NSRange)initRange
-              delegate:(id<DownloadDelegate>)delegate {
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sDownloaders = [NSMutableArray array];
-  });
-
-  @synchronized(sDownloaders) {
-    [sDownloaders addObject:[Downloader DownloaderWithUrl:url
-                                                     file:file
-                                                initRange:initRange
-                                                 delegate:delegate]];
-  }
-}
-
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-  _expectedBytes = [response expectedContentLength];
+  _expectedBytes = (NSUInteger)[response expectedContentLength];
 }
 
 - (void)connection:(NSURLConnection *)connection
@@ -94,24 +93,26 @@ static NSMutableArray *sDownloaders;
 }
 
 - (void)downloadUrlArray:(NSArray *)urlArray {
-  for (MpdResult *mpdResult in urlArray) {
+  for (Stream *stream in urlArray) {
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:mpdResult.url.lastPathComponent];
-    [Downloader DownloadWithUrl:mpdResult.url
-                           file:fileUrl
-                      initRange:mpdResult.initRange
-                       delegate:_delegate];
+        urlInDocumentDirectoryForFile:stream.url.lastPathComponent];
+    [Downloader initDownloaderWithUrl:stream.url
+                                 file:fileUrl
+                         initialRange:stream.initialRange
+                             delegate:_delegate];
   }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   [_fileHandle closeFile];
   if (_isMpd) {
-    NSData *mpd = [NSData dataWithContentsOfURL:_file];
-    [self downloadUrlArray:[Mpd parseMpd:mpd baseUrl:_url]];
+    NSData *mpdData = [NSData dataWithContentsOfURL:_file];
+    [self downloadUrlArray:[MpdParser parseMpdWithStreaming:nil
+                                                    mpdData:mpdData
+                                                    baseUrl:_url]];
   }
-  if ([_delegate respondsToSelector:@selector(finishedDownloading:file:initRange:)]) {
-    [_delegate finishedDownloading:self file:_file initRange:_initRange];
+  if ([_delegate respondsToSelector:@selector(finishedDownloading:file:initialRange:)]) {
+    [_delegate finishedDownloading:self file:_file initialRange:_initialRange];
   }
   @synchronized(sDownloaders) {
     [sDownloaders removeObject:self];
@@ -120,39 +121,45 @@ static NSMutableArray *sDownloaders;
 
 // completion can be nil and it will run sync.
 + (NSData *)downloadPartialData:(NSURL *)url
-                          range:(NSRange)range
-                     completion:(void(^)(NSData *data, NSError *error))completion {
+                   initialRange:(NSDictionary *)initialRange
+                     completion:(void(^)(NSData *data,
+                                         NSURLResponse *response,
+                                         NSError *error))completion {
   NSError *error = nil;
+  NSURLResponse *response = nil;
+  int startRange = [[initialRange objectForKey:kStartString] intValue];
+  int length = [[initialRange objectForKey:kLengthString] intValue];
+
   if ([url isFileURL]) {
     NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:url error:&error];
     if (error) {
       if (completion) {
-        completion(nil, error);
+        completion(nil, response, error);
       }
       return nil;
     }
-    [fileHandle seekToFileOffset:range.location];
-    NSData *data = [fileHandle readDataOfLength:range.length];
+        [fileHandle seekToFileOffset:startRange];
+    NSData *data = [fileHandle readDataOfLength:length];
     if (completion) {
-      completion(data, nil);
+      completion(data, response, nil);
     }
     return data;
   } else {
     NSMutableURLRequest *request = [NSMutableURLRequest
-                                    requestWithURL:url
-                                    cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                                    timeoutInterval:5];
-    NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%lu-%lu",
-                                 (unsigned long)range.location,
-                                 (unsigned long)(range.location + range.length)];
-    [request setValue:byteRangeString forHTTPHeaderField:@"Range"];
+                                       requestWithURL:url
+                                          cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                                      timeoutInterval:10];
+    NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%d-%d",
+                                 startRange,
+                                 startRange + length];
+    [request setValue:byteRangeString forHTTPHeaderField:kRangeHeaderString];
     if (completion) {
       [NSURLConnection sendAsynchronousRequest:request
                                          queue:[NSOperationQueue mainQueue]
                              completionHandler:^(NSURLResponse *response,
                                                  NSData *data,
                                                  NSError *connectionError) {
-                               completion(data, connectionError);
+                               completion(data, response, connectionError);
                              }];
       return nil;
     }

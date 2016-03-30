@@ -1,3 +1,5 @@
+// Copyright 2015 Google Inc. All rights reserved.
+
 #import "MediaCell.h"
 
 static NSString *const kNormalStateIconName = @"ico_download_before.png";
@@ -65,6 +67,7 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
 }
 
 - (void)layoutSubviews {
+  self.imageView.image = _thumbnail;
   [super layoutSubviews];
   [self.contentView setNeedsLayout];
   [self.contentView layoutIfNeeded];
@@ -76,9 +79,9 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
   [self setConstraints:_downloadPercentLabel attribute:NSLayoutAttributeTrailing constant:-45];
 }
 
-- (void) setConstraints:(UIView *)element
-              attribute:(NSLayoutAttribute *)attribute
-               constant:(CGFloat)constant {
+- (void)setConstraints:(UIView *)element
+             attribute:(NSLayoutAttribute)attribute
+              constant:(CGFloat)constant {
   [element setTranslatesAutoresizingMaskIntoConstraints:NO];
   [self addConstraint:[NSLayoutConstraint constraintWithItem:element
                                                    attribute:attribute
@@ -98,9 +101,9 @@ static NSString *const kDownloadedStateIconName = @"ico_download_after.png";
 
 - (UIColor *)offlineColor {
   return [UIColor colorWithRed:255.0/255.0
-                  green:127.0/255.0
-                   blue:0.0
-                  alpha:1.0];
+                         green:127.0/255.0
+                          blue:0.0
+                         alpha:1.0];
 
 
 }

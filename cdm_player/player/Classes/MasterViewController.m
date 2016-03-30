@@ -4,10 +4,12 @@
 
 #import "AppDelegate.h"
 #import "DetailViewController.h"
+#import "Downloader.h"
 #import "LicenseManager.h"
 #import "MediaCell.h"
 #import "MediaResource.h"
-#import "Mpd.h"
+#import "MpdParser.h"
+
 
 static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 static NSString *kAlertTitle = @"Info";
@@ -34,7 +36,6 @@ static NSString *kPlaylistTitle = @"Playlist";
     NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources"
                                                          ofType:@"json"];
     NSData *jsonData = [NSData dataWithContentsOfFile:jsonPath];
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSError *error = nil;
     NSArray *mediaResources =
         [NSJSONSerialization JSONObjectWithData:jsonData
@@ -47,9 +48,8 @@ static NSString *kPlaylistTitle = @"Playlist";
         NSString *url = [mediaResource objectForKey:@"url"];
         [self.mediaResources
              addObject:[[MediaResource alloc] initWithName:name
-                                                 thumbnail:nil
-                                                       url:[NSURL URLWithString:url]
-                                                   offline:NO]];
+                                                 thumbnail:[NSURL URLWithString:thumbnail]
+                                                       url:[NSURL URLWithString:url]]];
       }
     }
   }
@@ -89,6 +89,13 @@ static NSString *kPlaylistTitle = @"Playlist";
   mediaCell.isDownloaded = mediaResource.isDownloaded;
   mediaCell.filesBeingDownloaded = mediaResource.filesBeingDownloaded;
   mediaCell.percentage = mediaResource.percentage;
+  dispatch_async(mediaResource.downloadQ, ^() {
+    mediaCell.thumbnail =
+        [UIImage imageWithData:[NSData dataWithContentsOfURL:mediaResource.thumbnail]];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      [mediaCell layoutSubviews];
+    });
+  });
   mediaCell.delegate = self;
   [mediaCell updateDisplay];
 
@@ -97,12 +104,34 @@ static NSString *kPlaylistTitle = @"Playlist";
 
 #pragma mark - Private Methods
 
+// TODO(seawardt): Add Reachability in place of basic check (b/27264396).
+- (BOOL)isInternetConnectionAvailable {
+  NSURL *scriptUrl = [NSURL URLWithString:@"http://www.google.com"];
+  NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
+  if (data) {
+    return YES;
+  } else {
+    return NO;
+  }
+}
+
+- (void)connectionErrorAlert {
+  // Display the error.
+  NSError *error = [NSError errorWithDomain:@"No Connection Found." code:404 userInfo:nil];
+  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[error localizedDescription]
+                                                      message:[error localizedFailureReason]
+                                                     delegate:nil
+                                            cancelButtonTitle:@"OK"
+                                            otherButtonTitles:nil];
+  [alertView show];
+}
+
 - (void)didPressDelete:(MediaCell *)cell {
   NSInteger row = [self.tableView indexPathForCell:cell].row;
   MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
   NSURL *mpdUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
                        urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
-  [Mpd deleteFilesInMpd:mpdUrl];
+  [MpdParser deleteFilesInMpd:mpdUrl];
   [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
                                                       object:self];
   UIAlertView* alert;
@@ -117,18 +146,29 @@ static NSString *kPlaylistTitle = @"Playlist";
 }
 
 - (void)didPressDownload:(MediaCell *)cell {
-  NSInteger row = [self.tableView indexPathForCell:cell].row;
-  MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
-  NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                        urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
-  [Downloader DownloadWithUrl:mediaResource.url file:fileUrl
-                    initRange:NSMakeRange(0, 0)
-                     delegate:mediaResource];
+  if ([self isInternetConnectionAvailable]) {
+    NSInteger row = [self.tableView indexPathForCell:cell].row;
+    MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
+    NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+                          urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
+    [Downloader initDownloaderWithUrl:mediaResource.url
+                                 file:fileUrl
+                         initialRange:nil
+                             delegate:mediaResource];
+  } else {
+    [self connectionErrorAlert];
+  }
 }
 
 - (void)didPressPlay:(MediaCell *)cell {
   NSInteger row = [self.tableView indexPathForCell:cell].row;
   MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
+  if (!mediaResource.isDownloaded) {
+    if (![self isInternetConnectionAvailable]) {
+      [self connectionErrorAlert];
+      return;
+    }
+  }
   DetailViewController *playerViewController =
       [[DetailViewController alloc] initWithMediaResource:mediaResource];
   [[self navigationController] pushViewController:playerViewController

@@ -1,4 +1,5 @@
 // Copyright 2015 Google Inc. All rights reserved.
+
 #import "DetailViewController.h"
 
 #import <AudioToolbox/AudioToolbox.h>
@@ -6,9 +7,9 @@
 #import "CdmWrapper.h"
 #import "DashToHlsApi.h"
 #import "DashToHlsApiAVFramework.h"
+#import "LicenseManager.h"
 #import "MasterViewController.h"
 #import "MediaResource.h"
-#import "LicenseManager.h"
 #import "PlaybackView.h"
 #import "PlayerControlsView.h"
 #import "PlayerScrubberView.h"
@@ -37,6 +38,7 @@ static DetailViewController *sDetailViewController;
 @end
 
 @interface DetailViewController (Player)
+- (void)assetFailedToPrepareForPlayback:(NSError *)error;
 - (BOOL)isPlaying;
 - (void)observeValueForKeyPath:(NSString *)path ofObject:(id)object
                         change:(NSDictionary *)change context:(void *)context;
@@ -79,7 +81,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
     _mediaUrl = mediaResource.url;
   }
   if ([_mediaUrl.pathExtension isEqualToString:@"mpd"]) {
-    _streaming.manifestURL = _mediaUrl;
+    [_streaming processMpd:_mediaUrl];
   }
 }
 
@@ -420,7 +422,6 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   } else if (context == PlaybackViewControllerRateObservationContext) {
     // TODO(seawardt): Handle Bit rate changes
   } else if (context == PlaybackViewControllerCurrentItemObservationContext) {
-    AVPlayerItem *newPlayerItem = [change objectForKey:NSKeyValueChangeNewKey];
     [_playbackView setPlayer:_player];
     /* Specifies that the player should preserve the video’s aspect ratio and
        fit the video within the layer’s bounds. */

@@ -2,10 +2,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import "Downloader.h"
-
 @class DetailViewController;
 
-@interface MasterViewController : UITableViewController<DownloadDelegate>
+@interface MasterViewController : UITableViewController
 @property(nonatomic, strong) DetailViewController *detailViewController;
 @end

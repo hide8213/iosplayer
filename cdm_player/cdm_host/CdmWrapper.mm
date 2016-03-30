@@ -4,7 +4,6 @@
 #include "CdmWrapper.h"
 
 NSString *const kiOSCdmError = @"kiOSCdmError";
-static NSUInteger kWidevineSystemIdOffset = 12;
 
 @interface iOSCdm ()<iOSCdmHandler>
 @end
@@ -62,6 +61,7 @@ static NSUInteger kWidevineSystemIdOffset = 12;
   _sessionIdsToBlocks = [[NSMutableDictionary alloc] init];
   _psshKeysToIds = [[NSMutableDictionary alloc] init];
   _offlineSessions = [[NSMutableDictionary alloc] init];
+
 }
 
 - (void)shutdownCdm {
@@ -75,21 +75,24 @@ static NSUInteger kWidevineSystemIdOffset = 12;
 }
 
 - (void)processPsshKey:(NSData *)psshKey
-              mimeType:(NSString *)mimeType
           isOfflineVod:(BOOL)isOfflineVod
        completionBlock:(void(^)(NSError *))completionBlock {
   dispatch_queue_t queue = [_delegate iOSCdmDispatchQueue:self];
-
   NSString *sessionIdForKey = _psshKeysToIds[psshKey];
+
   if (!sessionIdForKey) {
+    // No Session has been loaded.
     NSString *sessionId;
     NSError *error;
-    if (isOfflineVod &&
-        [_delegate respondsToSelector:@selector(webSessionForPssh:)]) {
-      sessionId = [_delegate webSessionForPssh:psshKey];
+    if (isOfflineVod) {
+      // Check if license was previously stored.
+      if ([_delegate respondsToSelector:@selector(sessionIdFromPssh:)]) {
+        sessionId = [_delegate sessionIdFromPssh:psshKey];
+      }
     }
 
     if (sessionId) {
+      // License exists, attempt to Load Session.
       error = iOSCdmHost::GetHost()->LoadSession(sessionId);
       if (error) {
         dispatch_async(queue, ^{
@@ -97,20 +100,29 @@ static NSUInteger kWidevineSystemIdOffset = 12;
         });
         return;
       }
-
+      _psshKeysToIds[psshKey] = sessionId;
       _offlineSessions[sessionId] = @YES;
+
+      NSMutableArray *blocks = _sessionIdsToBlocks[sessionId];
+      if (blocks) {
+        [blocks addObject:[completionBlock copy]];
+      } else if (queue) {
+        dispatch_async(queue, ^{
+          completionBlock(nil);
+        });
+      }
     } else {
-      error  = iOSCdmHost::GetHost()->CreateSession(
-          isOfflineVod ? widevine::Cdm::kPersistent :
-                         widevine::Cdm::kTemporary,
-          &sessionId);
+      // Setup new Streaming Session.
+      error  = iOSCdmHost::GetHost()->CreateSession(isOfflineVod ?
+                                                    widevine::Cdm::kPersistent :
+                                                    widevine::Cdm::kTemporary,
+                                                    &sessionId);
       if (error) {
         dispatch_async(queue, ^{
           completionBlock(error);
         });
         return;
       }
-
       // Add the completionBlock to the array to ensure the blocks are called
       // once the GenerateRequest completes.
       [[self blocksForSessionId:sessionId] addObject:[completionBlock copy]];
@@ -126,7 +138,6 @@ static NSUInteger kWidevineSystemIdOffset = 12;
         iOSCdmHost::GetHost()->CloseSessions(@[sessionId]);
         return;
       }
-
       _psshKeysToIds[psshKey] = sessionId;
       [self onSessionCreated:sessionId];
     }
@@ -144,13 +155,7 @@ static NSUInteger kWidevineSystemIdOffset = 12;
 
 - (void)removeOfflineLicenseForPsshKey:(NSData *)psshKey
                        completionBlock:(void(^)(NSError *))completionBlock {
-  NSString *sessionIdForKey = nil;
-  if ([_delegate respondsToSelector:@selector(webSessionForPssh:)]) {
-    sessionIdForKey = [_delegate webSessionForPssh:psshKey];
-  }
-  if (!sessionIdForKey) {
-    sessionIdForKey = _psshKeysToIds[psshKey];
-  }
+  NSString *sessionIdForKey = [_delegate sessionIdFromPssh:psshKey];
   if (sessionIdForKey) {
     iOSCdmHost::GetHost()->RemoveSession(sessionIdForKey);
     [_offlineSessions removeObjectForKey:sessionIdForKey];
@@ -168,15 +173,11 @@ static NSUInteger kWidevineSystemIdOffset = 12;
 - (void)onSessionMessage:(NSData *)data
                sessionId:(NSString *)sessionId
          completionBlock:(void(^)(NSData *, NSError *))completionBlock {
-  if ([_delegate respondsToSelector:
-          @selector(iOSCdm:sendData:offline:toURL:completionBlock:)]) {
-
-    BOOL isOffline = [_offlineSessions[sessionId] isEqual:@YES];
-    // TODO: Update delegate API.
+  BOOL isOffline = [_offlineSessions[sessionId] boolValue];
+  if (isOffline) {
     [_delegate iOSCdm:self
              sendData:data
               offline:isOffline
-                toURL:nil
       completionBlock:completionBlock];
   } else {
     [_delegate iOSCdm:self
@@ -188,9 +189,8 @@ static NSUInteger kWidevineSystemIdOffset = 12;
 - (void)onSessionCreated:(NSString *)sessionId {
   NSArray *keys = [_psshKeysToIds allKeysForObject:sessionId];
   for (NSData *key in keys) {
-    if ([_delegate
-            respondsToSelector:@selector(onSessionCreatedWithPssh:webId:)]) {
-      [_delegate onSessionCreatedWithPssh:key webId:sessionId];
+    if ([_delegate respondsToSelector:@selector(onSessionCreatedWithPssh:sessionId:)]) {
+      [_delegate onSessionCreatedWithPssh:key sessionId:sessionId];
     }
   }
   if ([_offlineSessions[sessionId] isEqual:@YES]) {
