@@ -94,6 +94,7 @@ static NSString *const kInvalidParamsMpdData =
       @"</Period>"
     @"</MPD>";
 
+
 @interface MpdParserTest : XCTestCase {
   Streaming *_streaming;
 }
@@ -162,13 +163,30 @@ static NSString *const kInvalidParamsMpdData =
   _streaming.streams = [self parseStaticMPD:kSplitBaseMpdData urlString:kEncContentMpdUrl];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
-      XCTAssertEqualObjects([stream.url absoluteString],
+      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
                             @"http://google.com/test/content/video.mp4");
     } else {
-      XCTAssertEqualObjects([stream.url absoluteString],
+      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
                             @"http://google.com/test/content/audio.mp4");
     }
   }
+}
+
+// Validate parsing of Manifest Duration
+- (void)testMediaDuration {
+  MpdParser *parser = [[MpdParser alloc] init];
+  XCTAssertLessThan([parser convertDurationToSeconds:@"P1M1DT1H2M3.00S"],
+                    ((60 * 60 * 24 * 30) + 90123 + 1));
+  XCTAssertGreaterThan([parser convertDurationToSeconds:@"P1M1DT1H2M3.00S"],
+                       ((60 * 60 * 24 * 28) + 90123 - 1));
+  XCTAssertEqual([parser convertDurationToSeconds:@"P1DT0H10M0.00S"],
+                 (24 * 60 *60) + (10 * 60));
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT0H10M0.00S"], (10 * 60));
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT0H10M"], (10 * 60));
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT1S"], 1);
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT1.1S"], 1);
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT0.1S"], 0);
+  XCTAssertEqual([parser convertDurationToSeconds:@"PT.1S"], 0);
 }
 
 // Validate total streams are accounted for and the indexValue increments correctly
@@ -176,7 +194,7 @@ static NSString *const kInvalidParamsMpdData =
   _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kClearContentMpdUrl];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
-      XCTAssertEqual(stream.indexValue, 1);
+      XCTAssertEqual(stream.streamIndex, 1);
     }
   }
   XCTAssertEqual(_streaming.streams.count, 2);
@@ -190,10 +208,10 @@ static NSString *const kInvalidParamsMpdData =
     NSLog(@"%@", stream);
     if (stream.isVideo) {
       // Representation Scheme should stay HTTP.
-      XCTAssertEqualObjects(stream.url.scheme, @"http");
+      XCTAssertEqualObjects(stream.sourceUrl.scheme, @"http");
     } else {
       // No scheme present will default to MPD Scheme.
-      XCTAssertEqualObjects(stream.url.scheme, @"https");
+      XCTAssertEqualObjects(stream.sourceUrl.scheme, @"https");
     }
   }
 
@@ -205,11 +223,11 @@ static NSString *const kInvalidParamsMpdData =
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       // Validate this URL is same as Representation BaseURL.
-      XCTAssertEqualObjects([stream.url absoluteString],
+      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
                             @"http://google.com/new/video/path/video.mp4");
     } else {
       // Validate this URL uses Global BaseURL.
-      XCTAssertEqualObjects([stream.url absoluteString],
+      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
                             @"http://google.com/test/content/audio.mp4");
     }
   }

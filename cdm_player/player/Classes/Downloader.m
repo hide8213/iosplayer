@@ -95,8 +95,8 @@ NSString *const kZeroString = @"0";
 - (void)downloadUrlArray:(NSArray *)urlArray {
   for (Stream *stream in urlArray) {
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:stream.url.lastPathComponent];
-    [Downloader initDownloaderWithUrl:stream.url
+        urlInDocumentDirectoryForFile:stream.sourceUrl.lastPathComponent];
+    [Downloader initDownloaderWithUrl:stream.sourceUrl
                                  file:fileUrl
                          initialRange:stream.initialRange
                              delegate:_delegate];
@@ -149,10 +149,13 @@ NSString *const kZeroString = @"0";
                                        requestWithURL:url
                                           cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                                       timeoutInterval:10];
-    NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%d-%d",
-                                 startRange,
-                                 startRange + length];
-    [request setValue:byteRangeString forHTTPHeaderField:kRangeHeaderString];
+    // Check if it is a byte range request or full file request.
+    if (length != 0) {
+      NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%d-%d",
+                                   startRange,
+                                   startRange + length];
+      [request setValue:byteRangeString forHTTPHeaderField:kRangeHeaderString];
+    }
     if (completion) {
       [NSURLConnection sendAsynchronousRequest:request
                                          queue:[NSOperationQueue mainQueue]

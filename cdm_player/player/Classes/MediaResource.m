@@ -4,18 +4,17 @@
 
 #import "AppDelegate.h"
 #import "CdmWrapper.h"
-#import "DashToHlsApi.h"
 #import "Downloader.h"
+#import "UDTApi.h"
 
 static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 NSString *kMimeType = @"video/mp4";
 
-static DashToHlsStatus mediaResourcePsshHandler (void *context, const uint8_t *pssh,
-                                                 size_t pssh_length) {
+static DashToHlsStatus mediaResourcePsshHandler(void *context, const uint8_t *pssh,
+                                                size_t pssh_length) {
   [[iOSCdm sharedInstance] processPsshKey:[NSData dataWithBytes:pssh length:pssh_length]
                              isOfflineVod:YES
                           completionBlock:^(NSError *error) {
-
                           }];
   return kDashToHlsStatus_OK;
 }
@@ -111,30 +110,34 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 
 - (BOOL)findPssh:(NSData*)initializationData {
   struct DashToHlsSession *session = NULL;
-  DashToHlsStatus status = DashToHls_CreateSession(&session);
+  DashToHlsStatus status = Udt_CreateSession(&session);
   if (status != kDashToHlsStatus_OK) {
     NSLog(@"\n::ERROR::Could not initialize session url=%@", _url);
     return NO;
   }
   status = DashToHls_SetCenc_PsshHandler(session,
-                                         nil,
-                                         mediaResourcePsshHandler);
+                              nil,
+                              mediaResourcePsshHandler);
   if (status != kDashToHlsStatus_OK) {
     NSLog(@"\n::ERROR::Could not set PSSH Handler url=%@", _url);
     return NO;
   }
   status = DashToHls_SetCenc_DecryptSample(session,
-                                           nil,
-                                           mediaResourceDecryptionHandler,
-                                           false);
+                                nil,
+                                mediaResourceDecryptionHandler,
+                                false);
   if (status != kDashToHlsStatus_OK) {
     NSLog(@"\n::ERROR::Could not set Decrypt Handler url=%@", _url);
     return NO;
   }
   if (_offline) {
-    status = DashToHls_ParseLivePssh(session,
-                                     (const uint8_t *)[initializationData bytes],
-                                     [initializationData length]);
+    status = Udt_ParseDash(session,
+                           nil,
+                           (uint8_t *)[initializationData bytes],
+                           [initializationData length],
+                           nil,
+                           nil,
+                           nil);
     if (status == kDashToHlsStatus_ClearContent) {
     } else if (status == kDashToHlsStatus_OK) {
     } else {

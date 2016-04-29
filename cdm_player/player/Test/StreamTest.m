@@ -51,7 +51,7 @@ static NSString *const kVideoMpd =
 
 - (void)testStreamDescription {
   Stream *stream = [[Stream alloc] initWithStreaming:_streaming];
-  stream.url = [[NSURL alloc] initWithString:kMpdUrlString];
+  stream.sourceUrl = [[NSURL alloc] initWithString:kMpdUrlString];
   NSArray *streamString = [stream.description componentsSeparatedByString: @"="];
   NSString *streamUrl = [streamString objectAtIndex:4];
   XCTAssertEqualObjects(streamUrl, kMpdUrlString);
@@ -66,6 +66,8 @@ static NSString *const kVideoMpd =
   NSMutableArray *streams = [MpdParser parseMpdWithStreaming:_streaming
                                                      mpdData:mpdData
                                                      baseUrl:mpdUrl];
+  NSUInteger *preloadCount = streams.count;
+  NSString *variantPlaylist = [_streaming buildVariantPlaylist:streams];
   [streams enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
     Stream *stream = obj;
     XCTAssertNotNil(stream);

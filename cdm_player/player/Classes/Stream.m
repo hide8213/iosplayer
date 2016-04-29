@@ -2,17 +2,18 @@
 
 #import "Stream.h"
 
+#import "LiveStream.h"
 #import "Streaming.h"
 
 NSString *kAudioMimeType = @"audio/mp4";
 NSString *kVideoMimeType = @"video/mp4";
 
 // Handler used to hold pass the PSSH (License Key) to the DASH Transmuxer
-// as part of DashToHls_SetCenc_PsshHandler.
+// as part of Udt_SetPsshHandler.
 static DashToHlsStatus dashPsshHandler(void *context, const uint8_t *pssh, size_t pssh_length) {
   Stream *stream = (__bridge Stream *)(context);
   [[iOSCdm sharedInstance] processPsshKey:[NSData dataWithBytes:pssh length:pssh_length]
-                             isOfflineVod:[stream.url isFileURL]
+                             isOfflineVod:[stream.sourceUrl isFileURL]
                           completionBlock:^(NSError *error) {
                             [stream.streaming streamReady:stream];
                           }];
@@ -20,7 +21,7 @@ static DashToHlsStatus dashPsshHandler(void *context, const uint8_t *pssh, size_
   return kDashToHlsStatus_OK;
 }
 
-// Handler to be used with DashToHls_SetCenc_DecryptSample from the DASH Transmuxer.
+// Handler to be used with Udt_SetDecryptSample from the DASH Transmuxer.
 static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encrypted,
                                              uint8_t *clear, size_t length, uint8_t *iv,
                                              size_t iv_length, const uint8_t *key_id,
@@ -37,34 +38,37 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
   return kDashToHlsStatus_OK;
 }
 
+
+@implementation LiveStream
+@end
+
 @implementation Stream
 
 - (id)initWithStreaming:(Streaming *)streaming {
   self = [super init];
   if (self) {
+    _liveStream = [[LiveStream alloc] init];
     _streaming = streaming;
-
   }
   return self;
 }
 
-
 - (BOOL)initialize:(NSData*)initializationData {
   struct DashToHlsSession *session = NULL;
-  DashToHlsStatus status = DashToHls_CreateSession(&session);
+  DashToHlsStatus status = Udt_CreateSession(&session);
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not initialize session url=%@", _url);
+    NSLog(@"Could not initialize session");
     return NO;
   }
   _session = session;
   status = [self setPsshHandler:dashPsshHandler];
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set PSSH Handler url=%@", _url);
+    NSLog(@"Could not set PSSH Handler");
     return NO;
   }
   status = [self setDecryptionHandler:dashDecryptionHandler];
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set Decrypt Handler url=%@", _url);
+    NSLog(@"Could not set Decrypt Handler");
     return NO;
   }
   status = [self parseInitData:initializationData];
@@ -72,11 +76,33 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
     [_streaming streamReady:self];
   } else if (status == kDashToHlsStatus_OK) {
   } else {
-    NSLog(@"Could not parse dash url=%@", _url);
-    DashToHls_PrettyPrint(_session);
+    NSLog(@"Could not parse dash");
+    Udt_PrettyPrint(_session);
     return NO;
   }
   return YES;
+}
+
+- (void)hlsFromDashData:(NSData *)dashData {
+  DashToHlsStatus status;
+  const uint8_t* hlsSegment = NULL;
+  size_t hlsSize = 0;
+  NSData *data;
+  NSError *error;
+  bool is_video = self.isVideo;
+  // Parse Data to setup UDT Session properties.
+  status = [self parseInitData:dashData];
+  if (status == kDashToHlsStatus_ClearContent) {
+    [_streaming streamReady:self];
+  } else if (kDashToHlsStatus_OK == status) {
+    data = [NSData dataWithBytes:hlsSegment length:hlsSize];
+    DashToHls_ReleaseHlsSegment(_session, (uint32_t)_streamIndex);
+  } else {
+    NSLog(@"Could not parse dash url=%@", _sourceUrl);
+    Udt_PrettyPrint(_session);
+    return;
+  }
+  return;
 }
 
 - (DashToHlsStatus)setPsshHandler:(DashToHlsContext)handler {
@@ -92,18 +118,22 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
                                          false);
 }
 
-- (DashToHlsStatus)parseInitData:(NSData*)initializationData {
-  return DashToHls_ParseDash(_session,
-                             (const uint8_t *)[initializationData bytes],
-                             [initializationData length], &_dashIndex);
+- (DashToHlsStatus)parseInitData:(NSData*)data {
+  // If SegmentBase, use 0 to pass as Stream Index.
+  return Udt_ParseDash(_session,
+                       _dashMediaType == SEGMENT_BASE ? 0 : _streamIndex,
+                       (uint8_t *)[data bytes],
+                       [data length],
+                       (uint8_t *)[_pssh bytes],
+                       [_pssh length],
+                       &_dashIndex);
 }
-
 
 // Debug logging formatting.
 - (NSString *)description {
   return [NSString stringWithFormat:@"Stream%lu: isVideo=%s codec=%@ bandwidth=%lu \n url=%@",
-              (unsigned long)_indexValue, _isVideo ? "YES":"NO", _codecs, (unsigned long)_bandwidth,
-              _url];
+              (unsigned long)_streamIndex, _isVideo ? "YES":"NO", _codecs,
+              (unsigned long)_bandwidth, _sourceUrl];
 }
 
 @end

@@ -6,11 +6,11 @@
 	<dict>
 		<key>Headers/DashToHlsApi.h</key>
 		<data>
-		ei736w0BtyXTdqIejRY7XWhJATY=
+		ChubbhuP3O5tjEKYaWZcaGtbQds=
 		</data>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
 		<data>
-		HasCiNlf8W8bLyPXQ3osX3JfZL4=
+		z41zhVnAf388veLLiZ5J3ZBRlLg=
 		</data>
 		<key>Headers/cdm.h</key>
 		<data>
@@ -22,27 +22,55 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		XD1Z5pMF4kvEOPl10qrbshuoFDg=
+		O2qmzwbL1qjaXACHDxZsL6ryP0E=
 		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
 		<key>Headers/DashToHlsApi.h</key>
-		<data>
-		ei736w0BtyXTdqIejRY7XWhJATY=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			ChubbhuP3O5tjEKYaWZcaGtbQds=
+			</data>
+			<key>hash2</key>
+			<data>
+			1sADwSUpwRXfucDkQZ0i7EuvT4eScg4dmgVUo0GF5Lg=
+			</data>
+		</dict>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
-		<data>
-		HasCiNlf8W8bLyPXQ3osX3JfZL4=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			z41zhVnAf388veLLiZ5J3ZBRlLg=
+			</data>
+			<key>hash2</key>
+			<data>
+			ZtGwmg79/2zytbbbHhSS5Y5d3ekfIZA+3xNklZkRflA=
+			</data>
+		</dict>
 		<key>Headers/cdm.h</key>
-		<data>
-		RqyeYiMz/ximB6LKKTUO3t1C20g=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			RqyeYiMz/ximB6LKKTUO3t1C20g=
+			</data>
+			<key>hash2</key>
+			<data>
+			4Zh/M3w1UlyxtYRSX1z+lXepmeFKE+vYcQ/Pdbci/0w=
+			</data>
+		</dict>
 		<key>Headers/tfit_rsa_keys.h</key>
-		<data>
-		uCMLqpyggrBEC4gTpPWPI30OedU=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			uCMLqpyggrBEC4gTpPWPI30OedU=
+			</data>
+			<key>hash2</key>
+			<data>
+			bidtokJNVCHItfOq5xPx2WrVQXbYQultINENCCc8x7M=
+			</data>
+		</dict>
 	</dict>
 	<key>rules</key>
 	<dict>

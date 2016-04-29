@@ -57,7 +57,7 @@ static NSString *const kBasicVODMPD =
   [_streaming processMpd:_streaming.mpdURL];
   Stream *stream = nil;
   for (stream in _streaming.streams) {
-    [Downloader downloadPartialData:stream.url
+    [Downloader downloadPartialData:stream.sourceUrl
                        initialRange:stream.initialRange
                          completion:^(NSData *data,
                                       NSURLResponse *response,

@@ -14,7 +14,6 @@
 
 ### Components
 * CDM Host Interface
-* iOS SDK
 * Reference Player
 * CDM Dynamic Library
 

@@ -5,7 +5,6 @@
 #import <AudioToolbox/AudioToolbox.h>
 
 #import "CdmWrapper.h"
-#import "DashToHlsApi.h"
 #import "DashToHlsApiAVFramework.h"
 #import "LicenseManager.h"
 #import "MasterViewController.h"
@@ -14,11 +13,13 @@
 #import "PlayerControlsView.h"
 #import "PlayerScrubberView.h"
 #import "Streaming.h"
-
+#import "UDTApi.h"
 
 static DetailViewController *sDetailViewController;
 
-@interface DetailViewController() <PlayerControlsDelegate, PlayerScrubberDelegate> {
+@interface DetailViewController() <PlayerControlsDelegate,
+                                   PlayerScrubberDelegate,
+                                   StreamingDelegate> {
   BOOL _isSeeking;
   NSURL *_keyStoreURL;
   NSString *_mediaName;
@@ -108,7 +109,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   }
 }
 
-#pragma mark EXODemoPlayerControlsDelegate
+#pragma mark PlayerControlsDelegate
 
 - (void)didPressPlay {
   [_player play];
@@ -144,6 +145,10 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
                                           withAnimation:NO];
 }
 
+- (void)volumeSliderDidScrubToValue:(float)value {
+  [_player setVolume:value];
+}
+
 #pragma mark PlayerScrubberDelegate
 
 - (void)scrubberDidScrubToValue:(NSTimeInterval)value {
@@ -159,13 +164,24 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   [self setScrubberTime:CMTimeGetSeconds([_player currentTime])];
 }
 
+#pragma mark StreamingDelegate
+
+- (float)getCurrentTime {
+  float seconds = 0;
+  if (_player) {
+    seconds = CMTimeGetSeconds([_player currentTime]);
+  }
+  return seconds;
+}
+
 #pragma mark
 #pragma mark View Controller
 
 - (void)loadView {
   _playbackView = [[PlaybackView alloc] init];
-  _playbackView.controlsView.delegate = self;
+  _playbackView.controlsView.controlsDelegate = self;
   _playbackView.scrubberView.scrubberDelegate = self;
+  _streaming.streamingDelegate = self;
   [_playbackView setVideoRenderingView:_renderingView];
   [self setView:_playbackView];
   _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -204,7 +220,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
                        _streaming.address, _streaming.httpPort];
   _mediaUrl = [[NSURL alloc] initWithString:address];
   AVURLAsset *asset = [AVURLAsset URLAssetWithURL:_mediaUrl options:nil];
-  if (DashToHls_SetAVURLAsset(asset, NULL, dispatch_get_main_queue()) != kDashToHlsStatus_OK) {
+  if (Udt_SetAVURLAsset(asset, NULL, dispatch_get_main_queue()) != kDashToHlsStatus_OK) {
     NSLog(@"Cannot set the loopback encryption");
   }
 
@@ -253,6 +269,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
+  [self.navigationController popViewControllerAnimated:YES];
   // After the movie has played to its end time, seek back to time zero to play it again.
   _seekToZeroBeforePlay = YES;
 }
@@ -359,7 +376,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   _seekToZeroBeforePlay = NO;
   // Create new player, if we don't already have one.
   if (!_player) {
-    [self setPlayer:[AVPlayer playerWithPlayerItem:_playerItem]];
+    _player = [AVPlayer playerWithPlayerItem:_playerItem];
     /* Observe the AVPlayer "currentItem" property to find out when any
      AVPlayer replaceCurrentItemWithPlayerItem: replacement will/did
      occur". */

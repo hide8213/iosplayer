@@ -13,8 +13,10 @@
   UIBarButtonItem *_playButtonItem;
   UIBarButtonItem *_pauseButtonItem;
   UIBarButtonItem *_restartButtonItem;
+  UIBarButtonItem *_volumeButtonItem;
   UIImage *_fullscreenEnterImage;
   UIImage *_fullscreenExitImage;
+  UISlider *_volumeSlider;
 }
 
 - (instancetype)init {
@@ -43,6 +45,13 @@
     [airplayView sizeToFit];
     UIBarButtonItem *airplayButtonItem = [[UIBarButtonItem alloc] initWithCustomView:airplayView];
     [_buttonBarItems addObject:airplayButtonItem];
+    _volumeSlider = [[UISlider alloc] init];
+    [self initSlider];
+    [_volumeSlider addTarget:self
+                      action:@selector(volumeSliderDidScrubToValue)
+            forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *volumeSliderItem = [[UIBarButtonItem alloc] initWithCustomView:_volumeSlider];
+    [_buttonBarItems addObject:volumeSliderItem];
     _restartButtonItem = [self barButtonWithTitle:@"Restart"
                                        systemItem:UIBarButtonSystemItemRefresh
                                          selector:@selector(didPressRestart)];
@@ -70,20 +79,27 @@
   _buttonBar.frame = CGRectMake(0, 0, self.frame.size.width, kElementHeight);
 }
 
+- (void)initSlider {
+  _volumeSlider.minimumValue = 0;
+  _volumeSlider.maximumValue = 1;
+  _volumeSlider.value = .5;
+}
+
 #pragma mark Private Methods
 
+
 - (void)didPressPlay {
-  [_delegate didPressPlay];
+  [_controlsDelegate didPressPlay];
   [self showPauseButton];
 }
 
 - (void)didPressPause {
-  [_delegate didPressPause];
+  [_controlsDelegate didPressPause];
   [self showPlayButton];
 }
 
 - (void)didPressRestart {
-  [_delegate didPressRestart];
+  [_controlsDelegate didPressRestart];
   [self didPressPlay];
 }
 
@@ -93,7 +109,7 @@
   } else {
     _isFullscreen = YES;
   }
-  [_delegate didPressToggleFullscreen];
+  [_controlsDelegate didPressToggleFullscreen];
   [self toggleFullscreenButton];
 }
 
@@ -113,6 +129,10 @@
   } else {
     [_fullscreenButtonItem setImage:_fullscreenEnterImage];
   }
+}
+
+- (void)volumeSliderDidScrubToValue {
+  [_controlsDelegate volumeSliderDidScrubToValue:_volumeSlider.value];
 }
 
 - (UIBarButtonItem *)barButtonWithImage:(UIImage *)image

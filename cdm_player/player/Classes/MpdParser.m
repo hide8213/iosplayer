@@ -19,6 +19,10 @@ NSString *const kDashSegmentBase = @"SegmentBase";
 NSString *const kDashSegmentBaseIndexRange = @"indexRange";
 NSString *const kDashSegmentBaseInitializationRange = @"range";
 NSString *const kDashSegmentInitRange = @"Initialization";
+NSString *const kDashSegmentList = @"SegmentList";
+NSString *const kDashSegmentListURL = @"SegmentURL";
+NSString *const kDashSegmentTemplate = @"SegmentTemplate";
+NSString *const kDashSegmentTimeline = @"SegmentTimeline";
 
 NSString *const kAttrAudioSampleRate = @"audioSamplingRate";
 NSString *const kAttrBandwidth = @"bandwidth";
@@ -30,12 +34,16 @@ NSString *const kAttrId = @"id";
 NSString *const kAttrIndexRange = @"indexRange";
 NSString *const kAttrLang = @"lang";
 NSString *const kAttrMimeType = @"mimeType";
+NSString *const kAttrMimeTypeMp4 = @"/mp4";
 NSString *const kAttrNumChannels = @"numChannels";
+NSString *const kAttrPssh = @"pssh";
+NSString *const kAttrPsshCenc = @"cenc:pssh";
 NSString *const kAttrSampleRate = @"sampleRate";
 NSString *const kAttrWidth = @"width";
 
 NSString *const kBoolNo = @"NO";
 NSString *const kBoolYes = @"YES";
+NSString *const kDashMediaType = @"dashMediaType";
 NSString *const kDashToHlsString = @"DashToHls";
 NSString *const kDashSeparator = @"-";
 NSString *const kHttpString = @"http";
@@ -46,7 +54,6 @@ NSString *const kRangeStart = @"startRange";
 NSString *const kSlashesString = @"//";
 NSString *const kStreamingString = @"Streaming";
 NSString *const kVideoString = @"video";
-
 
 
 @implementation MpdParser {
@@ -62,6 +69,12 @@ NSString *const kVideoString = @"video";
   BOOL _storeOffline;
   NSInteger _streamCount;
   Streaming *_streaming;
+}
+
+// Init methods.
+- (id)init {
+  self = [super init];
+  return self;
 }
 
 - (id)initWithStreaming:(Streaming *)streaming
@@ -87,6 +100,7 @@ NSString *const kVideoString = @"video";
   return self;
 }
 
+// External methods to be used to begin parsing.
 + (NSArray *)parseMpdWithStreaming:(Streaming *)streaming
                            mpdData:(NSData *)mpdData
                            baseUrl:(NSURL *)baseUrl {
@@ -106,61 +120,80 @@ NSString *const kVideoString = @"video";
 
 #pragma mark NSXMLParser methods -- start
 
+// Set stream counter to track the amout of streams found in the manifest.
 - (void)parserDidStartDocument:(NSXMLParser *)parser {
   _streamCount = 0;
 }
 
+// XML Element found, being parsing.
 - (void)parser:(NSXMLParser *)parser
     didStartElement:(NSString *)elementName
        namespaceURI:(NSString *)namespaceURI
       qualifiedName:(NSString *)qName
          attributes:(NSDictionary *)attributeDict {
   _currentElement = elementName;
-  for (id key in attributeDict) {
-    NSString *value = [[attributeDict objectForKey:key]
+  for (NSString *key in attributeDict) {
+    NSString *value = [[attributeDict valueForKey:key]
                            stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     // Check that value isnt blank.
-    if (!([value length] == 0)) {
+    if (([value length] != 0)) {
       [_mpdDict setValue:value forKey:key];
       if ([key isEqualToString:kDashRepresentationMime]) {
-         if ([value containsString:kVideoString]) {
-           [_mpdDict setValue:kBoolYes forKey:kIsVideoString];
-         } else {
-           [_mpdDict setValue:kBoolNo forKey:kIsVideoString];
-         }
+        if ([value containsString:kVideoString]) {
+          [_mpdDict setValue:kBoolYes forKey:kIsVideoString];
+        } else {
+          [_mpdDict setValue:kBoolNo forKey:kIsVideoString];
+        }
+      }
+      if ([elementName hasPrefix:@"Segment"]) {
+        if (![self setDashMediaType:elementName]) {
+          [parser abortParsing];
+        }
       }
     }
   }
 }
 
+// Characters found within an element that do not contain a specific key.
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
   if (string) {
     if ([string hasPrefix:kSlashesString]) {
-      [_mpdDict setValue:string forKey:kRootUrl];
+        [_mpdDict setValue:string forKey:kRootUrl];
     }
+    // Stores PSSH to dictionary
+    if ([_currentElement isEqualToString:kAttrPsshCenc]) {
+      [_mpdDict setValue:string forKey:kAttrPssh];
+    }
+    // Ignores values that contain two lines. If needed, modify as necessary.
     if (![string containsString:@"\n "]) {
       [_mpdDict setValue:string forKey:_currentElement];
     }
   }
 }
 
+// Finished parsing Element.
 - (void)parser:(NSXMLParser *)parser
     didEndElement:(NSString *)elementName
      namespaceURI:(NSString *)namespaceURI
     qualifiedName:(NSString *)qName {
   if ([elementName isEqualToString:kDashRepresentation]) {
-    if (![self setStreamProperties:elementName]) {
-      [parser abortParsing];
+    // Only setup stream object when mimeType is MP4. Ignores all others.
+    if ([[_mpdDict objectForKey:kAttrMimeType] containsString:kAttrMimeTypeMp4]) {
+      if (![self setStreamProperties:elementName]) {
+        [parser abortParsing];
+      }
     }
   }
 }
 
+// If parsing fails, this error will be returned.
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError {
   NSLog(@"\n::ERROR::Parse Failed: %@", parseError);
 }
 
 
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
+
 }
 
 #pragma mark NSXMLParser methods -- end
@@ -168,7 +201,6 @@ NSString *const kVideoString = @"video";
 // Look up aviailable properties from Stream object and populate the required values.
 - (BOOL)setStreamProperties:(NSString *)elementName {
   Stream *stream = [[Stream alloc] initWithStreaming:_streaming];
-
   unsigned int numberOfProperties = 0;
   unsigned int propertyIndex = 0;
   objc_property_t *properties = class_copyPropertyList([Stream class], &numberOfProperties);
@@ -189,13 +221,13 @@ NSString *const kVideoString = @"video";
   return NO;
 }
 
+// Check Property type and determine attribute.
 - (NSString *)getPropertyType:(objc_property_t)property {
   const char *attribute = property_getAttributes(property);
   NSString *attributeString = [NSString stringWithUTF8String:attribute];
   NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
   NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
                                      stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-
   switch(attribute[1]) {
     case '@' : // NSString
       attributeString = [attributeStripped substringFromIndex:1];
@@ -213,13 +245,12 @@ NSString *const kVideoString = @"video";
                               componentsSeparatedByString:@"="] firstObject];
       break;
     default:
-      NSLog(@"No Property Matched");
+      NSLog(@"No Property Matched: %c", attribute[1]);
       attributeString = nil;
       break;
   }
   return attributeString;
 }
-
 
 // Uses available property in Stream object and value when property and key match.
 - (void)setProperty:(Stream *)stream property:(objc_property_t)property {
@@ -229,12 +260,11 @@ NSString *const kVideoString = @"video";
   NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
   NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
                                  stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-
   NSString *propertyType = [attributeStripped substringFromIndex:1];
   switch(attribute[1]) {
     case '@' : // Char
       if ([propertyType isEqualToString:@"NSURL"]) {
-        NSURL *value = [self setStreamUrl];
+        NSURL *value = [self setStreamUrl:[_mpdDict objectForKey:kDashRepresentationBaseUrl]];
         [stream setValue:value forKey:propertyName];
       }
       if ([propertyType isEqualToString:@"NSDictionary"]) {
@@ -243,17 +273,33 @@ NSString *const kVideoString = @"video";
       }
       if ([propertyType isEqualToString:@"NSData"]) {
         NSData *value = [[NSData alloc] init];
+        if ([propertyName isEqualToString:@"pssh"]) {
+          NSString *psshString = [_mpdDict objectForKey:@"cenc:pssh"];
+          if (psshString) {
+            value = [[NSData alloc] initWithBase64EncodedString:psshString
+                                                        options:0];
+          }
+        }
         [stream setValue:value forKey:propertyName];
       }
       if ([propertyType isEqualToString:@"NSString"]) {
         NSString *value = [_mpdDict objectForKey:propertyName];
         [stream setValue:value forKey:propertyName];
       }
+      if ([propertyType isEqualToString:@"LiveStream"]) {
+        [self setLiveProperties:(Stream *)stream];
+      }
+      if ([propertyType isEqualToString:@"NSDate"]) {
+        [stream setValue:[NSDate dateWithTimeIntervalSince1970:0] forKey:propertyName];
+      }
       break;
     case 'I' : // NSUinteger 32-bit
     case 'Q' : // NSUinteger 64-bit
-      if ([propertyName isEqualToString:@"indexValue"]) {
+      if ([propertyName isEqualToString:@"streamIndex"]) {
         [stream setValue:[NSNumber numberWithInteger:_streamCount] forKey:propertyName];
+      } else if ([propertyName isEqualToString:@"mediaPresentationDuration"]) {
+        NSUInteger value = [self convertDurationToSeconds:[_mpdDict objectForKey:propertyName]];
+        [stream setValue:[NSNumber numberWithInteger:value] forKey:propertyName];
       } else {
         NSUInteger value = [[_mpdDict objectForKey:propertyName] integerValue];
         [stream setValue:[NSNumber numberWithInteger:value] forKey:propertyName];
@@ -313,18 +359,59 @@ NSString *const kVideoString = @"video";
       NSString *propertyName = [NSString stringWithUTF8String:propName];
       NSString *propertyType = [self getPropertyType:property];
       if (![propertyType containsString:kDashToHlsString]) {
-        if (![propertyType isEqualToString:kStreamingString]) {
-          NSString *propertyValue = [stream valueForKey:propertyName];
-          if (!propertyValue) {
-            NSLog(@"\n::ERROR::Property Not Set for Stream\n"
-                  @"  Name: %@ | Type: %@ | Value: %@", propertyName, propertyType, propertyValue);
-            attributeExists = NO;
+        if (![propertyName isEqualToString:@"pssh"]) {
+          if (![propertyType isEqualToString:kStreamingString]) {
+            NSString *propertyValue = [stream valueForKey:propertyName];
+            if (!propertyValue) {
+              NSLog(@"\n::ERROR::Property Not Set for Stream\n"
+                    @"  Name: %@ | Type: %@", propertyName, propertyType);
+              attributeExists = NO;
+            }
           }
         }
       }
     }
   }
   return attributeExists;
+}
+
+// Determine what type of Dash Template is being used.
+- (BOOL)setDashMediaType:(NSString *)elementName {
+  // SegmentBase
+  if ([elementName isEqualToString:kDashSegmentBase]) {
+    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_BASE]
+                forKey:kDashMediaType];
+  }
+  // SegmentList w/Duration
+  if ([elementName isEqualToString:kDashSegmentList]) {
+    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_LIST_DURATION]
+                forKey:kDashMediaType];
+  }
+  // SegmentTemplate w/Duration
+  if ([elementName isEqualToString:kDashSegmentTemplate]) {
+    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_DURATION]
+                forKey:kDashMediaType];
+  }
+  // SegmentTimeline
+  if ([elementName isEqualToString:kDashSegmentTimeline]) {
+    // SegmentTimeline is sub-section to SegmentList
+    if ([_mpdDict valueForKey:kDashMediaType] ==
+            [NSNumber numberWithUnsignedInteger:SEGMENT_LIST_DURATION]) {
+      [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_LIST_TIMELINE]
+                  forKey:kDashMediaType];
+    }
+    // SegmentTimeline is sub-section to SegmentTemplate
+    if ([_mpdDict valueForKey:kDashMediaType] ==
+            [NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_DURATION]) {
+      [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_TIMELINE]
+                  forKey:kDashMediaType];
+    }
+  }
+  if ([_mpdDict objectForKey:kDashMediaType]) {
+    return YES;
+  }
+  // DashMediaType has not been set.
+  return NO;
 }
 
 // Extract ranges from Dictionary, then parse and create Initialization Range.
@@ -336,35 +423,104 @@ NSString *const kVideoString = @"video";
   NSString *indexRange = [_mpdDict objectForKey:kAttrIndexRange];
   [_mpdDict removeObjectForKey:kAttrIndexRange];
   NSArray *indexRangeValues = [indexRange componentsSeparatedByString:kDashSeparator];
-  if (!indexRangeValues || !rangeValues) {
-    return nil;
-  }
-  // Add 1 to avoid overlap in bytes to the length.
-  NSNumber *length = [NSNumber numberWithInteger:([indexRangeValues[1] intValue] + 1)];
-  if ([startRange intValue] >= [length intValue]) {
-    NSLog(@"\n::ERROR::Start Range is greater than Length: %d, %d", [startRange intValue],
-                                                                    [length intValue]);
-    return nil;
-  }
-  if ([length intValue] == 0) {
-    NSLog(@"\n::ERROR::Length is not valid: %d", [length intValue]);
-    return nil;
+
+  NSNumber *length = [NSNumber numberWithInteger:0];
+  if (indexRangeValues && rangeValues) {
+    // Add 1 to avoid overlap in bytes to the length.
+    length = [NSNumber numberWithInteger:([indexRangeValues[1] intValue] + 1)];
+    if ([startRange intValue] >= [length intValue]) {
+      NSLog(@"\n::ERROR::Start Range is greater than Length: %d, %d", [startRange intValue],
+                                                                      [length intValue]);
+      return nil;
+    }
+    if ([length intValue] == 0) {
+      NSLog(@"\n::ERROR::Length is not valid: %d", [length intValue]);
+    }
   }
   NSDictionary *initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:startRange,
                                     kRangeStart, length, kRangeLength, nil];
   return initialRange;
 }
 
+// Parse MPEG Dash duration format and return seconds.
+// TODO(seawardt): Implement support for Leap year and months that are not 30 days.
+- (NSUInteger)convertDurationToSeconds:(NSString *)string {
+  if (!string) {
+    return 0;
+  }
+  NSString *pattern = @"^P(?:(\\d{0,2})Y)?(?:(\\d{0,2})M)?(?:(\\d{0,2})D)"
+                      @"?.(?:(\\d{0,2})H)?(?:(\\d{0,2})M)?(?:(\\d*[.]?\\d+)S)?$";
+  NSRange searchRange = NSMakeRange(0, [string length]);
+  NSError *error = nil;
+  NSUInteger duration = 0;
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                         options:0
+                                                                           error:&error];
+  int years = 0;
+  int months = 0;
+  int days = 0;
+  int hours = 0;
+  int minutes = 0;
+  float seconds = 0;
+  NSArray *matches = [regex matchesInString:string options:0 range:searchRange];
+  for (NSTextCheckingResult *match in matches) {
+    NSString* matchText = [string substringWithRange:[match range]];
+    NSRange matchGroup1 = [match rangeAtIndex:1];
+    NSRange matchGroup2 = [match rangeAtIndex:2];
+    NSRange matchGroup3 = [match rangeAtIndex:3];
+    NSRange matchGroup4 = [match rangeAtIndex:4];
+    NSRange matchGroup5 = [match rangeAtIndex:5];
+    NSRange matchGroup6 = [match rangeAtIndex:6];
+
+    years = matchGroup1.length > 0 ? [[string substringWithRange:matchGroup1] intValue] : 0;
+    months = matchGroup2.length > 0 ? [[string substringWithRange:matchGroup2] intValue] : 0;
+    days = matchGroup3.length > 0 ? [[string substringWithRange:matchGroup3] intValue] : 0;
+    hours = matchGroup4.length > 0 ? [[string substringWithRange:matchGroup4] intValue]: 0;
+    minutes = matchGroup5.length > 0 ? [[string substringWithRange:matchGroup5] intValue]: 0;
+    seconds = matchGroup6.length > 0 ? [[string substringWithRange:matchGroup6] floatValue]: 0;
+  }
+  duration = (60 * 60 * 24 * 365) * years +
+             (60 * 60 * 24 * 30) * months +
+             (60 * 60 * 24) * days +
+             (60 * 60) * hours +
+             60 * minutes +
+             seconds;
+  return duration;
+}
+
+// Builds Stream.LiveStream object. May be used for Non-Live streams depending on Manifest.
+- (void)setLiveProperties:(Stream *)stream {
+  if ([_mpdDict objectForKey:kDashMediaType] == [NSNumber numberWithUnsignedInteger:SEGMENT_BASE]) {
+    // Ignore if SegmentBase manifest is being used.
+    return;
+  }
+  stream.liveStream.duration = [[_mpdDict valueForKey:@"duration"] integerValue];
+  stream.liveStream.initializationUrl =
+      [self setStreamUrl:[_mpdDict valueForKey:@"initialization"]];
+  stream.liveStream.mediaFileName = [_mpdDict valueForKey:@"media"];
+  stream.liveStream.minBufferTime =
+      [self convertDurationToSeconds:[_mpdDict valueForKey:@"minBufferTime"]];
+  stream.liveStream.minimumUpdatePeriod = [_mpdDict valueForKey:@"minimumUpdatePeriod"];
+  stream.liveStream.representationId = [_mpdDict valueForKey:@"id"];
+  stream.liveStream.startNumber = [[_mpdDict valueForKey:@"startNumber"] integerValue];
+  stream.liveStream.timescale = [[_mpdDict valueForKey:@"timescale"] integerValue];
+  stream.liveStream.timeShiftBufferDepth = [_mpdDict valueForKey:@"timeShiftBufferDepth"];
+  stream.liveStream.segmentDuration = (float)stream.liveStream.duration /
+                                      (float)stream.liveStream.timescale;
+}
+
 // Adds a complete URL for each stream.
-- (NSURL *)setStreamUrl {
-  NSString *string = [_mpdDict objectForKey:kDashRepresentationBaseUrl];
+- (NSURL *)setStreamUrl:(NSString *)urlString {
+  if (!urlString) {
+    urlString = [_mpdDict objectForKey:@"media"];
+  }
   if (_playOffline) {
     return [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-            urlInDocumentDirectoryForFile:string.lastPathComponent];
+            urlInDocumentDirectoryForFile:urlString.lastPathComponent];
   }
   // URL is already complete. Move on.
-  if ([string containsString:kHttpString]) {
-    return [[NSURL alloc] initWithString:string];
+  if ([urlString containsString:kHttpString]) {
+    return [[NSURL alloc] initWithString:urlString];
   }
   NSString *rootUrl = [_mpdDict objectForKey:kRootUrl];
   if (rootUrl) {
@@ -372,7 +528,12 @@ NSString *const kVideoString = @"video";
     if ([rootUrl rangeOfString:kHttpString].location == NSNotFound) {
       rootUrl = [_mpdUrl.scheme stringByAppendingFormat:@":%@", rootUrl];
     }
-    return [[[NSURL alloc] initWithString:rootUrl] URLByAppendingPathComponent:string];
+    // Removes trailing path component (if present).
+    NSURL *url = [[NSURL alloc] initWithString:rootUrl];
+    if ([url pathExtension]) {
+      url = [url URLByDeletingLastPathComponent];
+    }
+    return [url URLByAppendingPathComponent:urlString];
   }
   // Removes query arguments to properly append the last component path.
   NSURLComponents *urlComponents = [[NSURLComponents alloc] initWithURL:_mpdUrl
@@ -380,9 +541,10 @@ NSString *const kVideoString = @"video";
   urlComponents.query = nil;
   urlComponents.fragment = nil;
   _mpdUrl = urlComponents.URL;
-  return [[_mpdUrl URLByDeletingLastPathComponent] URLByAppendingPathComponent:string];
+  return [[_mpdUrl URLByDeletingLastPathComponent] URLByAppendingPathComponent:urlString];
 }
 
+// Offline usage to delete files listed in MPD.
 + (void)deleteFilesInMpd:(NSURL *)mpdUrl {
   NSData *mpdData = [NSData dataWithContentsOfURL:mpdUrl];
   if (!mpdData) {
@@ -395,7 +557,7 @@ NSString *const kVideoString = @"video";
   NSFileManager *defaultFileManager = [NSFileManager defaultManager];
   for (Stream *stream in remoteUrls) {
     NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                      urlInDocumentDirectoryForFile:stream.url.lastPathComponent];
+                      urlInDocumentDirectoryForFile:stream.sourceUrl.lastPathComponent];
     [defaultFileManager removeItemAtURL:fileUrl error:&error];
     if (error) {
       NSLog(@"\n::ERROR::Unable to delete existing file.\n" "Error: %@ %ld %@",

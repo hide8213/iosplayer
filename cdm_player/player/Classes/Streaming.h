@@ -10,15 +10,20 @@
 @class HTTPServer;
 @class LocalWebServer;
 @class Stream;
+
 @protocol HTTPResponse;
+// Delegate to access DetailViewController to pull player time.
+@protocol StreamingDelegate
+- (float)getCurrentTime;
+@end
 
 extern NSString* kStreamingReadyNotification;
-
 // Contains a collection of Stream Objects.
 // The individual streams are used to create an HLS Playlist,
 // then the data is passed to the UDT (Dash Transmuxer) to be converted to DASH.
 @interface Streaming : NSObject
-// Internal IP address to be used for streaming locally. 
+@property(nonatomic, weak) id<StreamingDelegate> streamingDelegate;
+// Internal IP address to be used for streaming locally.
 // Typically localhost or 127.0.0.1, unless using Airplay which will then be the
 // IP Address of the device.
 @property(strong) NSString *address;
@@ -40,9 +45,9 @@ extern NSString* kStreamingReadyNotification;
 // Master HLS Playlist that is created to contain high level info about the
 // child streams (bandwidth, codec, URL of stream, etc.)
 @property NSString *variantPlaylist;
-
-// Init method. isAirplayActive determines what local address to be used when 
+// Init method. isAirplayActive determines what local address to be used when
 // setting up the local web server.
+
 - (id)initWithAirplay:(BOOL)isAirplayActive;
 // Creates the Master/Variant Playlist
 - (NSString *)buildVariantPlaylist:(NSArray *)parsedMpd;
@@ -53,7 +58,7 @@ extern NSString* kStreamingReadyNotification;
 - (void)loadStream:(Stream *)stream;
 // XML Parsing of the DASH Manifest that populates the Stream object values.
 - (void)processMpd:(NSURL *)mpdUrl;
-// Re-creates the Streaming object. 
+// Re-creates the Streaming object.
 // Used primarily when switching between AirPlay and non-Airplay usage.
 - (void)restart:(BOOL)isAirplayActive;
 // Destroys the Streaming object.

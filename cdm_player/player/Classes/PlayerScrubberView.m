@@ -62,6 +62,10 @@
   _slider.maximumValue = duration;
   [_currentTimeLabel setText:[self convertSeconds:0]];
   [_endTimeLabel setText:[self convertSeconds:duration]];
+  if (duration < 0) {
+    [_endTimeLabel setText:@"LIVE"];
+    _slider.userInteractionEnabled = NO;
+  }
 }
 
 - (NSString *)convertSeconds:(int)seconds {

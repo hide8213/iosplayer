@@ -43,13 +43,12 @@ be called on all AVAssetResourceLoaderDelegate not handled by the UDT.
 extern "C" {
 #endif  // __cplusplus
 
-void DashToHls_InitializeEncryption(struct DashToHlsSession* session);
+void Udt_InitializeEncryption(struct DashToHlsSession* session);
 
-DashToHlsStatus DashToHls_SetAVURLAsset(AVURLAsset* asset,
-                                        id<AVAssetResourceLoaderDelegate> assetDelegate,
-                                        dispatch_queue_t queue);
+DashToHlsStatus Udt_SetAVURLAsset(AVURLAsset* asset,
+                                  id<AVAssetResourceLoaderDelegate> assetDelegate,
+                                  dispatch_queue_t queue);
 NSString* GetKeyUrl(struct DashToHlsSession* session);
-
 #ifdef __cplusplus
 };
 #endif  // __cplusplus
