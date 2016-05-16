@@ -57,7 +57,7 @@
 
 #pragma mark Private Methods
 
-- (void)initScrubber:(int)duration {
+- (void)configScrubber:(int)duration {
   _slider.minimumValue = 0;
   _slider.maximumValue = duration;
   [_currentTimeLabel setText:[self convertSeconds:0]];
@@ -66,6 +66,7 @@
     [_endTimeLabel setText:@"LIVE"];
     _slider.userInteractionEnabled = NO;
   }
+
 }
 
 - (NSString *)convertSeconds:(int)seconds {

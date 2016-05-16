@@ -6,11 +6,15 @@
 	<dict>
 		<key>Headers/DashToHlsApi.h</key>
 		<data>
-		ChubbhuP3O5tjEKYaWZcaGtbQds=
+		r2Vlwpr8MQ5wLd8/EEfifwenvAA=
 		</data>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
 		<data>
 		z41zhVnAf388veLLiZ5J3ZBRlLg=
+		</data>
+		<key>Headers/UDTApi.h</key>
+		<data>
+		qAf/hkVJGmIQb9d2ZRB5ySjTJ+I=
 		</data>
 		<key>Headers/cdm.h</key>
 		<data>
@@ -22,7 +26,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		O2qmzwbL1qjaXACHDxZsL6ryP0E=
+		PHjEo/z9WFGwEbaYZXZKNJI43KY=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -31,11 +35,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			ChubbhuP3O5tjEKYaWZcaGtbQds=
+			r2Vlwpr8MQ5wLd8/EEfifwenvAA=
 			</data>
 			<key>hash2</key>
 			<data>
-			1sADwSUpwRXfucDkQZ0i7EuvT4eScg4dmgVUo0GF5Lg=
+			Ac8FotNBCNXfisorf4OK24ZJdrnuyA162eRcZf74UI4=
 			</data>
 		</dict>
 		<key>Headers/DashToHlsApiAVFramework.h</key>
@@ -47,6 +51,17 @@
 			<key>hash2</key>
 			<data>
 			ZtGwmg79/2zytbbbHhSS5Y5d3ekfIZA+3xNklZkRflA=
+			</data>
+		</dict>
+		<key>Headers/UDTApi.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			qAf/hkVJGmIQb9d2ZRB5ySjTJ+I=
+			</data>
+			<key>hash2</key>
+			<data>
+			hUDrvg59Uyytp5VIsrQyXCllx52efoHIFkcGnV0PclY=
 			</data>
 		</dict>
 		<key>Headers/cdm.h</key>

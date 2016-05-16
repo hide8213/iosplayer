@@ -108,7 +108,7 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
           [NSString stringWithUTF8String:_offlinePath.fileSystemRepresentation]];
 }
 
-- (BOOL)findPssh:(NSData*)initializationData {
+- (BOOL)findPssh:(NSData *)initializationData {
   struct DashToHlsSession *session = NULL;
   DashToHlsStatus status = Udt_CreateSession(&session);
   if (status != kDashToHlsStatus_OK) {
@@ -132,7 +132,7 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
   }
   if (_offline) {
     status = Udt_ParseDash(session,
-                           nil,
+                           0,
                            (uint8_t *)[initializationData bytes],
                            [initializationData length],
                            nil,

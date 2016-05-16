@@ -6,7 +6,7 @@
 
 NSString *kStorageName = @"Keystore/";
 NSString *kKeyMapName = @"KeyMap";
-NSString *kLicenseUrlString = @"https://widevine-proxy.appspot.com/proxy";
+NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
 
 @interface LicenseManager () {
   Streaming *_streaming;

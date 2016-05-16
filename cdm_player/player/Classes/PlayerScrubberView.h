@@ -10,7 +10,7 @@
 
 @property(nonatomic, weak) id<PlayerScrubberDelegate> scrubberDelegate;
 
-- (void)initScrubber:(int)duration;
+- (void)configScrubber:(int)duration;
 - (void)setScrubberTime:(int)currentTime;
 
 @end

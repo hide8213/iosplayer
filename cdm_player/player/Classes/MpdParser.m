@@ -72,11 +72,6 @@ NSString *const kVideoString = @"video";
 }
 
 // Init methods.
-- (id)init {
-  self = [super init];
-  return self;
-}
-
 - (id)initWithStreaming:(Streaming *)streaming
            storeOffline:(BOOL)storeOffline
                 mpdData:(NSData *)mpdData
@@ -224,10 +219,21 @@ NSString *const kVideoString = @"video";
 // Check Property type and determine attribute.
 - (NSString *)getPropertyType:(objc_property_t)property {
   const char *attribute = property_getAttributes(property);
+  if (!attribute) {
+    NSLog(@"\n::ERROR::Empty Property Attribute | Name: %@\n", property);
+    return nil;
+  }
   NSString *attributeString = [NSString stringWithUTF8String:attribute];
   NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
   NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
                                      stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+
+  // Verify attribute values are valid.
+  if (!attributeStripped || [attributeStripped length] == 0) {
+    NSLog(@"\n::ERROR::Empty Property Attribute Character | Name: %@\n", property);
+    return nil;
+  }
+
   switch(attribute[1]) {
     case '@' : // NSString
       attributeString = [attributeStripped substringFromIndex:1];
@@ -379,30 +385,28 @@ NSString *const kVideoString = @"video";
 - (BOOL)setDashMediaType:(NSString *)elementName {
   // SegmentBase
   if ([elementName isEqualToString:kDashSegmentBase]) {
-    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_BASE]
+    [_mpdDict setValue:@(SEGMENT_BASE)
                 forKey:kDashMediaType];
   }
   // SegmentList w/Duration
   if ([elementName isEqualToString:kDashSegmentList]) {
-    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_LIST_DURATION]
+    [_mpdDict setValue:@(SEGMENT_LIST_DURATION)
                 forKey:kDashMediaType];
   }
   // SegmentTemplate w/Duration
   if ([elementName isEqualToString:kDashSegmentTemplate]) {
-    [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_DURATION]
+    [_mpdDict setValue:@(SEGMENT_TEMPLATE_DURATION)
                 forKey:kDashMediaType];
   }
   // SegmentTimeline
   if ([elementName isEqualToString:kDashSegmentTimeline]) {
     // SegmentTimeline is sub-section to SegmentList
-    if ([_mpdDict valueForKey:kDashMediaType] ==
-            [NSNumber numberWithUnsignedInteger:SEGMENT_LIST_DURATION]) {
+    if ([[_mpdDict valueForKey:kDashMediaType] isEqual:@(SEGMENT_LIST_DURATION)]) {
       [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_LIST_TIMELINE]
                   forKey:kDashMediaType];
     }
     // SegmentTimeline is sub-section to SegmentTemplate
-    if ([_mpdDict valueForKey:kDashMediaType] ==
-            [NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_DURATION]) {
+    if ([[_mpdDict valueForKey:kDashMediaType] isEqual:@(SEGMENT_TEMPLATE_DURATION)]) {
       [_mpdDict setValue:[NSNumber numberWithUnsignedInteger:SEGMENT_TEMPLATE_TIMELINE]
                   forKey:kDashMediaType];
     }
@@ -443,6 +447,7 @@ NSString *const kVideoString = @"video";
 }
 
 // Parse MPEG Dash duration format and return seconds.
+// https://en.wikipedia.org/wiki/ISO_8601#Durations
 // TODO(seawardt): Implement support for Leap year and months that are not 30 days.
 - (NSUInteger)convertDurationToSeconds:(NSString *)string {
   if (!string) {
@@ -511,6 +516,7 @@ NSString *const kVideoString = @"video";
 
 // Adds a complete URL for each stream.
 - (NSURL *)setStreamUrl:(NSString *)urlString {
+  // BaseURL and Initialization URLs were not found. Use media URL then.
   if (!urlString) {
     urlString = [_mpdDict objectForKey:@"media"];
   }

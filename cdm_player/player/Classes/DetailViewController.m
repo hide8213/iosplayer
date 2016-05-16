@@ -96,7 +96,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   if (CMTIME_IS_INVALID(playerDuration)) {
     playerDuration = kCMTimeZero;
   }
-  [_playbackView.scrubberView initScrubber:CMTimeGetSeconds(playerDuration)];
+  [_playbackView.scrubberView configScrubber:CMTimeGetSeconds(playerDuration)];
 }
 
 - (void)handleTap {
@@ -143,10 +143,6 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   [[self navigationController] setNavigationBarHidden:_playbackView.isFullscreen];
   [[UIApplication sharedApplication] setStatusBarHidden:_playbackView.isFullscreen
                                           withAnimation:NO];
-}
-
-- (void)volumeSliderDidScrubToValue:(float)value {
-  [_player setVolume:value];
 }
 
 #pragma mark PlayerScrubberDelegate

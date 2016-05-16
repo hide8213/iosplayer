@@ -1,12 +1,17 @@
 [{
   "name": "Short",
   "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
-  "url": "http://storage.googleapis.com/wvmedia/cenc/tears.mpd"
+  "url": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd"
 },
 {
   "name": "Long",
   "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/valkaama.jpg",
   "url": "http://storage.googleapis.com/wvmedia/cenc/valkaama.mpd"
+},
+{
+  "name": "SegmentTemplate",
+  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/counter.png",
+  "url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/live/mp4-live-mpd-AV-BS.mpd"
 },
 {
   "name": "Clear",

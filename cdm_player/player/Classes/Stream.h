@@ -1,13 +1,12 @@
 // Copyright 2015 Google Inc. All rights reserved.
 
 #import "CdmWrapper.h"
-#import "UDTApi.h"
 #import "LiveStream.h"
+#import "UDTApi.h"
 
 struct DashToHlsIndex;
 struct DashToHlsSession;
 @class Streaming;
-@class LiveStream;
 
 // Object that contains an individual stream within an HLS playlist before
 // being transmuxed to DASH content via the UDT.
@@ -29,7 +28,7 @@ typedef NS_ENUM(NSUInteger, DashMediaType) {
 - (BOOL)initialize:(NSData *)initializationData;
 // Actual duration of the segment, will not be populated until after the segment has been
 // transmuxed. This value is in PTS clock (90khz)
-@property(nonatomic) NSUInteger actualDuration;
+@property(nonatomic) NSUInteger actualDurationInPts;
 // Contains the bandwidth of the given stream.
 @property NSUInteger bandwidth;
 // Contains the codec of the given stream.

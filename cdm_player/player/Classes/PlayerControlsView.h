@@ -4,7 +4,6 @@
 - (void)didPressPause;
 - (void)didPressRestart;
 - (void)didPressToggleFullscreen;
-- (void)volumeSliderDidScrubToValue:(float)value;
 
 @end
 

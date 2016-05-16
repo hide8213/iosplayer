@@ -1,3 +1,10 @@
+v3.0.6 (2016 May)
+- Add Manifest Support for Live (SegmentTemplate)
+- Expose Udt_ConvertDash and Udt_ParseDash APIs
+- Simplify UDT APIs
+- Parse PSSH from Manifest
+- Improved Sync
+
 v3.0.5 (2016 April)
  - Upgrade CDM to use latest interfaces
  - Multiple bugs in Transmuxer stability/support
