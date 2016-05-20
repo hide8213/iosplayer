@@ -92,7 +92,6 @@ DashToHlsStatus Udt_ParseDash(struct DashToHlsSession* session,
 DashToHlsStatus Udt_ReleaseHlsSegment(struct DashToHlsSession* session,
                                       uint32_t hls_segment_number);
 
-typedef void* DashToHlsContext;
 // Common Encryption callbacks.  Common encryption (CENC) at Google is handled
 // by a module called the CDM.  Other implementations may use their own DRM
 // code to handle the decryption.  This library will call the CENC_PsshHandler

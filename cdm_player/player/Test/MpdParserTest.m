@@ -47,9 +47,9 @@ static NSString *const kSubParamOverrideMpdData =
             @"</SegmentBase>"
           @"</Representation>"
         @"</AdaptationSet>"
-        @"<AdaptationSet mimeType=\"video/mp4\">"
+        @"<AdaptationSet mimeType=\"video/junk\">"
           @"<Representation id=\"142\" codecs=\"avc1.4d4015\" width=\"426\" height=\"240\" "
-              @"bandwidth=\"254027\" mimeType=\"video/m4a\">"
+              @"bandwidth=\"254027\" mimeType=\"video/mp4\">"
             @"<BaseURL>http://google.com/new/video/path/video.mp4</BaseURL>"
             @"<SegmentBase indexRange=\"1555-1766\">"
               @"<Initialization range=\"0-1554\"/>"
@@ -121,7 +121,7 @@ static NSString *const kInvalidParamsMpdData =
   _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kEncContentMpdUrl];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
-      XCTAssertEqualObjects(stream.mimeType, @"video/m4a");
+      XCTAssertEqualObjects(stream.mimeType, @"video/mp4");
     }
   }
 }
@@ -164,10 +164,10 @@ static NSString *const kInvalidParamsMpdData =
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       XCTAssertEqualObjects([stream.sourceUrl absoluteString],
-                            @"http://google.com/test/content/video.mp4");
+                            @"http://google.com/test/video.mp4");
     } else {
       XCTAssertEqualObjects([stream.sourceUrl absoluteString],
-                            @"http://google.com/test/content/audio.mp4");
+                            @"http://google.com/test/audio.mp4");
     }
   }
 }
@@ -228,7 +228,7 @@ static NSString *const kInvalidParamsMpdData =
     } else {
       // Validate this URL uses Global BaseURL.
       XCTAssertEqualObjects([stream.sourceUrl absoluteString],
-                            @"http://google.com/test/content/audio.mp4");
+                            @"http://google.com/test/audio.mp4");
     }
   }
 }

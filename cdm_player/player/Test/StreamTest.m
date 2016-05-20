@@ -36,7 +36,7 @@ static NSString *const kVideoMpd =
 
 - (void)testStreamInit {
   Stream *stream = [[Stream alloc] initWithStreaming:_streaming];
-  NSString *thePath = [[NSBundle mainBundle] pathForResource:@"dash-139" ofType:@"fmp4"];
+  NSString *thePath = [[NSBundle mainBundle] pathForResource:@"video" ofType:@"mp4"];
   NSData *initData = [[NSData alloc] initWithContentsOfFile:thePath];
   XCTAssertTrue([stream initialize:initData]);
 }
@@ -44,7 +44,7 @@ static NSString *const kVideoMpd =
 - (void)testStreamInitWithNilStreaming {
   _streaming = nil;
   Stream *stream = [[Stream alloc] initWithStreaming:_streaming];
-  NSString *thePath = [[NSBundle mainBundle] pathForResource:@"dash-139" ofType:@"fmp4"];
+  NSString *thePath = [[NSBundle mainBundle] pathForResource:@"video" ofType:@"mp4"];
   NSData *initData = [[NSData alloc] initWithContentsOfFile:thePath];
   XCTAssertTrue([stream initialize:initData]);
 }

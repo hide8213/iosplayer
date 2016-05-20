@@ -12,10 +12,6 @@
 		<data>
 		z41zhVnAf388veLLiZ5J3ZBRlLg=
 		</data>
-		<key>Headers/UDTApi.h</key>
-		<data>
-		qAf/hkVJGmIQb9d2ZRB5ySjTJ+I=
-		</data>
 		<key>Headers/cdm.h</key>
 		<data>
 		RqyeYiMz/ximB6LKKTUO3t1C20g=
@@ -26,7 +22,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		fGiRnjHZCqescMQ30ypAwFqq3rs=
+		NLhdbjKAlo7+iIr7//3IREbpibQ=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -51,17 +47,6 @@
 			<key>hash2</key>
 			<data>
 			ZtGwmg79/2zytbbbHhSS5Y5d3ekfIZA+3xNklZkRflA=
-			</data>
-		</dict>
-		<key>Headers/UDTApi.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			qAf/hkVJGmIQb9d2ZRB5ySjTJ+I=
-			</data>
-			<key>hash2</key>
-			<data>
-			hUDrvg59Uyytp5VIsrQyXCllx52efoHIFkcGnV0PclY=
 			</data>
 		</dict>
 		<key>Headers/cdm.h</key>
