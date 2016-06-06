@@ -65,9 +65,8 @@ static NSString *const kVideoMpd =
   NSData *mpdData = [kVideoMpd dataUsingEncoding:NSUTF8StringEncoding];
   NSMutableArray *streams = [MpdParser parseMpdWithStreaming:_streaming
                                                      mpdData:mpdData
-                                                     baseUrl:mpdUrl];
-  NSUInteger *preloadCount = streams.count;
-  NSString *variantPlaylist = [_streaming buildVariantPlaylist:streams];
+                                                     baseUrl:mpdUrl
+                                                storeOffline:NO];
   [streams enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
     Stream *stream = obj;
     XCTAssertNotNil(stream);

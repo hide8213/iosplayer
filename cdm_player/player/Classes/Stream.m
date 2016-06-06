@@ -88,8 +88,6 @@ static DashToHlsStatus dashDecryptionHandler(void *context, const uint8_t *encry
   const uint8_t* hlsSegment = NULL;
   size_t hlsSize = 0;
   NSData *data;
-  NSError *error;
-  bool is_video = self.isVideo;
   // Parse Data to setup UDT Session properties.
   status = [self parseInitData:dashData];
   if (status == kDashToHlsStatus_ClearContent) {
