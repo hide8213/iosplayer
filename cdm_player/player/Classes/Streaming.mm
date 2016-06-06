@@ -311,7 +311,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
                                       initialRange:stream.initialRange
                                         completion:nil];
     if (![stream initialize:data]) {
-      NSLog(@"Failed to initialize stream: %@", requestUrl);
+      NSLog(@"\n::ERROR::Failed to initialize stream: %@", requestUrl);
       return;
     }
     stream.m3u8 = [self buildChildPlaylist:stream];
@@ -323,7 +323,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
                                       NSError *connectionError) {
                            dispatch_async(_streamingQ, ^() {
                              if (!data) {
-                               NSLog(@"Did not download %@", connectionError);
+                               NSLog(@"\n::ERROR::Did not download %@", connectionError);
                              }
                              if (![stream initialize:data]) {
                                return;
@@ -338,7 +338,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
 - (void)streamReady:(Stream*)stream {
   stream.done = YES;
   --_preloadCount;
-  if (_preloadCount == 0) {
+  if (_preloadCount == 0 && _streamingQ) {
     // streamReady is called in the middle of processing a stream.
     // Ensure all streams have been processed before sending to video player.
     dispatch_async(_streamingQ, ^() {
@@ -351,6 +351,9 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
 
 // Creates TS segments based on downloading a specific byte range.
 - (NSData *)tsDataForIndex:(int)index segment:(int)segment {
+  if ((int)_streams.count <= index) {
+    return nil;
+  }
   Stream *stream = _streams[index];
   NSURL *requestUrl = stream.sourceUrl;
   NSData *data = nil;
@@ -369,6 +372,14 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
                                         completion:nil];
 
   } else {
+    if (!stream.dashIndex) {
+      NSLog(@"\n::ERROR::DashIndex is Empty");
+      return nil;
+    }
+    if ((int)stream.dashIndex->index_count <= segment) {
+      NSLog(@"\n::ERROR::Segment out of range %@/%@", @(segment), @(stream.dashIndex->index_count));
+      return nil;
+    }
     NSNumber *startRange =
         [NSNumber numberWithUnsignedLongLong:stream.dashIndex->segments[segment].location];
     NSNumber *length =

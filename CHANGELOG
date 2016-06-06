@@ -1,3 +1,8 @@
+v3.0.7 (2016 June)
+- Update SDK plist files to be Apple App Store compliant
+- Minor tweak to handle Init segments that contain ID in filename
+- Few memory leak fixes in reference app
+
 v3.0.6 (2016 May)
 - Add Manifest Support for Live (SegmentTemplate)
 - Expose Udt_ConvertDash and Udt_ParseDash APIs

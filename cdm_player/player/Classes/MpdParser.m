@@ -270,7 +270,8 @@ NSString *const kVideoString = @"video";
   switch(attribute[1]) {
     case '@' : // Char
       if ([propertyType isEqualToString:@"NSURL"]) {
-        NSURL *value = [self setStreamUrl:[_mpdDict objectForKey:kDashRepresentationBaseUrl]];
+        NSURL *value = [self setStreamUrl:[_mpdDict objectForKey:kDashRepresentationBaseUrl]
+                                     init:NO];
         [stream setValue:value forKey:propertyName];
       }
       if ([propertyType isEqualToString:@"NSDictionary"]) {
@@ -469,7 +470,6 @@ NSString *const kVideoString = @"video";
   float seconds = 0;
   NSArray *matches = [regex matchesInString:string options:0 range:searchRange];
   for (NSTextCheckingResult *match in matches) {
-    NSString* matchText = [string substringWithRange:[match range]];
     NSRange matchGroup1 = [match rangeAtIndex:1];
     NSRange matchGroup2 = [match rangeAtIndex:2];
     NSRange matchGroup3 = [match rangeAtIndex:3];
@@ -501,7 +501,7 @@ NSString *const kVideoString = @"video";
   }
   stream.liveStream.duration = [[_mpdDict valueForKey:@"duration"] integerValue];
   stream.liveStream.initializationUrl =
-      [self setStreamUrl:[_mpdDict valueForKey:@"initialization"]];
+      [self setStreamUrl:[_mpdDict valueForKey:@"initialization"] init:YES];
   stream.liveStream.mediaFileName = [_mpdDict valueForKey:@"media"];
   stream.liveStream.minBufferTime =
       [self convertDurationToSeconds:[_mpdDict valueForKey:@"minBufferTime"]];
@@ -515,7 +515,7 @@ NSString *const kVideoString = @"video";
 }
 
 // Adds a complete URL for each stream.
-- (NSURL *)setStreamUrl:(NSString *)urlString {
+- (NSURL *)setStreamUrl:(NSString *)urlString init:(BOOL)init {
   // BaseURL and Initialization URLs were not found. Use media URL then.
   if (!urlString) {
     urlString = [_mpdDict objectForKey:@"media"];
@@ -547,6 +547,10 @@ NSString *const kVideoString = @"video";
   urlComponents.query = nil;
   urlComponents.fragment = nil;
   _mpdUrl = urlComponents.URL;
+  if (init) {
+    urlString = [urlString stringByReplacingOccurrencesOfString:@"$RepresentationID$"
+                                                     withString:[_mpdDict valueForKey:@"id"]];
+  }
   return [[_mpdUrl URLByDeletingLastPathComponent] URLByAppendingPathComponent:urlString];
 }
 
