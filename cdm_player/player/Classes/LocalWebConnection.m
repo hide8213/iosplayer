@@ -3,7 +3,6 @@
 #import "LocalWebConnection.h"
 
 #import "LocalWebServer.h"
-#import "Streaming.h"
 
 // Handles incoming HTTP request to the |LocalWebServer|.
 @implementation LocalWebConnection {
@@ -20,8 +19,7 @@
   return self;
 }
 
-- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method
-                                              URI:(NSString *)path {
-   return [_streaming responseForMethod:method path:path connection:self];
- }
+- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path {
+  return [_streaming responseForMethod:method path:path connection:self];
+}
 @end

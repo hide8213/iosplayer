@@ -1,3 +1,18 @@
+v3.0.8 (2016 September)
+| CDM and Wrapper |
+-- Retain offline licensing data that is signed and encrypted
+-- iOS 10 and iPhone7 support
+| Reference App |
+-- Additional support for Dash Manifests, ie. availableStartTime
+-- Add ability to remove licenses from device
+-- Address URL encoded values found in manifest
+-- Demonstrate pulling licensing info for offline content
+-- General cleanup and additional tests
+| Dash Transmuxer (UDT) |
+-- Support SAIO v0 and v1
+-- PSSH 16 byte IV support
+-- Handle negative values in TRUN (UDT/Dash2Hls)
+
 v3.0.7 (2016 June)
 - Update SDK plist files to be Apple App Store compliant
 - Minor tweak to handle Init segments that contain ID in filename

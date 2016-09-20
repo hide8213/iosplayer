@@ -13,33 +13,37 @@
 - (instancetype)init {
   self = [super initWithFrame:CGRectZero];
   if (self) {
-    _scrubberBar = [[UIToolbar alloc] init];
-    _scrubberBar.translucent = YES;
-    _scrubberBar.barTintColor = [UIColor blackColor];
-    _scrubberBar.tintColor = [UIColor whiteColor];
-    _scrubberBarItems = [[NSMutableArray alloc] init];
     _currentTimeLabel =
         [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kElementWidth, kElementHeight)];
     _currentTimeLabel.textColor = [UIColor whiteColor];
     _endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kElementWidth, kElementHeight)];
     _endTimeLabel.textColor = [UIColor whiteColor];
-    UIBarButtonItem *flexItem =
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                      target:nil
-                                                      action:nil];
-    UIBarButtonItem *currentTimeItem =
-        [[UIBarButtonItem alloc] initWithCustomView:_currentTimeLabel];
-    [_scrubberBarItems addObject:currentTimeItem];
-    [_scrubberBarItems addObject:flexItem];
     _slider = [[UISlider alloc] init];
     [_slider addTarget:self
                 action:@selector(scrubberDidScrubToValue)
       forControlEvents:UIControlEventTouchUpInside];
+
+    UIBarButtonItem *flexItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                      target:nil
+                                                      action:nil];
+
+    UIBarButtonItem *currentTimeItem =
+        [[UIBarButtonItem alloc] initWithCustomView:_currentTimeLabel];
     UIBarButtonItem *sliderItem = [[UIBarButtonItem alloc] initWithCustomView:_slider];
-    [_scrubberBarItems addObject:sliderItem];
     UIBarButtonItem *endTimeItem = [[UIBarButtonItem alloc] initWithCustomView:_endTimeLabel];
+
+    _scrubberBarItems = [[NSMutableArray alloc] init];
+    [_scrubberBarItems addObject:currentTimeItem];
+    [_scrubberBarItems addObject:flexItem];
+    [_scrubberBarItems addObject:sliderItem];
     [_scrubberBarItems addObject:flexItem];
     [_scrubberBarItems addObject:endTimeItem];
+
+    _scrubberBar = [[UIToolbar alloc] init];
+    _scrubberBar.translucent = YES;
+    _scrubberBar.barTintColor = [UIColor blackColor];
+    _scrubberBar.tintColor = [UIColor whiteColor];
     _scrubberBar.items = _scrubberBarItems;
     [self addSubview:_scrubberBar];
   }
@@ -66,7 +70,6 @@
     [_endTimeLabel setText:@"LIVE"];
     _slider.userInteractionEnabled = NO;
   }
-
 }
 
 - (NSString *)convertSeconds:(int)seconds {
@@ -75,11 +78,12 @@
   NSUInteger mins = floor(seconds % 3600 / 60);
   NSUInteger secs = floor(seconds % 3600 % 60);
   if (hrs == 0) {
-    time = [NSString stringWithFormat:@"%02ld:%02ld",
-            (unsigned long)mins, (unsigned long)secs];
+    time = [NSString stringWithFormat:@"%02ld:%02ld", (unsigned long)mins, (unsigned long)secs];
   } else {
     time = [NSString stringWithFormat:@"%02ld:%02ld:%02ld",
-               (unsigned long)hrs, (unsigned long)mins, (unsigned long)secs];
+                                      (unsigned long)hrs,
+                                      (unsigned long)mins,
+                                      (unsigned long)secs];
   }
   return time;
 }

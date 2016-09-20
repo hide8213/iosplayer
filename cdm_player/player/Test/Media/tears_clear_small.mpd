@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MPD xmlns="urn:mpeg:DASH:schema:MPD:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd" minBufferTime="PT2S" type="static" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011" mediaPresentationDuration="PT734.1666870117188S">
+  <Period>
+    <AdaptationSet id="0">
+      <Representation id="1" bandwidth="773490" codecs="avc1.42c01e" mimeType="video/mp4" width="320" height="142">
+        <BaseURL>noenc_tears_h264_baseline_240p_800.mp4</BaseURL>
+        <SegmentBase indexRange="677-1452" timescale="12288">
+          <Initialization range="0-676"/>
+        </SegmentBase>
+      </Representation>
+    </AdaptationSet>
+    <AdaptationSet id="1">
+      <Representation id="0" bandwidth="129559" codecs="mp4a.40.2" mimeType="audio/mp4" audioSamplingRate="44100">
+        <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>
+        <BaseURL>noenc_tears_audio_eng.mp4</BaseURL>
+        <SegmentBase indexRange="608-1527" timescale="44100">
+          <Initialization range="0-607"/>
+        </SegmentBase>
+      </Representation>
+    </AdaptationSet>
+  </Period>
+</MPD>

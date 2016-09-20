@@ -16,6 +16,10 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
   __weak id<iOSCdmDelegate> _delegate;
 }
 
+extern "C" {
+extern const char *OEMCryptoTfit_Version();
+}
+
 // TODO: Forward all errors given from the CdmHost.
 - (id)init {
   self = [super init];
@@ -26,13 +30,12 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
         objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     std::string product =
         displayName ? std::string(displayName.UTF8String) : "cdm_test";
-
     clientInfo.product_name = product;
     clientInfo.company_name = "WV";
     clientInfo.device_name = "iPhone";
     clientInfo.model_name = "6+";
     clientInfo.arch_name = "arm64";
-    clientInfo.build_info = "0.1";
+    clientInfo.build_info = OEMCryptoTfit_Version();
     iOSCdmHost::GetHost()->Initialize(clientInfo, widevine::Cdm::kWarnings);
     iOSCdmHost::GetHost()->SetiOSCdmHandler(self);
   }
@@ -61,7 +64,6 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
   _sessionIdsToBlocks = [[NSMutableDictionary alloc] init];
   _psshKeysToIds = [[NSMutableDictionary alloc] init];
   _offlineSessions = [[NSMutableDictionary alloc] init];
-
 }
 
 - (void)shutdownCdm {
@@ -78,88 +80,149 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
           isOfflineVod:(BOOL)isOfflineVod
        completionBlock:(void(^)(NSError *))completionBlock {
   dispatch_queue_t queue = [_delegate iOSCdmDispatchQueue:self];
-  NSString *sessionIdForKey = _psshKeysToIds[psshKey];
+  NSString *sessionId = _psshKeysToIds[psshKey];
+  NSError *error = nil;
 
-  if (!sessionIdForKey) {
-    // No Session has been loaded.
-    NSString *sessionId;
-    NSError *error;
-    if (isOfflineVod) {
-      // Check if license was previously stored.
-      if ([_delegate respondsToSelector:@selector(sessionIdFromPssh:)]) {
-        sessionId = [_delegate sessionIdFromPssh:psshKey];
-      }
+  // No Session has been loaded.
+  if (isOfflineVod && !sessionId) {
+    // Check if license was previously stored.
+    if ([_delegate respondsToSelector:@selector(sessionIdFromPssh:)]) {
+      sessionId = [_delegate sessionIdFromPssh:psshKey];
     }
-
+    // License exists, attempt to Load Session.
     if (sessionId) {
-      // License exists, attempt to Load Session.
       error = iOSCdmHost::GetHost()->LoadSession(sessionId);
       if (error) {
-        dispatch_async(queue, ^{
-          completionBlock(error);
-        });
-        return;
+        // Do NOT error out if session is already loaded.
+        if (!error.code) {
+          dispatch_async(queue, ^{
+            completionBlock(error);
+          });
+          return;
+        }
       }
       _psshKeysToIds[psshKey] = sessionId;
       _offlineSessions[sessionId] = @YES;
-
-      NSMutableArray *blocks = _sessionIdsToBlocks[sessionId];
-      if (blocks) {
-        [blocks addObject:[completionBlock copy]];
-      } else if (queue) {
-        dispatch_async(queue, ^{
-          completionBlock(nil);
-        });
-      }
-    } else {
-      // Setup new Streaming Session.
-      error  = iOSCdmHost::GetHost()->CreateSession(isOfflineVod ?
-                                                    widevine::Cdm::kPersistent :
-                                                    widevine::Cdm::kTemporary,
-                                                    &sessionId);
-      if (error) {
-        dispatch_async(queue, ^{
-          completionBlock(error);
-        });
-        return;
-      }
-      // Add the completionBlock to the array to ensure the blocks are called
-      // once the GenerateRequest completes.
-      [[self blocksForSessionId:sessionId] addObject:[completionBlock copy]];
-
-      error = iOSCdmHost::GetHost()->GenerateRequest(sessionId, psshKey);
-      if (error) {
-        // The completionBlock is not called if GenerateRequest fails, call it
-        // here and clean up the session.
-        dispatch_async(queue, ^{
-          completionBlock(error);
-        });
-        [_sessionIdsToBlocks removeObjectForKey:sessionId];
-        iOSCdmHost::GetHost()->CloseSessions(@[sessionId]);
-        return;
-      }
-      _psshKeysToIds[psshKey] = sessionId;
-      [self onSessionCreated:sessionId];
-    }
-  } else {
-    NSMutableArray *blocks = _sessionIdsToBlocks[sessionIdForKey];
-    if (blocks) {
-      [blocks addObject:[completionBlock copy]];
-    } else if (queue) {
-      dispatch_async(queue, ^{
-          completionBlock(nil);
-      });
     }
   }
+  if (!sessionId) {
+    // Setup new Streaming Session.
+    error = iOSCdmHost::GetHost()->CreateSession(
+        isOfflineVod ? widevine::Cdm::kPersistent : widevine::Cdm::kTemporary,
+        &sessionId);
+    if (error) {
+      dispatch_async(queue, ^{
+        completionBlock(error);
+      });
+      return;
+    }
+    // Add the completionBlock to the array to ensure the blocks are called
+    // once the GenerateRequest completes.
+    [[self blocksForSessionId:sessionId] addObject:[completionBlock copy]];
+
+    error = iOSCdmHost::GetHost()->GenerateRequest(sessionId, psshKey);
+    if (error) {
+      // The completionBlock is not called if GenerateRequest fails.
+      // Call it here and clean up the session.
+      dispatch_async(queue, ^{
+        completionBlock(error);
+      });
+      iOSCdmHost::GetHost()->CloseSessions(@[ sessionId ]);
+      return;
+    }
+    _psshKeysToIds[psshKey] = sessionId;
+    [self onSessionCreated:sessionId];
+  }
+  NSMutableArray *blocks = _sessionIdsToBlocks[sessionId];
+  if (blocks) {
+    [blocks addObject:[completionBlock copy]];
+  } else if (queue) {
+    dispatch_async(queue, ^{
+        completionBlock(nil);
+    });
+  }
+}
+
+- (void)getLicenseInfo:(NSData *)psshKey
+       completionBlock:
+           (void (^)(int64_t *expiration, NSError *))completionBlock {
+  NSError *error = nil;
+  NSString *sessionId = _psshKeysToIds[psshKey];
+
+  dispatch_queue_t queue = [_delegate iOSCdmDispatchQueue:self];
+  auto callCompletionBlock = ^(NSError *error) {
+    if (queue && completionBlock) {
+      dispatch_async(queue, ^{
+        completionBlock(nil, error);
+      });
+    }
+  };
+  // No Session has been loaded.
+  if (!sessionId) {
+    // Check if license was previously stored.
+    if ([_delegate respondsToSelector:@selector(sessionIdFromPssh:)]) {
+      sessionId = [_delegate sessionIdFromPssh:psshKey];
+    }
+    // License exists, attempt to Load Session.
+    if (sessionId) {
+      error = iOSCdmHost::GetHost()->LoadSession(sessionId);
+      if (error) {
+        // Do NOT error out if session is already loaded.
+        if (!error.code) {
+          dispatch_async(queue, ^{
+            completionBlock(nil, error);
+          });
+          return;
+        }
+      }
+    }
+    _psshKeysToIds[psshKey] = sessionId;
+  }
+  if (sessionId) {
+    int64_t expiration;
+    error = iOSCdmHost::GetHost()->GetLicenseInfo(sessionId, &expiration);
+    if (error) {
+      NSLog(@"::ERROR::Unable to get Expiration");
+      callCompletionBlock(error);
+      return;
+    }
+    if (expiration > 0) {
+      NSTimeInterval timeInterval = double(expiration);
+      NSDate *timeStamp = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+      NSLog(@"Expiration: %@", timeStamp);
+    }
+  }
+  callCompletionBlock(error);
 }
 
 - (void)removeOfflineLicenseForPsshKey:(NSData *)psshKey
                        completionBlock:(void(^)(NSError *))completionBlock {
+  dispatch_queue_t queue = [_delegate iOSCdmDispatchQueue:self];
+  auto callCompletionBlock = ^(NSError *error) {
+    if (queue && completionBlock) {
+      dispatch_async(queue, ^{
+        completionBlock(error);
+      });
+    }
+  };
   NSString *sessionIdForKey = [_delegate sessionIdFromPssh:psshKey];
   if (sessionIdForKey) {
-    iOSCdmHost::GetHost()->RemoveSession(sessionIdForKey);
+    NSError *error = nil;
+    error = iOSCdmHost::GetHost()->RemoveSession(sessionIdForKey);
+    if (error) {
+      NSLog(@"::ERROR::Removing Session");
+      callCompletionBlock(error);
+      return;
+    }
+    if (![_delegate removePssh:psshKey]) {
+      error = [NSError errorWithDomain:@"RemovePssh" code:errno userInfo:nil];
+      NSLog(@"::ERROR::Removing PSSH: %@", error);
+      callCompletionBlock(error);
+      return;
+    }
     [_offlineSessions removeObjectForKey:sessionIdForKey];
-    [_psshKeysToIds removeObjectForKey:sessionIdForKey];
+    [_psshKeysToIds removeObjectForKey:psshKey];
+    callCompletionBlock(error);
   }
 }
 
@@ -173,17 +236,9 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
 - (void)onSessionMessage:(NSData *)data
                sessionId:(NSString *)sessionId
          completionBlock:(void(^)(NSData *, NSError *))completionBlock {
-  BOOL isOffline = [_offlineSessions[sessionId] boolValue];
-  if (isOffline) {
-    [_delegate iOSCdm:self
-             sendData:data
-              offline:isOffline
-      completionBlock:completionBlock];
-  } else {
-    [_delegate iOSCdm:self
-        fetchLicenseWithData:data
-             completionBlock:completionBlock];
-  }
+  [_delegate iOSCdm:self
+      fetchLicenseWithData:data
+           completionBlock:completionBlock];
 }
 
 - (void)onSessionCreated:(NSString *)sessionId {
@@ -209,6 +264,8 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
   if (_sessionIdsToBlocks[sessionId]) {
     [self callBlockWithError:error forSessionId:sessionId];
     [_sessionIdsToBlocks removeObjectForKey:sessionId];
+  }
+  if (_psshKeysToIds[sessionId]) {
     NSArray *keys = [_psshKeysToIds allKeysForObject:sessionId];
     [_psshKeysToIds removeObjectsForKeys:keys];
     iOSCdmHost::GetHost()->CloseSessions(@[ sessionId ]);
@@ -244,7 +301,6 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
 
 - (BOOL)writeFile:(NSData *)data file:(NSString *)fileName {
   if ([_delegate respondsToSelector:@selector(writeData:file:)]) {
-    // TODO: Update delegate API.
     [_delegate writeData:data file:fileName];
     return YES;
   }
@@ -259,7 +315,7 @@ NSString *const kiOSCdmError = @"kiOSCdmError";
   }
 }
 
-- (int32_t)fileSize:(NSString *)fileName {
+- (int64_t)fileSize:(NSString *)fileName {
   if ([_delegate respondsToSelector:@selector(fileSize:)]) {
     return [_delegate fileSize:fileName];
   } else {

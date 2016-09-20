@@ -87,8 +87,34 @@ NSError *iOSCdmHost::CreateSession(Cdm::SessionType sessionType,
   if (code != Cdm::kSuccess) {
     return GetErrorFromStatus(code, @"Error creating session.");
   }
-
   *sessionIdStr = [NSString stringWithStdString:sessionId];
+  return nil;
+}
+
+NSError *iOSCdmHost::GetLicenseInfo(NSString *sessionId, int64_t *expiration) {
+  int64_t expirationData;
+  Cdm::Status cdmStatus =
+      cdm_->getExpiration([sessionId stdString], &expirationData);
+  if (cdmStatus != Cdm::kSuccess) {
+    return GetErrorFromStatus(cdmStatus, @"Error Getting Expiration.");
+  }
+  if (expirationData > 0) {
+    *expiration = expirationData;
+  } else {
+    *expiration = nil;
+    NSLog(@"::INFO::No Expiration Data found");
+  }
+  widevine::Cdm::KeyStatusMap map;
+  cdmStatus = cdm_->getKeyStatuses([sessionId stdString], &map);
+  if (cdmStatus != Cdm::kSuccess) {
+    return GetErrorFromStatus(cdmStatus, @"Error Getting Key Status.");
+  }
+  widevine::Cdm::KeyStatus keyStatus = map.begin()->second;
+  if (!(keyStatus == widevine::Cdm::KeyStatus::kUsable)) {
+    NSLog(@"::ERROR::License Status: %u", map.begin()->second);
+    return GetErrorFromStatus(cdmStatus, @"License Error.");
+  }
+  NSLog(@"::INFO::License Status is Valid (Usable)");
   return nil;
 }
 
@@ -121,7 +147,7 @@ NSData* iOSCdmHost::Decrypt(NSData *encrypted, NSData *key_id, NSData *iv) {
   Cdm::OutputBuffer decrypted;
   decrypted.data = (uint8_t*)malloc(sizeof(uint8_t) * input.data_length);
   decrypted.data_length = input.data_length;
-  if (cdm_->decrypt(input, decrypted) != Cdm::kSuccess) {
+  if (cdm_->decrypt(input, decrypted)) {
     return nil;
   }
   return [NSData dataWithBytesNoCopy:decrypted.data
@@ -254,7 +280,6 @@ bool iOSCdmHost::remove(const std::string& name) {
   if ([nameStr isEqualToString:kCertFilename]) {
     return false;
   }
-
   return [iOSCdmHandler_ removeFile:nameStr];
 }
 

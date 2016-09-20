@@ -39,7 +39,7 @@ class iOSCdmHost : public widevine::Cdm::IEventListener,
   iOSCdmHost();
 
   // Initalize/Deinitialize should be called once for the lifetime of the app.
-  NSError *Initialize(const widevine::Cdm::ClientInfo& clientInfo,
+  NSError *Initialize(const widevine::Cdm::ClientInfo &clientInfo,
                       widevine::Cdm::LogLevel verbosity);
 
   void Deinitialize();
@@ -54,6 +54,9 @@ class iOSCdmHost : public widevine::Cdm::IEventListener,
   NSError *CreateSession(widevine::Cdm::SessionType sessionType,
                           NSString **sessionId);
 
+  // Get Status of License and Expiration of Session.
+  NSError *GetLicenseInfo(NSString *sessionId, int64_t *expiration);
+
   // Loads the session for a |sessionId|.
   NSError *LoadSession(NSString *sessionId);
 
@@ -65,43 +68,43 @@ class iOSCdmHost : public widevine::Cdm::IEventListener,
   void CloseSessions(NSArray *sessionIds);
 
   // Decrypts the |encypted| blob with |key_id| and |iv|.
-  NSData* Decrypt(NSData *encrypted, NSData* key_id, NSData* iv);
+  NSData *Decrypt(NSData *encrypted, NSData *key_id, NSData *iv);
 
   // Generates a request based on |data|.
   NSError *GenerateRequest(NSString *sessionId, NSData *initData);
 
   virtual void setTimeout(int64_t delay_ms,
-                          widevine::Cdm::ITimer::IClient* client,
-                          void* context) override final;
+                          widevine::Cdm::ITimer::IClient *client,
+                          void *context) override final;
 
-  virtual void cancel(widevine::Cdm::ITimer::IClient* client) override final;
+  virtual void cancel(widevine::Cdm::ITimer::IClient *client) override final;
 
   virtual int64_t now() override final;
 
-  virtual void onMessage(const std::string& session_id,
+  virtual void onMessage(const std::string &session_id,
                          widevine::Cdm::MessageType message_type,
-                         const std::string& message) override final;
+                         const std::string &message) override final;
 
-  virtual void onKeyStatusesChange(const std::string& session_id)
-      override final;
+  virtual void onKeyStatusesChange(
+      const std::string &session_id) override final;
 
-  virtual void onRemoveComplete(const std::string& session_id) override final;
+  virtual void onRemoveComplete(const std::string &session_id) override final;
 
-  virtual bool read(const std::string& name, std::string* data) override final;
+  virtual bool read(const std::string &name, std::string *data) override final;
 
-  virtual bool write(const std::string& name, const std::string& data)
-      override final;
+  virtual bool write(const std::string &name,
+                     const std::string &data) override final;
 
-  virtual bool exists(const std::string& name) override final;
+  virtual bool exists(const std::string &name) override final;
 
-  virtual bool remove(const std::string& name) override final;
+  virtual bool remove(const std::string &name) override final;
 
-  virtual int32_t size(const std::string& name) override final;
+  virtual int32_t size(const std::string &name) override final;
 
  private:
-  widevine::Cdm* cdm_;
+  widevine::Cdm *cdm_;
   id<iOSCdmHandler> iOSCdmHandler_;
-  NSMutableDictionary* timers_;
+  NSMutableDictionary *timers_;
 };
 
 #endif // WIDEVINE_BASE_CDM_HOST_IOS_CDMHOST_H_

@@ -54,7 +54,7 @@ const int kElementWidth = 70;
   return [AVPlayerLayer class];
 }
 
-- (AVPlayer*)player {
+- (AVPlayer *)player {
   return [(AVPlayerLayer *)[self layer] player];
 }
 
@@ -65,7 +65,7 @@ const int kElementWidth = 70;
 /* Specifies how the video is displayed within a player layer’s bounds.
  (AVLayerVideoGravityResizeAspect is default) */
 - (void)setVideoFillMode:(NSString *)fillMode {
-  AVPlayerLayer *playerLayer = (AVPlayerLayer*)[self layer];
+  AVPlayerLayer *playerLayer = (AVPlayerLayer *)[self layer];
   playerLayer.videoGravity = fillMode;
 }
 

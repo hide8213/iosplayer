@@ -8,8 +8,8 @@ struct DashToHlsIndex;
 struct DashToHlsSession;
 @class Streaming;
 
-// Object that contains an individual stream within an HLS playlist before
-// being transmuxed to DASH content via the UDT.
+// Object that contains an individual stream within an HLS playlist before being transmuxed to DASH
+// content via the UDT.
 // Initialized via the Streaming object.
 @interface Stream : NSObject
 
@@ -37,8 +37,8 @@ typedef NS_ENUM(NSUInteger, DashMediaType) {
 @property DashMediaType dashMediaType;
 // Stores the complete status of the stream.
 @property BOOL done;
-// Maintains the index (or count) of dash segments that will be used to
-// determine how many TS segments will need to be created.
+// Maintains the index (or count) of dash segments that will be used to determine how many TS
+// segments will need to be created.
 @property struct DashToHlsIndex *dashIndex;
 // Video height.
 @property NSUInteger height;
@@ -54,7 +54,8 @@ typedef NS_ENUM(NSUInteger, DashMediaType) {
 @property(strong) NSData *m3u8;
 // Full duration of the clip (optional, may not be present in manifest).
 @property(nonatomic) NSUInteger mediaPresentationDuration;
-// MimeType of the stream (typically, but not limited to: video/mp4 or audio/mp4).
+// MimeType of the stream (typically, but not limited to: video/mp4 or
+// audio/mp4).
 @property(strong) NSString *mimeType;
 // Value of PSSH to be passed into UDT (Dash Transmuxer).
 @property(strong) NSData *pssh;
@@ -64,7 +65,7 @@ typedef NS_ENUM(NSUInteger, DashMediaType) {
 // Session to be used when Transmuxing with UDT (Dash Transmuxer).
 @property struct DashToHlsSession *session;
 // URL of the physical media file.
-@property(strong) NSURL *sourceUrl;
+@property(strong) NSURL *sourceURL;
 // Streaming object that contains the Stream object.
 @property(weak) Streaming *streaming;
 // Index of the single stream in relation to all stream.

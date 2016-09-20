@@ -4,19 +4,16 @@
 
 #import "AppDelegate.h"
 #import "DetailViewController.h"
-#import "Downloader.h"
-#import "LicenseManager.h"
+#import "CdmPlayerErrors.h"
 #import "MediaCell.h"
 #import "MediaResource.h"
-#import "MpdParser.h"
-
 
 static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 static NSString *kAlertTitle = @"Info";
 static NSString *kAlertButtonTitle = @"OK";
 static NSString *kPlaylistTitle = @"Playlist";
 
-@interface MasterViewController ()<MasterViewControllerDelegate>
+@interface MasterViewController () <MediaCellDelegate>
 @property(nonatomic, strong) MediaResource *mediaResource;
 @property(nonatomic, strong) NSMutableArray *mediaResources;
 @property(nonatomic, strong) NSIndexPath *offlineIndexPath;
@@ -30,26 +27,28 @@ static NSString *kPlaylistTitle = @"Playlist";
   if (self) {
     self.title = kPlaylistTitle;
     self.mediaResources = [NSMutableArray array];
-    self.detailViewController = (DetailViewController *)
-        [[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (DetailViewController *)[
+        [self.splitViewController.viewControllers lastObject] topViewController];
     // Load Media from JSON file (mediaResources.json)
-    NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources"
-                                                         ofType:@"json"];
+    NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources" ofType:@"json"];
     NSData *jsonData = [NSData dataWithContentsOfFile:jsonPath];
     NSError *error = nil;
-    NSArray *mediaResources =
-        [NSJSONSerialization JSONObjectWithData:jsonData
-                                        options:NSJSONReadingAllowFragments
-                                          error:&error];
+    NSArray *mediaResources = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                              options:NSJSONReadingAllowFragments
+                                                                error:&error];
     for (NSDictionary *mediaResource in mediaResources) {
       if ([mediaResource isKindOfClass:[NSDictionary class]] && error == nil) {
         NSString *name = [mediaResource objectForKey:@"name"];
         NSString *thumbnail = [mediaResource objectForKey:@"thumbnail"];
-        NSString *url = [mediaResource objectForKey:@"url"];
-        [self.mediaResources
-             addObject:[[MediaResource alloc] initWithName:name
-                                                 thumbnail:[NSURL URLWithString:thumbnail]
-                                                       url:[NSURL URLWithString:url]]];
+        NSString *URL = [mediaResource objectForKey:@"url"];
+        if (thumbnail && URL && name) {
+          [self.mediaResources
+              addObject:[[MediaResource alloc] initWithName:name
+                                                  thumbnail:[NSURL URLWithString:thumbnail]
+                                                        URL:[NSURL URLWithString:URL]]];
+        } else {
+          NSLog(@"ERROR::Media Entry Found, but not complete. Skipping.");
+        }
       }
     }
   }
@@ -66,24 +65,23 @@ static NSString *kPlaylistTitle = @"Playlist";
 
 #pragma mark - Table View
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   return 1;
 }
 
-- (NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
   return self.mediaResources.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-  static NSString * const sReuseIdentifier = @"mediaCell";
+  static NSString *const sReuseIdentifier = @"mediaCell";
   MediaResource *mediaResource = _mediaResources[indexPath.row];
 
-  MediaCell *mediaCell =
-      [tableView dequeueReusableCellWithIdentifier:sReuseIdentifier];
+  MediaCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:sReuseIdentifier];
   if (!mediaCell) {
-    mediaCell =  [[MediaCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                  reuseIdentifier:sReuseIdentifier];
+    mediaCell = [[MediaCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                 reuseIdentifier:sReuseIdentifier];
   }
   mediaCell.textLabel.text = mediaResource.name;
   mediaCell.isDownloaded = mediaResource.isDownloaded;
@@ -98,7 +96,6 @@ static NSString *kPlaylistTitle = @"Playlist";
   });
   mediaCell.delegate = self;
   [mediaCell updateDisplay];
-
   return mediaCell;
 }
 
@@ -106,8 +103,8 @@ static NSString *kPlaylistTitle = @"Playlist";
 
 // TODO(seawardt): Add Reachability in place of basic check (b/27264396).
 - (BOOL)isInternetConnectionAvailable {
-  NSURL *scriptUrl = [NSURL URLWithString:@"http://www.google.com"];
-  NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
+  NSURL *scriptURL = [NSURL URLWithString:@"http://www.google.com"];
+  NSData *data = [NSData dataWithContentsOfURL:scriptURL];
   if (data) {
     return YES;
   } else {
@@ -117,7 +114,7 @@ static NSString *kPlaylistTitle = @"Playlist";
 
 - (void)connectionErrorAlert {
   // Display the error.
-  NSError *error = [NSError errorWithDomain:@"No Connection Found." code:404 userInfo:nil];
+  NSError *error = [NSError cdmErrorWithCode:CdmPlayeriOSErrorCode_NoConnection userInfo:nil];
   UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[error localizedDescription]
                                                       message:[error localizedFailureReason]
                                                      delegate:nil
@@ -126,38 +123,60 @@ static NSString *kPlaylistTitle = @"Playlist";
   [alertView show];
 }
 
+- (void)didDeleteMediaURL:(NSURL *)mediaURL error:(NSError *)error {
+  if (error) {
+    NSLog(@"\n::ERROR::Could not delete: %@\n%@", mediaURL, error);
+  } else {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
+                                                        object:self];
+    UIAlertView *alert = nil;
+    NSString *alertMessage = [NSString
+        stringWithFormat:@"Downloaded File Removed.\n File: %@", [mediaURL lastPathComponent]];
+    alert = [[UIAlertView alloc] initWithTitle:kAlertTitle
+                                       message:alertMessage
+                                      delegate:nil
+                             cancelButtonTitle:kAlertButtonTitle
+                             otherButtonTitles:nil];
+    [alert show];
+  }
+}
+
 - (void)didPressDelete:(MediaCell *)cell {
   NSInteger row = [self.tableView indexPathForCell:cell].row;
   MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
-  NSURL *mpdUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                       urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
-  [MpdParser deleteFilesInMpd:mpdUrl];
-  [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
-                                                      object:self];
-  UIAlertView* alert;
-  NSString *alertMessage = [NSString stringWithFormat:@"Downloaded File Removed.\n File: %@",
-                               [mediaResource.url lastPathComponent]];
-  alert = [[UIAlertView alloc] initWithTitle:kAlertTitle
-                                     message:alertMessage
-                                    delegate:nil
-                           cancelButtonTitle:kAlertButtonTitle
-                           otherButtonTitles: nil];
-  [alert show];
+  NSURL *mpdURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+      urlInDocumentDirectoryForFile:[mediaResource.URL lastPathComponent]];
+  [mediaResource deleteMediaResource:mpdURL
+                     completionBlock:^(NSError *error) {
+                       [self didDeleteMediaURL:mediaResource.URL error:error];
+                     }];
 }
 
 - (void)didPressDownload:(MediaCell *)cell {
   if ([self isInternetConnectionAvailable]) {
     NSInteger row = [self.tableView indexPathForCell:cell].row;
     MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
-    NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                          urlInDocumentDirectoryForFile:[mediaResource.url lastPathComponent]];
-    [Downloader initDownloaderWithUrl:mediaResource.url
-                                 file:fileUrl
-                         initialRange:nil
-                             delegate:mediaResource];
+    NSURL *fileURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+        urlInDocumentDirectoryForFile:[mediaResource.URL lastPathComponent]];
+    [Downloader downloaderWithURL:mediaResource.URL
+                          fileURL:fileURL
+                     initialRange:nil
+                         delegate:mediaResource];
   } else {
     [self connectionErrorAlert];
   }
+}
+
+- (void)didPressLicense:(MediaCell *)cell {
+  NSInteger row = [self.tableView indexPathForCell:cell].row;
+  MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
+  [mediaResource
+      fetchLicenseInfo:mediaResource.URL
+       completionBlock:^(NSError *error) {
+         if (error) {
+           NSLog(@"\n::INFO::License: %@\n%@", mediaResource.name, error);
+         }
+       }];
 }
 
 - (void)didPressPlay:(MediaCell *)cell {
@@ -169,10 +188,10 @@ static NSString *kPlaylistTitle = @"Playlist";
       return;
     }
   }
+
   DetailViewController *playerViewController =
       [[DetailViewController alloc] initWithMediaResource:mediaResource];
-  [[self navigationController] pushViewController:playerViewController
-                                         animated:YES];
+  [[self navigationController] pushViewController:playerViewController animated:YES];
 }
 
 @end

@@ -49,10 +49,9 @@
     _fullscreenButtonItem = [self barButtonWithImage:_fullscreenEnterImage
                                             selector:@selector(didPressToggleFullscreen)];
     [_buttonBarItems addObject:_fullscreenButtonItem];
-    _playButtonItem =
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
-                                                      target:self
-                                                      action:@selector(didPressPlay)];
+    _playButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
+                                                                    target:self
+                                                                    action:@selector(didPressPlay)];
     _buttonBar.items = _buttonBarItems;
     [self addSubview:_buttonBar];
   }
@@ -115,21 +114,19 @@
   }
 }
 
-- (UIBarButtonItem *)barButtonWithImage:(UIImage *)image
-                     selector:(SEL)selector {
-  UIBarButtonItem *barButton = [[UIBarButtonItem alloc]  initWithImage:_fullscreenEnterImage
-                                                                 style:UIBarButtonItemStylePlain
-                                                                target:self
-                                                                action:selector];
+- (UIBarButtonItem *)barButtonWithImage:(UIImage *)image selector:(SEL)selector {
+  UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithImage:_fullscreenEnterImage
+                                                                style:UIBarButtonItemStylePlain
+                                                               target:self
+                                                               action:selector];
   return barButton;
 }
 
 - (UIBarButtonItem *)barButtonWithTitle:(NSString *)title
                              systemItem:(UIBarButtonSystemItem)systemItem
                                selector:(SEL)selector {
-  UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:systemItem
-                                                                             target:self
-                                                                             action:selector];
+  UIBarButtonItem *barButton =
+      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:systemItem target:self action:selector];
   [barButton setStyle:UIBarButtonItemStyleDone];
   [barButton setTitle:title];
   [_buttonBarItems addObject:barButton];

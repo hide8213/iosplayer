@@ -1,13 +1,15 @@
 #import "MpdParser.h"
-#import "Stream.h"
 #import "Streaming.h"
 
-static NSString *kMultiAudioMpdUrl = @"https://shaka-player-demo.appspot.com/assets/angel_one.mpd";
+static NSString *kMultiAudioMpdURL =
+    @"https://shaka-player-demo.appspot.com/assets/angel_one.mpd";
 
-static NSString *kClearContentMpdUrl =
-    @"http://yt-dash-mse-test.commondatastorage.googleapis.com/media/oops-20120802-manifest.mpd";
+static NSString *kClearContentMpdURL =
+    @"http://yt-dash-mse-test.commondatastorage.googleapis.com/media/"
+    @"oops-20120802-manifest.mpd";
 
-static NSString *kEncContentMpdUrl = @"http://storage.googleapis.com/wvmedia/cenc/tears.mpd";
+static NSString *kEncContentMpdURL =
+    @"http://storage.googleapis.com/wvmedia/cenc/tears.mpd";
 
 static NSString *const kSplitBaseMpdData =
     @"<MPD type=\"static\">"
@@ -108,7 +110,8 @@ static NSString *const kInvalidParamsMpdData =
 
 // Validate Parents attributes in Adaptation set are propogated down.
 - (void)testDownwardPropagation {
-  _streaming.streams = [self parseStaticMPD:kSplitBaseMpdData urlString:kEncContentMpdUrl];
+  _streaming.streams =
+      [self parseStaticMPD:kSplitBaseMpdData URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       XCTAssertEqualObjects(stream.mimeType, @"video/mp4");
@@ -118,7 +121,8 @@ static NSString *const kInvalidParamsMpdData =
 
 // Validate lower attributes take precendence over higher ones.
 - (void)testOverwritingAttributes {
-  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kEncContentMpdUrl];
+  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData
+                                  URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       XCTAssertEqualObjects(stream.mimeType, @"video/mp4");
@@ -129,7 +133,8 @@ static NSString *const kInvalidParamsMpdData =
 
 // Validate Index Range is being parsed and set correctly.
 - (void)testIndexRange {
-  _streaming.streams = [self parseStaticMPD:kSplitBaseMpdData urlString:kEncContentMpdUrl];
+  _streaming.streams =
+      [self parseStaticMPD:kSplitBaseMpdData URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       XCTAssertEqual([[stream.initialRange valueForKey:@"length"] intValue], 1767);
@@ -139,7 +144,8 @@ static NSString *const kInvalidParamsMpdData =
 
 // Validate Failure when InitRange is missing or invalid.
 - (void)testInvalidIndexRange {
-  _streaming.streams = [self parseStaticMPD:kInvalidParamsMpdData urlString:kClearContentMpdUrl];
+  _streaming.streams =
+      [self parseStaticMPD:kInvalidParamsMpdData URLString:kClearContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       // Initalization Range is incorrect. Start range is equal/higher to end.
@@ -159,14 +165,15 @@ static NSString *const kInvalidParamsMpdData =
 }
 
 // Validate having a Base URL that is different than the MPD source.
-- (void)testSplitUrl {
-  _streaming.streams = [self parseStaticMPD:kSplitBaseMpdData urlString:kEncContentMpdUrl];
+- (void)testSplitURL {
+  _streaming.streams =
+      [self parseStaticMPD:kSplitBaseMpdData URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
-      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
+      XCTAssertEqualObjects([stream.sourceURL absoluteString],
                             @"http://google.com/test/video.mp4");
     } else {
-      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
+      XCTAssertEqualObjects([stream.sourceURL absoluteString],
                             @"http://google.com/test/audio.mp4");
     }
   }
@@ -191,7 +198,8 @@ static NSString *const kInvalidParamsMpdData =
 
 // Validate total streams are accounted for and the indexValue increments correctly
 - (void)testStreamCount {
-  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kClearContentMpdUrl];
+  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData
+                                  URLString:kClearContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       XCTAssertEqual(stream.streamIndex, 1);
@@ -202,32 +210,34 @@ static NSString *const kInvalidParamsMpdData =
 
 
 // Validate changing scheme from HTTP to HTTPS based on MPD URL.
-- (void)testUrlScheme {
-  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kMultiAudioMpdUrl];
+- (void)testURLScheme {
+  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData
+                                  URLString:kMultiAudioMpdURL];
   for (Stream *stream in _streaming.streams) {
     NSLog(@"%@", stream);
     if (stream.isVideo) {
       // Representation Scheme should stay HTTP.
-      XCTAssertEqualObjects(stream.sourceUrl.scheme, @"http");
+      XCTAssertEqualObjects(stream.sourceURL.scheme, @"http");
     } else {
       // No scheme present will default to MPD Scheme.
-      XCTAssertEqualObjects(stream.sourceUrl.scheme, @"https");
+      XCTAssertEqualObjects(stream.sourceURL.scheme, @"https");
     }
   }
 
 }
 
 // Validate Parents attributes for BaseURL are propogated down correctly.
-- (void)testRepresentationBaseUrl {
-  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData urlString:kEncContentMpdUrl];
+- (void)testRepresentationBaseURL {
+  _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData
+                                  URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
       // Validate this URL is same as Representation BaseURL.
-      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
+      XCTAssertEqualObjects([stream.sourceURL absoluteString],
                             @"http://google.com/new/video/path/video.mp4");
     } else {
       // Validate this URL uses Global BaseURL.
-      XCTAssertEqualObjects([stream.sourceUrl absoluteString],
+      XCTAssertEqualObjects([stream.sourceURL absoluteString],
                             @"http://google.com/test/audio.mp4");
     }
   }
@@ -235,23 +245,30 @@ static NSString *const kInvalidParamsMpdData =
 
 # pragma mark - Private Methods
 
-- (NSMutableArray *)parseStaticMPD:(NSString *)mpd urlString:(NSString *)urlString {
-  NSURL *mpdUrl = [[NSURL alloc] initWithString:urlString];
+- (NSArray<Stream *> *)parseStaticMPD:(NSString *)mpd
+                         URLString:(NSString *)URLString {
+  NSURL *mpdURL = [[NSURL alloc] initWithString:URLString];
   NSData *mockData = [mpd dataUsingEncoding:NSUTF8StringEncoding];
-  return [MpdParser parseMpdWithStreaming:_streaming mpdData:mockData baseUrl:mpdUrl];
+  return [MpdParser parseMpdWithStreaming:_streaming
+                                  mpdData:mockData
+                                  baseURL:mpdURL
+                             storeOffline:NO];
 }
 
-- (NSMutableArray *)parseMPDUrl:(NSString *)mpdUrl {
-  NSURL *url = [[NSURL alloc] initWithString:mpdUrl];
+- (NSArray<Stream *> *)parseMPDURL:(NSString *)mpdURL {
+  NSURL *URL = [[NSURL alloc] initWithString:mpdURL];
   NSError *error = nil;
-  NSData *data = [NSData dataWithContentsOfURL:url
+  NSData *data = [NSData dataWithContentsOfURL:URL
                                        options:NSDataReadingUncached
                                          error:&error];
   if (error) {
-    NSLog(@"Error reading %@ %@", mpdUrl, error);
+    NSLog(@"Error reading %@ %@", mpdURL, error);
     return nil;
   } else {
-    return [MpdParser parseMpdWithStreaming:_streaming mpdData:data baseUrl:url];
+    return [MpdParser parseMpdWithStreaming:_streaming
+                                    mpdData:data
+                                    baseURL:URL
+                               storeOffline:NO];
   }
 }
 

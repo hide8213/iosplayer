@@ -3,10 +3,12 @@
 @interface LiveStream : NSObject
 
 // All properties are optional and only stored if found within the manifest.
+// Date establishing when stream was created, corresponds to first segment.
+@property NSDate *availabilityStartTime;
 // Duration of Stream
 @property NSUInteger duration;
 // URL for the Init file, if present
-@property NSURL *initializationUrl;
+@property NSURL *initializationURL;
 // Media File name property. May contain wildcards (i.e $Number$)
 // See https://gpac.wp.mines-telecom.fr/mp4box/dash
 @property NSString *mediaFileName;
@@ -26,4 +28,3 @@
 @property NSUInteger timeShiftBufferDepth;
 
 @end
-

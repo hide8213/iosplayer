@@ -4,9 +4,10 @@
 
 #import "Streaming.h"
 
-NSString *kStorageName = @"Keystore/";
-NSString *kKeyMapName = @"KeyMap";
-NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
+static NSString *kStorageName = @"Keystore/";
+static NSString *kKeyMapName = @"KeyMap";
+static NSString *const kLicenseUrlString =
+    @"https://proxy.uat.widevine.com/proxy";
 
 @interface LicenseManager () {
   Streaming *_streaming;
@@ -17,43 +18,38 @@ NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
 @end
 
 @implementation LicenseManager
-// Very naive archival of offline licenses.  The naivity is to help integration
-// by keeping the keyfiles in the clear.  These keyfiles could be lifted and
-// placed on another device to authorize that device.
+// Very naive archival of offline licenses.  The naivity is to help integration by keeping the
+// keyfiles in the clear.  These keyfiles could be lifted and placed on another device to authorize
+// that device.
 //
 // A real implementation should encrypt these files.
 //
-// A minimal encryption would be combining a keychain random password with an
-// application password.  This scheme would prevent just lifting the keys and
-// moving them to another user, but as the keychain can be dumped and modified
-// a user would be able to copy the licenses.
+// A minimal encryption would be combining a keychain random password with an application password.
+// This scheme would prevent just lifting the keys and moving them to another user, but as the
+// keychain can be dumped and modified a user would be able to copy the licenses.
 
 + (void)startup {
   [self sharedInstance];
 }
 
-// No actual work done to shut us down.
-+ (void)shutdown {
-}
-
-- (instancetype) init {
+- (instancetype)init {
   self = [super init];
   if (self) {
-    _queue = dispatch_queue_create("Licensing", NULL);
+    _queue =
+        dispatch_queue_create("com.google.widevine.cdm-player.licensing", DISPATCH_QUEUE_SERIAL);
     _keyStoreURL =
         [NSURL URLWithString:kStorageName
-               relativeToURL:[[NSFileManager defaultManager]URLsForDirectory:NSDocumentDirectory
-                                                                   inDomains:NSUserDomainMask][0]];
+               relativeToURL:[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+                                                                    inDomains:NSUserDomainMask][0]];
     NSError *error = nil;
     [[NSFileManager defaultManager] createDirectoryAtURL:_keyStoreURL
                              withIntermediateDirectories:YES
                                               attributes:nil
                                                    error:&error];
     if (error) {
-      NSLog(@"Could not create directory because %@", error);
+      NSLog(@"::ERROR::Could not create directory because %@", error);
       return nil;
     }
-
   }
   return self;
 }
@@ -77,7 +73,7 @@ NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
   NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
   [data writeToFile:filePath options:NSDataWritingAtomic error:&error];
   if (error) {
-    NSLog(@"Could not write data to %@ because %@", fileName, error);
+    NSLog(@"::ERROR::Could not write data to %@ because %@", fileName, error);
   }
 }
 
@@ -86,26 +82,35 @@ NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
   return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 
-- (int32_t)fileSize:(NSString *)fileName {
+- (int64_t)fileSize:(NSString *)fileName {
   NSError *error;
   NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
-  NSDictionary *fileAttributes = [[NSFileManager defaultManager]
-      attributesOfItemAtPath:filePath error:&error];
+  NSDictionary *fileAttributes =
+      [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&error];
   if (error) {
     return -1;
   }
   NSNumber *sizeNumber = [fileAttributes objectForKey:NSFileSize];
-  return [sizeNumber intValue];
+  return [sizeNumber unsignedLongLongValue];
 }
 
 - (BOOL)removeFile:(NSString *)fileName {
   NSError *error;
-  NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
-  [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
-  if (error) {
-    NSLog(@"Could not remove %@ due to %@", fileName, error);
+  NSURL *fileURL = [NSURL URLWithString:fileName relativeToURL:_keyStoreURL];
+  return [[NSFileManager defaultManager] removeItemAtURL:fileURL error:&error];
+}
+
+- (BOOL)removePssh:(NSData *)pssh {
+  NSURL *fileURL = [NSURL URLWithString:kKeyMapName relativeToURL:_keyStoreURL];
+  NSData *keyMapData = [NSData dataWithContentsOfURL:fileURL];
+  if (keyMapData) {
+    NSMutableDictionary *keyMap = [NSKeyedUnarchiver unarchiveObjectWithData:keyMapData];
+    [keyMap removeObjectForKey:pssh];
+    keyMapData = [NSKeyedArchiver archivedDataWithRootObject:keyMap];
+    [keyMapData writeToURL:fileURL atomically:YES];
+    return true;
   }
-  return error == nil;
+  return false;
 }
 
 - (void)onSessionCreatedWithPssh:(NSData *)pssh sessionId:(NSString *)sessionId {
@@ -139,16 +144,15 @@ NSString *kLicenseUrlString = @"https://proxy.uat.widevine.com/proxy";
 
 - (void)iOSCdm:(iOSCdm *)iOSCdm
     fetchLicenseWithData:(NSData *)data
-         completionBlock:(void(^)(NSData *, NSError *))completionBlock {
+         completionBlock:(void (^)(NSData *, NSError *))completionBlock {
   NSMutableURLRequest *request =
       [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kLicenseUrlString]];
   [request setHTTPMethod:@"POST"];
   [request setHTTPBody:data];
   NSURLResponse *response = nil;
   NSError *error = nil;
-  NSData *response_data = [NSURLConnection sendSynchronousRequest:request
-                                                returningResponse:&response
-                                                            error:&error];
+  NSData *response_data =
+      [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
   completionBlock(response_data, error);
 }
 

@@ -6,21 +6,18 @@
 @interface MpdParser : NSObject <NSXMLParserDelegate>
 
 // Array of streams found in the XML manifest.
-@property(nonatomic, strong) NSMutableArray *streams;
+@property(nonatomic, strong) NSMutableArray<Stream *> *streams;
+
+- (instancetype)initWithMpdData:(NSData *)mpdData;
 
 // Remove media files listed in Manifest.
-+ (void)deleteFilesInMpd:(NSURL *)mpdUrl;
++ (void)deleteFilesInMpd:(NSURL *)mpdURL;
 // Being parsing of Manifest by passing URL of streaming content.
-+ (NSMutableArray *)parseMpdWithStreaming:(Streaming *)streaming
-                                  mpdData:(NSData *)mpdData
-                                  baseUrl:(NSURL *)baseUrl;
-
-// Being parsing of Manifest by passing URL for offline content.
-+ (NSMutableArray *)parseMpdForOffline:(NSData *)mpdData
-                               baseUrl:(NSURL *)baseUrl;
++ (NSArray<Stream *> *)parseMpdWithStreaming:(Streaming *)streaming
+                                     mpdData:(NSData *)mpdData
+                                     baseURL:(NSURL *)baseURL
+                                storeOffline:(BOOL)storeOffline;
 
 // Convert MPEG Dash formatted duration into seconds.
 - (NSUInteger)convertDurationToSeconds:(NSString *)string;
 @end
-
-

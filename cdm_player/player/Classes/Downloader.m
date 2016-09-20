@@ -2,9 +2,7 @@
 
 #import "Downloader.h"
 
-#import "AppDelegate.h"
 #import "MpdParser.h"
-#import "Streaming.h"
 
 static NSMutableArray *sDownloaders;
 
@@ -13,14 +11,16 @@ NSString *const kLengthString = @"length";
 NSString *const kRangeHeaderString = @"Range";
 NSString *const kStartString = @"startRange";
 NSString *const kZeroString = @"0";
+NSTimeInterval const kPartialDownloadTimeout = 10.0;
+NSTimeInterval const kDownloadTimeout = 90.0;
 
-@interface Downloader()
+@interface Downloader ()
 @property(nonatomic, strong) NSURLConnection *connection;
 @property(nonatomic) NSDictionary *initialRange;
-@property(nonatomic, strong) NSURL *file;
+@property(nonatomic, strong) NSURL *fileURL;
 @property(nonatomic, strong) NSFileHandle *fileHandle;
 @property(nonatomic) BOOL isMpd;
-@property(nonatomic, strong) NSURL *url;
+@property(nonatomic, strong) NSURL *URL;
 @end
 
 @implementation Downloader {
@@ -28,41 +28,39 @@ NSString *const kZeroString = @"0";
   NSUInteger _receivedBytes;
 }
 
-+ (instancetype)initDownloaderWithUrl:(NSURL *)url
-                                 file:(NSURL *)file
-                         initialRange:(NSDictionary *)initialRange
-                             delegate:(id<DownloadDelegate>)delegate{
++ (instancetype)downloaderWithURL:(NSURL *)URL
+                          fileURL:(NSURL *)fileURL
+                     initialRange:(NSDictionary *)initialRange
+                         delegate:(id<DownloadDelegate>)delegate {
   Downloader *downloader = [[Downloader alloc] init];
   if (downloader) {
     downloader.delegate = delegate;
-    downloader.url = url;
+    downloader.URL = URL;
     if (!initialRange) {
-      initialRange = [[NSDictionary alloc] initWithObjectsAndKeys:kZeroString,
-                      kStartString,
-                      kZeroString,
-                      kLengthString,
-                      nil];
+      initialRange = [[NSDictionary alloc]
+          initWithObjectsAndKeys:kZeroString, kStartString, kZeroString, kLengthString, nil];
     }
     downloader.initialRange = initialRange;
-    downloader.file = file;
-    NSString *fileString = [NSString stringWithUTF8String:file.fileSystemRepresentation];
+    downloader.fileURL = fileURL;
+    NSString *fileString =
+        [NSString stringWithUTF8String:fileURL.fileSystemRepresentation];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager createFileAtPath:fileString contents:[NSData data] attributes:nil]) {
-      NSLog(@"Error was code: %d - message: %s", errno, strerror(errno));
+      NSLog(@"Error for creating file at %@ was code: %d - message: %s",
+            URL, errno, strerror(errno));
     }
-    downloader.isMpd = [file.pathExtension isEqualToString:kMpdString];
+    downloader.isMpd = [fileURL.pathExtension isEqualToString:kMpdString];
     downloader.fileHandle = [NSFileHandle fileHandleForWritingAtPath:fileString];
 
-    NSURLRequest *request = [NSURLRequest requestWithURL:url
+    // TODO(seawardt): Switch to NSURLSession
+    NSURLRequest *request = [NSURLRequest requestWithURL:URL
                                              cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                                         timeoutInterval:90];
-    downloader.connection = [[NSURLConnection alloc] initWithRequest:request
-                                                            delegate:downloader
-                                                    startImmediately:NO];
-    [downloader.connection scheduleInRunLoop:[NSRunLoop mainRunLoop]
-                                     forMode:NSDefaultRunLoopMode];
-    if ([delegate respondsToSelector:@selector(startDownloading:file:)]) {
-      [delegate startDownloading:downloader file:file];
+                                         timeoutInterval:kDownloadTimeout];
+    downloader.connection =
+        [[NSURLConnection alloc] initWithRequest:request delegate:downloader startImmediately:NO];
+    [downloader.connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    if ([delegate respondsToSelector:@selector(startDownloading:fileURL:)]) {
+      [delegate startDownloading:downloader fileURL:fileURL];
     }
     [downloader.connection start];
   }
@@ -73,46 +71,52 @@ NSString *const kZeroString = @"0";
   _expectedBytes = (NSUInteger)[response expectedContentLength];
 }
 
-- (void)connection:(NSURLConnection *)connection
-    didReceiveData:(NSData *)data {
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
   [_fileHandle writeData:data];
   _receivedBytes += [data length];
-  _progress = [NSNumber numberWithFloat:((float)_receivedBytes)/((float)_expectedBytes)];
-  if ([_delegate respondsToSelector:@selector(updateDownloadProgress:file:)]) {
-    [_delegate updateDownloadProgress:_progress file:_file];
+  _progress = [NSNumber numberWithFloat:((float)_receivedBytes) / ((float)_expectedBytes)];
+  if ([_delegate
+          respondsToSelector:@selector(updateDownloadProgress:fileURL:)]) {
+    [_delegate updateDownloadProgress:_progress fileURL:_fileURL];
   }
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-  if ([_delegate respondsToSelector:@selector(failedDownloading:file:error:)]) {
-    [_delegate failedDownloading:self file:_file error:error];
+  if ([_delegate
+          respondsToSelector:@selector(failedDownloading:fileURL:error:)]) {
+    [_delegate failedDownloading:self fileURL:_fileURL error:error];
   }
   @synchronized(sDownloaders) {
     [sDownloaders removeObject:self];
   }
 }
 
-- (void)downloadUrlArray:(NSArray *)urlArray {
-  for (Stream *stream in urlArray) {
-    NSURL *fileUrl = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:stream.sourceUrl.lastPathComponent];
-    [Downloader initDownloaderWithUrl:stream.sourceUrl
-                                 file:fileUrl
-                         initialRange:stream.initialRange
-                             delegate:_delegate];
+- (void)downloadURLArray:(NSArray *)URLArray {
+  for (Stream *stream in URLArray) {
+    NSURL *fileURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+        urlInDocumentDirectoryForFile:stream.sourceURL.lastPathComponent];
+    [Downloader downloaderWithURL:stream.sourceURL
+                          fileURL:fileURL
+                     initialRange:stream.initialRange
+                         delegate:_delegate];
   }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   [_fileHandle closeFile];
   if (_isMpd) {
-    NSData *mpdData = [NSData dataWithContentsOfURL:_file];
-    [self downloadUrlArray:[MpdParser parseMpdWithStreaming:nil
+    NSData *mpdData = [NSData dataWithContentsOfURL:_fileURL];
+    [self downloadURLArray:[MpdParser parseMpdWithStreaming:nil
                                                     mpdData:mpdData
-                                                    baseUrl:_url]];
+                                                    baseURL:_URL
+                                               storeOffline:YES]];
   }
-  if ([_delegate respondsToSelector:@selector(finishedDownloading:file:initialRange:)]) {
-    [_delegate finishedDownloading:self file:_file initialRange:_initialRange];
+  if ([_delegate respondsToSelector:@selector(finishedDownloading:
+                                                          fileURL:
+                                                     initialRange:)]) {
+    [_delegate finishedDownloading:self
+                           fileURL:_fileURL
+                      initialRange:_initialRange];
   }
   @synchronized(sDownloaders) {
     [sDownloaders removeObject:self];
@@ -120,58 +124,58 @@ NSString *const kZeroString = @"0";
 }
 
 // completion can be nil and it will run sync.
-+ (NSData *)downloadPartialData:(NSURL *)url
++ (NSData *)downloadPartialData:(NSURL *)URL
                    initialRange:(NSDictionary *)initialRange
-                     completion:(void(^)(NSData *data,
-                                         NSURLResponse *response,
-                                         NSError *error))completion {
+                     completion:(void (^)(NSData *data, NSURLResponse *response, NSError *error))
+                                    completion {
   NSError *error = nil;
   NSURLResponse *response = nil;
   int startRange = [[initialRange objectForKey:kStartString] intValue];
   int length = [[initialRange objectForKey:kLengthString] intValue];
 
-  if ([url isFileURL]) {
-    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:url error:&error];
+  if ([URL isFileURL]) {
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:URL error:&error];
     if (error) {
       if (completion) {
         completion(nil, response, error);
       }
       return nil;
     }
-        [fileHandle seekToFileOffset:startRange];
+    [fileHandle seekToFileOffset:startRange];
     NSData *data = [fileHandle readDataOfLength:length];
     if (completion) {
       completion(data, response, nil);
     }
     return data;
   } else {
-    NSMutableURLRequest *request = [NSMutableURLRequest
-                                       requestWithURL:url
-                                          cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                                      timeoutInterval:10];
+    NSMutableURLRequest *request =
+        [NSMutableURLRequest requestWithURL:URL
+                                cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                            timeoutInterval:kPartialDownloadTimeout];
     // Check if it is a byte range request or full file request.
     if (length != 0) {
-      NSString *byteRangeString = [NSString stringWithFormat:@"bytes=%d-%d",
-                                   startRange,
-                                   startRange + length];
+      NSString *byteRangeString =
+          [NSString stringWithFormat:@"bytes=%d-%d", startRange, startRange + length];
       [request setValue:byteRangeString forHTTPHeaderField:kRangeHeaderString];
     }
     if (completion) {
       [NSURLConnection sendAsynchronousRequest:request
                                          queue:[NSOperationQueue mainQueue]
-                             completionHandler:^(NSURLResponse *response,
-                                                 NSData *data,
-                                                 NSError *connectionError) {
+                             completionHandler:^(
+                                 NSURLResponse *response, NSData *data, NSError *connectionError) {
                                completion(data, response, connectionError);
                              }];
       return nil;
     }
     NSURLResponse *response = nil;
-    return [NSURLConnection sendSynchronousRequest:request
-                                 returningResponse:&response
-                                             error:&error];
+    NSData *data =
+        [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (error != nil) {
+      NSLog(@"Error reading %@: %@", URL, error);
+      return nil;
+    }
+    return data;
   }
 }
-
 
 @end

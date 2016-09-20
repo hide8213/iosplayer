@@ -2,33 +2,11 @@
 #import "Stream.h"
 #import "Streaming.h"
 
-static NSString *const kManifestURL_eDash = @"http://storage.googleapis.com/wvmedia/cenc/tears.mpd";
-static NSString *const kManifestURL_Clear =
-    @"http://yt-dash-mse-test.commondatastorage.googleapis.com/media/oops-20120802-manifest.mpd";
+static NSString *const kManifestURL_eDash = @"tears_cenc_small";
+static NSString *const kManifestURL_Clear = @"tears_clear_small";
+static int const kExpectedStreams = 2;
 
-static NSString *const kBasicVODMPD =
-    @"<MPD type=\"static\">"
-      @"<Period>"
-        @"<AdaptationSet mimeType=\"audio/mp4\">"
-          @"<Representation id=\"148\" codecs=\"mp4a.40.2\" audioSamplingRate=\"22050\" "
-              @"bandwidth=\"49993\">"
-            @"<BaseURL>https://localhost</BaseURL>"
-            @"<SegmentBase indexRange=\"1555-1766\">"
-              @"<Initialization range=\"0-1554\"/>"
-            @"</SegmentBase>"
-          @"</Representation>"
-        @"</AdaptationSet>"
-        @"<AdaptationSet mimeType=\"video/mp4\">"
-          @"<Representation id=\"142\" codecs=\"avc1.4d4015\" width=\"426\" height=\"240\" "
-              @"bandwidth=\"254027\">"
-            @"<BaseURL>https://localhost</BaseURL>"
-            @"<SegmentBase indexRange=\"1555-1766\">"
-              @"<Initialization range=\"0-1554\"/>"
-            @"</SegmentBase>"
-          @"</Representation>"
-        @"</AdaptationSet>"
-      @"</Period>"
-    @"</MPD>";
+extern float kPartialDownloadTimeout;
 
 @interface StreamingTest : XCTestCase {
   Streaming *_streaming;
@@ -41,38 +19,75 @@ static NSString *const kBasicVODMPD =
   _streaming = [[Streaming alloc] initWithAirplay:NO];
 }
 
-- (void)testManifestUrl_Clear {
-  [self convertMPDtoHLS:kManifestURL_Clear];
+- (void)testManifestURL_Clear {
+  [self convertMPDtoHLS:kManifestURL_Clear expectedStreams:kExpectedStreams];
 }
 
-- (void)testManifestUrl_eDash {
-  [self convertMPDtoHLS:kManifestURL_eDash];
+- (void)testManifestURL_eDash {
+  [self convertMPDtoHLS:kManifestURL_eDash expectedStreams:kExpectedStreams];
 }
 
-# pragma mark private methods
+#pragma mark private methods
 
 // Creates an output of an HLS Playlist from a MPD.
-- (void)convertMPDtoHLS:(NSString *)mpdURL {
-  _streaming.mpdURL = [[NSURL alloc] initWithString:mpdURL];
-  [_streaming processMpd:_streaming.mpdURL];
-  Stream *stream = nil;
-  for (stream in _streaming.streams) {
-    [Downloader downloadPartialData:stream.sourceUrl
-                       initialRange:stream.initialRange
-                         completion:^(NSData *data,
-                                      NSURLResponse *response,
-                                      NSError *connectionError) {
-                           XCTAssertFalse(data);
-                           XCTAssertTrue([stream initialize:data]);
-                           NSString *m3u8 =
-                               [[NSString alloc] initWithData:[_streaming buildChildPlaylist:stream]
-                                                     encoding:NSUTF8StringEncoding];
-                           NSString *endList = [m3u8 substringFromIndex:[m3u8 length] - 14];
-                           // Verify the End of the list is present and completed.
-                           XCTAssertEqualObjects(endList, @"#EXT-X-ENDLIST", @"Bad HLS Playlist");
-                         }];
+- (void)convertMPDtoHLS:(NSString *)mpdURL expectedStreams:(int)expectedStreams {
+  __weak XCTestExpectation *streamExpectation =
+      [self expectationWithDescription:@"Stream completion called"];
+
+  // use the custom callback version of processMpd, so the test can control the downloader
+  _streaming.mpdURL = [[NSBundle mainBundle] URLForResource:mpdURL withExtension:@"mpd"];
+  [_streaming processMpd:_streaming.mpdURL
+          withCompletion:^(NSArray<Stream *> *streams, NSError *error) {
+            [streamExpectation fulfill];
+
+            XCTAssertNil(error, @"MPD failed to load with error %@", error);
+          }];
+
+  // wait for the MPD to finish loading
+  [self waitForExpectationsWithTimeout:0.5 handler:nil];  // hopefully 0.5s is long enough
+
+  // because expectations are blocking, I can just put the rest down here
+  if (_streaming.streams) {
+    NSArray *streams = _streaming.streams;
+    XCTAssertEqual(streams.count, expectedStreams);
+    if (streams.count == expectedStreams) {
+      [self downloadStreams:streams];
+    }
   }
 }
 
-@end
+// downloads the streams, and test to see if the contents are as expected
+- (void)downloadStreams:(NSArray<Stream *> *)streams {
+  for (Stream *stream in streams) {
+    __weak XCTestExpectation *downloadExpectation =
+        [self expectationWithDescription:@"Download completion called"];
 
+    NSLog(@"%@", stream);
+
+    [Downloader
+        downloadPartialData:stream.sourceURL
+               initialRange:stream.initialRange
+                 completion:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
+                   [downloadExpectation fulfill];
+
+                   XCTAssertNotNil(data);
+
+                   BOOL initialized = [stream initialize:data];
+                   XCTAssertTrue(initialized);
+
+                   if (initialized) {
+                     NSString *m3u8 =
+                         [[NSString alloc] initWithData:[_streaming buildChildPlaylist:stream]
+                                               encoding:NSUTF8StringEncoding];
+                     NSString *endList = [m3u8 substringFromIndex:[m3u8 length] - 14];
+                     // Verify the End of the list is present and completed.
+                     XCTAssertEqualObjects(endList, @"#EXT-X-ENDLIST", @"Bad HLS Playlist");
+                   }
+                 }];
+  }
+
+  // wait for the downloads to complete
+  [self waitForExpectationsWithTimeout:kPartialDownloadTimeout handler:nil];
+}
+
+@end

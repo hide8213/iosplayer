@@ -2,9 +2,8 @@
 
 #import "AppDelegate.h"
 
-#import "MasterViewController.h"
-#import "DetailViewController.h"
 #import "LicenseManager.h"
+#import "MasterViewController.h"
 
 @implementation AppDelegate {
   UIWindow *_window;
@@ -26,7 +25,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application
-didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Disable the idle timer so that the screen does not sleep while playing video.
   application.idleTimerDisabled = YES;
   MasterViewController *masterViewController = [[MasterViewController alloc] init];

@@ -2,7 +2,6 @@
 
 #import "LocalWebServer.h"
 
-#import "HTTPConnection.h"
 #import "LocalWebConnection.h"
 
 NSString *kHttpPrefix = @"http://%@";

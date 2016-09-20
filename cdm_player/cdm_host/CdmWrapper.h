@@ -28,31 +28,34 @@ extern NSString *const kiOSCdmError;
             offline:(BOOL)isOffline
     completionBlock:(void (^)(NSData *, NSError *))completionBlock;
 
+// Asks whether the given file exists (See writeData).
+- (BOOL)fileExists:(NSString *)fileName;
+// Asks the size of the file saved with writeData.
+- (int64_t)fileSize:(NSString *)fileName;
+// Pull license data (Expiration and Key Status) and return expiration.
+- (void)getLicenseInfo:(NSData *)psshKey
+       completionBlock:
+           (void (^)(int64_t *expiration, NSError *))completionBlock;
+
 // Called when a session is created.  The |sessionId| can be stored and associated
 // with the |pssh|.  Future sessions will call sessionIdFromPssh with the same
 // |pssh|.
 - (void)onSessionCreatedWithPssh:(NSData *)pssh sessionId:(NSString *)sessionId;
-
 // Reads a file saved with writeData.
 - (NSData *)readFile:(NSString *)fileName;
+// Removes the file saved with writeData.
+- (BOOL)removeFile:(NSString *)fileName;
+// Removes Pssh from KeyMap
+- (BOOL)removePssh:(NSData *)pssh;
 
+// Gets the sessionId previously stored in onSessionCreatedWithPssh:sessionId:.  Should
+// return nil if no sessionId exists for that |pssh|.
+- (NSString *)sessionIdFromPssh:(NSData *)pssh;
 // Asks the application to save |data| to |fileName| to persist it for a later
 // invokation of the application.
 // TODO: Rename to writeFile and return success value.
 - (void)writeData:(NSData *)data file:(NSString *)fileName;
 
-// Asks whether the given file exists (See writeData).
-- (BOOL)fileExists:(NSString *)fileName;
-
-// Asks the size of the file saved with writeData.
-- (int32_t)fileSize:(NSString *)fileName;
-
-// Removes the file saved with writeData.
-- (BOOL)removeFile:(NSString *)fileName;
-
-// Gets the sessionId previously stored in onSessionCreatedWithPssh:sessionId:.  Should
-// return nil if no sessionId exists for that |pssh|.
-- (NSString *)sessionIdFromPssh:(NSData *)pssh;
 @end
 
 // This class is the ObjectiveC wrapper around the C++ interface.
@@ -62,30 +65,32 @@ extern NSString *const kiOSCdmError;
 // Returns an instance of WvCdmIos.
 + (iOSCdm *)sharedInstance;
 
-// Creates a new CDM playback session.
-- (void)setupCdmWithDelegate:(id<iOSCdmDelegate>)delegate;
-
-// Frees any allocated resources that were created from the current playback session.
-- (void)shutdownCdm;
-
+// Decrypts the sepcified |encrypted| data with |keyId| and |iv|.
+- (NSData *)decrypt:(NSData *)encrypted keyId:(NSData *)keyId IV:(NSData *)iv;
+// Use |psshKey| to retrive the key status and expiration of the license.
+- (void)getLicenseInfo:(NSData *)psshKey
+       completionBlock:
+           (void (^)(int64_t *expiration, NSError *))completionBlock;
 // Given a |psshKey|, |completionBlock| will be called
 // once the license data has been added.
 - (void)processPsshKey:(NSData *)psshKey
           isOfflineVod:(BOOL)isOfflineVod
        completionBlock:(void(^)(NSError *))completionBlock;
-
 // The offline license for |psshKey| will be removed and
 // then call the |completionBlock|.
 - (void)removeOfflineLicenseForPsshKey:(NSData *)psshKey
                        completionBlock:(void(^)(NSError *))completionBlock;
+// Creates a new CDM playback session.
+- (void)setupCdmWithDelegate:(id<iOSCdmDelegate>)delegate;
 
-// Decrypts the sepcified |encrypted| data with |keyId| and |iv|.
-- (NSData *)decrypt:(NSData *)encrypted keyId:(NSData *)keyId IV:(NSData *)iv;
+// Frees any allocated resources that were created from the current playback
+// session.
+- (void)shutdownCdm;
 
 // iOSCdmHandler methods forwarded to the iOSCdmDelegate.
-- (NSData *)readFile:(NSString *)fileName;
-- (int32_t)fileSize:(NSString *)fileName;
-- (BOOL)removeFile:(NSString *)fileName;
+- (int64_t)fileSize:(NSString *)fileName;
 - (void)onSessionCreated:(NSString *)sessionId;
+- (NSData *)readFile:(NSString *)fileName;
+- (BOOL)removeFile:(NSString *)fileName;
 
 @end

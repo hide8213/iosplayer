@@ -4,26 +4,23 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 
-#import "CdmWrapper.h"
 #import "DashToHlsApiAVFramework.h"
-#import "LicenseManager.h"
-#import "MasterViewController.h"
+#import "CdmPlayerErrors.h"
 #import "MediaResource.h"
 #import "PlaybackView.h"
 #import "PlayerControlsView.h"
 #import "PlayerScrubberView.h"
 #import "Streaming.h"
-#import "UDTApi.h"
 
 static DetailViewController *sDetailViewController;
 
-@interface DetailViewController() <PlayerControlsDelegate,
-                                   PlayerScrubberDelegate,
-                                   StreamingDelegate> {
+@interface DetailViewController () <PlayerControlsDelegate,
+                                    PlayerScrubberDelegate,
+                                    StreamingDelegate> {
   BOOL _isSeeking;
   NSURL *_keyStoreURL;
   NSString *_mediaName;
-  NSURL *_mediaUrl;
+  NSURL *_mediaURL;
   BOOL *_offline;
   PlaybackView *_playbackView;
   AVPlayer *_player;
@@ -41,9 +38,11 @@ static DetailViewController *sDetailViewController;
 @interface DetailViewController (Player)
 - (void)assetFailedToPrepareForPlayback:(NSError *)error;
 - (BOOL)isPlaying;
-- (void)observeValueForKeyPath:(NSString *)path ofObject:(id)object
-                        change:(NSDictionary *)change context:(void *)context;
-- (void)playerItemDidReachEnd:(NSNotification *)notification ;
+- (void)observeValueForKeyPath:(NSString *)path
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context;
+- (void)playerItemDidReachEnd:(NSNotification *)notification;
 - (CMTime)playerItemDuration;
 - (void)prepareToPlayAsset:(AVURLAsset *)asset withKeys:(NSArray *)requestedKeys;
 - (void)removePlayerTimeObserver;
@@ -56,7 +55,7 @@ static void *PlaybackViewControllerStatusObservationContext =
 static void *PlaybackViewControllerCurrentItemObservationContext =
     &PlaybackViewControllerCurrentItemObservationContext;
 
-NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
+NSString *kDash2HlsURL = @"http://%@:%d/dash2hls.m3u8";
 
 @implementation DetailViewController
 
@@ -77,12 +76,12 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   _streaming.offline = mediaResource.isDownloaded;
   _mediaName = mediaResource.name;
   if (_streaming.offline) {
-    _mediaUrl = mediaResource.offlinePath;
+    _mediaURL = mediaResource.offlinePath;
   } else {
-    _mediaUrl = mediaResource.url;
+    _mediaURL = mediaResource.URL;
   }
-  if ([_mediaUrl.pathExtension isEqualToString:@"mpd"]) {
-    [_streaming processMpd:_mediaUrl];
+  if ([_mediaURL.pathExtension isEqualToString:@"mpd"]) {
+    [_streaming processMpd:_mediaURL];
   }
 }
 
@@ -180,8 +179,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   _streaming.streamingDelegate = self;
   [_playbackView setVideoRenderingView:_renderingView];
   [self setView:_playbackView];
-  _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                           action:@selector(handleTap)];
+  _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap)];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(streamingReady:)
                                                name:kStreamingReadyNotification
@@ -198,7 +196,7 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   [_player pause];
   [_streaming stop];
   _streaming = nil;
-  _mediaUrl = nil;
+  _mediaURL = nil;
   [self removePlayerTimeObserver];
   [_playerItem removeObserver:self forKeyPath:@"status"];
   [_player removeObserver:self forKeyPath:@"rate"];
@@ -212,24 +210,23 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 }
 
 - (void)streamingReady:(NSNotification *)notification {
-  NSString *address = [[NSString alloc] initWithFormat:kDash2HlsUrl,
-                       _streaming.address, _streaming.httpPort];
-  _mediaUrl = [[NSURL alloc] initWithString:address];
-  AVURLAsset *asset = [AVURLAsset URLAssetWithURL:_mediaUrl options:nil];
+  NSString *address =
+      [[NSString alloc] initWithFormat:kDash2HlsURL, _streaming.address, _streaming.httpPort];
+  _mediaURL = [[NSURL alloc] initWithString:address];
+  AVURLAsset *asset = [AVURLAsset URLAssetWithURL:_mediaURL options:nil];
   if (Udt_SetAVURLAsset(asset, NULL, dispatch_get_main_queue()) != kDashToHlsStatus_OK) {
     NSLog(@"Cannot set the loopback encryption");
   }
 
-  NSArray *requestedKeys = @[@"playable"];
+  NSArray *requestedKeys = @[ @"playable" ];
   // Tells the asset to load the values of any of the specified keys that are not already loaded.
-  [asset loadValuesAsynchronouslyForKeys:requestedKeys completionHandler:
-   ^{
-     dispatch_async( dispatch_get_main_queue(),
-                    ^{
-                      // IMPORTANT: Must dispatch to main queue.
-                      [self prepareToPlayAsset:asset withKeys:requestedKeys];
-                    });
-   }];
+  [asset loadValuesAsynchronouslyForKeys:requestedKeys
+                       completionHandler:^{
+                         dispatch_async(dispatch_get_main_queue(), ^{
+                           // IMPORTANT: Must dispatch to main queue.
+                           [self prepareToPlayAsset:asset withKeys:requestedKeys];
+                         });
+                       }];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -239,16 +236,16 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 #pragma mark - External screen handling
 
 - (BOOL)isAirplayActive {
-  AVAudioSession* audioSession = [AVAudioSession sharedInstance];
-  AVAudioSessionRouteDescription* currentRoute = audioSession.currentRoute;
-  for (AVAudioSessionPortDescription* outputPort in currentRoute.outputs){
+  AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+  AVAudioSessionRouteDescription *currentRoute = audioSession.currentRoute;
+  for (AVAudioSessionPortDescription *outputPort in currentRoute.outputs) {
     if ([outputPort.portType isEqualToString:AVAudioSessionPortAirPlay])
-    return YES;
+      return YES;
   }
   return NO;
 }
 
-- (void)audioRouteHasChangedNotification:(NSNotification*)notification {
+- (void)audioRouteHasChangedNotification:(NSNotification *)notification {
   _resumeTime = CMTimeGetSeconds([_player currentTime]);
   [_streaming restart:[self isAirplayActive]];
   [[NSNotificationCenter defaultCenter] postNotificationName:kStreamingReadyNotification
@@ -273,11 +270,10 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 - (CMTime)playerItemDuration {
   AVPlayerItem *playerItem = [_player currentItem];
   if (playerItem.status == AVPlayerItemStatusReadyToPlay) {
-    return([playerItem duration]);
+    return ([playerItem duration]);
   }
-  return(kCMTimeInvalid);
+  return kCMTimeInvalid;
 }
-
 
 // Cancels the previously registered time observer.
 - (void)removePlayerTimeObserver {
@@ -290,15 +286,13 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
 #pragma mark -
 #pragma mark Error Handling - Preparing Assets for Playback Failed
 
-/* --------------------------------------------------------------
- **  Called when an asset fails to prepare for playback for any of
- **  the following reasons:
+/* ------------------------------------------------------------------------------------------
+ **  Called when an asset fails to prepare for playback for any of the following reasons:
  **
  **  1) values of asset keys did not load successfully,
- **  2) the asset keys did load successfully, but the asset is not
- **     playable
+ **  2) the asset keys did load successfully, but the asset is not playable
  **  3) the item did not become ready to play.
- ** ----------------------------------------------------------- */
+ ** -----------------------------------------------------------------------------------------*/
 
 - (void)assetFailedToPrepareForPlayback:(NSError *)error {
   [self removePlayerTimeObserver];
@@ -310,7 +304,6 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
                                             otherButtonTitles:nil];
   [alertView show];
 }
-
 
 #pragma mark Prepare to play asset, URL
 
@@ -337,13 +330,14 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
     NSString *localizedFailureReason =
         NSLocalizedString(@"The assets tracks were loaded, but could not be made playable.",
                           @"Item cannot be played failure reason");
-    NSDictionary *errorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               localizedDescription, NSLocalizedDescriptionKey,
-                               localizedFailureReason, NSLocalizedFailureReasonErrorKey,
-                               nil];
-    NSError *assetCannotBePlayedError = [NSError errorWithDomain:@"StitchedStreaplayer"
-                                                            code:0
-                                                        userInfo:errorDict];
+    NSDictionary *errorDict =
+        [NSDictionary dictionaryWithObjectsAndKeys:localizedDescription,
+                                                   NSLocalizedDescriptionKey,
+                                                   localizedFailureReason,
+                                                   NSLocalizedFailureReasonErrorKey,
+                                                   nil];
+    NSError *assetCannotBePlayedError =
+        [NSError cdmErrorWithCode:CdmPlayeriOSErrorCode_AssetCannotBePlayed userInfo:errorDict];
     // Display the error to the user.
     [self assetFailedToPrepareForPlayback:assetCannotBePlayedError];
     return;
@@ -360,9 +354,9 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   }
   _playerItem = [AVPlayerItem playerItemWithAsset:asset];
   [_playerItem addObserver:self
-                     forKeyPath:@"status"
-                        options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
-                        context:PlaybackViewControllerStatusObservationContext];
+                forKeyPath:@"status"
+                   options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
+                   context:PlaybackViewControllerStatusObservationContext];
   // When the player item has played to its end time we'll toggle the movie controller Pause button.
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(playerItemDidReachEnd:)
@@ -373,25 +367,22 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   // Create new player, if we don't already have one.
   if (!_player) {
     _player = [AVPlayer playerWithPlayerItem:_playerItem];
-    /* Observe the AVPlayer "currentItem" property to find out when any
-     AVPlayer replaceCurrentItemWithPlayerItem: replacement will/did
-     occur". */
+    /* Observe the AVPlayer "currentItem" property to find out when any AVPlayer
+     * replaceCurrentItemWithPlayerItem: replacement will/did occur". */
     [_player addObserver:self
-                  forKeyPath:@"currentItem"
-                     options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
-                     context:PlaybackViewControllerCurrentItemObservationContext];
+              forKeyPath:@"currentItem"
+                 options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
+                 context:PlaybackViewControllerCurrentItemObservationContext];
 
     // Observe the AVPlayer "rate" property to update the scrubber control.
     [_player addObserver:self
-                  forKeyPath:@"rate"
-                     options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
-                     context:PlaybackViewControllerRateObservationContext];
+              forKeyPath:@"rate"
+                 options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
+                 context:PlaybackViewControllerRateObservationContext];
   }
   if (_player.currentItem != _playerItem) {
-    /* Replace the player item with a new player item. The item replacement occurs
-     asynchronously; observe the currentItem property to find out when the
-     replacement will/did occur.
-     */
+    /* Replace the player item with a new player item. The item replacement occurs asynchronously;
+     * observe the currentItem property to find out when the replacement will/did occur. */
     [_player replaceCurrentItemWithPlayerItem:_playerItem];
   }
   if (_resumeTime) {
@@ -413,31 +404,28 @@ NSString *kDash2HlsUrl = @"http://%@:%d/dash2hls.m3u8";
   if (context == PlaybackViewControllerStatusObservationContext) {
     AVPlayerItemStatus status = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
     switch (status) {
-        /* Indicates that the status of the player is not yet known because
-         it has not tried to load new media resources for playback. */
+      /* Indicates that the status of the player is not yet known because it has not tried to load
+       * new media resources for playback. */
       case AVPlayerItemStatusUnknown: {
         [self removePlayerTimeObserver];
-      }
-        break;
+      } break;
       case AVPlayerItemStatusReadyToPlay: {
         /* Once the AVPlayerItem becomes ready to play, i.e.
          [playerItem status] == AVPlayerItemStatusReadyToPlay,
          its duration can be fetched from the item. */
         [self configScrubber];
-      }
-        break;
+      } break;
       case AVPlayerItemStatusFailed: {
         AVPlayerItem *playerItem = (AVPlayerItem *)object;
         [self assetFailedToPrepareForPlayback:playerItem.error];
-      }
-        break;
+      } break;
     }
   } else if (context == PlaybackViewControllerRateObservationContext) {
     // TODO(seawardt): Handle Bit rate changes
   } else if (context == PlaybackViewControllerCurrentItemObservationContext) {
     [_playbackView setPlayer:_player];
-    /* Specifies that the player should preserve the video’s aspect ratio and
-       fit the video within the layer’s bounds. */
+    /* Specifies that the player should preserve the video’s aspect ratio and fit the video within
+     * the layer’s bounds. */
     [_playbackView setVideoFillMode:AVLayerVideoGravityResizeAspect];
   } else {
     [super observeValueForKeyPath:path ofObject:object change:change context:context];
