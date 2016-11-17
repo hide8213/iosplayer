@@ -66,32 +66,55 @@ static NSString *const kInvalidParamsMpdData =
         @"minBufferTime=\"PT1.5S\" profiles=\"urn:mpeg:dash:profile:isoff-on-demand:2011\"  "
         @"type=\"static\">"
       @"<Period duration=\"PT0H4M2.93S\" start=\"PT0S\">"
-          @"<AdaptationSet>"
-            @"<ContentComponent contentType=\"video\" id=\"1\" />"
-            @"<Representation bandwidth=\"4190760\" codecs=\"  \" height=\"1080\" "
+        @"<AdaptationSet>"
+          @"<ContentProtection value=\"Widevine\" "
+            @"schemeIdUri=\"urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed\">"
+            @"<cenc:pssh>AAAANHBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAABQIARIQnrQFDeRLSAKTLifXUIPiZg==</cenc:pssh>"
+          @"</ContentProtection>"
+          @"<ContentComponent contentType=\"video\" id=\"1\" />"
+            @"<Representation bandwidth=\"4190760\" codecs=\"avc1\" height=\"1080\" "
                 @"id=\"1\" mimeType=\"video/mp4\" width=\"1920\">"
               @"<BaseURL>oops-20120802-89.mp4</BaseURL>"
-              @"<SegmentBase indexRange=\"0-673\">"
-                @"<Initialization range=\"674-1293\" />"
+                @"<SegmentBase indexRange=\"1555-1766\">"
+                @"<Initialization range=\"0-1554\"/>"
+              @"</SegmentBase>"
+            @"</Representation>"
+            @"<Representation bandwidth=\"4190760\" codecs=\"avc1\" height=\"1080\" "
+                @"id=\"2\" mimeType=\"application/mp4\" width=\"1920\">"
+              @"<BaseURL>oops-20120802-89.mp4</BaseURL>"
+                @"<SegmentBase indexRange=\"0-1554\">"
+                @"<Initialization range=\"1555-1766\"/>"
+              @"</SegmentBase>"
+            @"</Representation>"
+            @"<Representation bandwidth=\"4190760\" codecs=\"hev1.2.4.L63.90\" height=\"1080\" "
+                @"id=\"3\" mimeType=\"video/mp4\" width=\"1920\">"
+              @"<BaseURL>oops-20120802-89.mp4</BaseURL>"
+                @"<SegmentBase indexRange=\"1555-1766\">"
+                @"<Initialization range=\"0-1554\"/>"
               @"</SegmentBase>"
             @"</Representation>"
           @"</AdaptationSet>"
           @"<AdaptationSet>"
-            @"<ContentComponent contentType=\"audio\" id=\"2\" />"
+            @"<ContentProtection value=\"Widevine\" "
+                @"schemeIdUri=\"urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed\">"
+              @"<cenc:pssh>AAAANHBzc2gAAAAA7e+LqXnWSs6j"
+              @"\n"
+              @"AAAANHBzc2gAAAAA7e+LqXnWSs6j</cenc:pssh>"
+            @"</ContentProtection>"
+            @"<ContentComponent contentType=\"audio\" id=\"4\" />"
             @"<Representation bandwidth=\"127236\" codecs=\"mp4a.40.02\" id=\"6\" "
                 @"mimeType=\"audio/mp4\" numChannels=\"2\" sampleRate=\"44100\">"
               @"<BaseURL>oops-20120802-8c.mp4</BaseURL>"
               @"<SegmentBase indexRange=\"592-923\">"
               @"</SegmentBase>"
             @"</Representation>"
-            @"<Representation bandwidth=\"127236\" codecs=\"mp3\" id=\"7\" "
+            @"<Representation bandwidth=\"127236\" codecs=\"mp4a\" id=\"5\" "
               @"mimeType=\"audio/mp4\" numChannels=\"2\" sampleRate=\"44100\">"
               @"<BaseURL>oops-20120802-8c.mp4</BaseURL>"
               @"<SegmentBase>"
                 @"<Initialization range=\"674-1293\" />"
               @"</SegmentBase>"
             @"</Representation>"
-
           @"</AdaptationSet>"
       @"</Period>"
     @"</MPD>";
@@ -146,23 +169,47 @@ static NSString *const kInvalidParamsMpdData =
 - (void)testInvalidIndexRange {
   _streaming.streams =
       [self parseStaticMPD:kInvalidParamsMpdData URLString:kClearContentMpdURL];
+  XCTAssertEqual(_streaming.streams.count, 3);
   for (Stream *stream in _streaming.streams) {
-    if (stream.isVideo) {
-      // Initalization Range is incorrect. Start range is equal/higher to end.
-      XCTAssertNil(stream.initialRange);
-      // Codec is missing from the Representation for the stream.
-      XCTAssertNil(stream.codecs);
-    } else {
-      if ([stream.codecs isEqualToString:@"mp3"]) {
-        // Index Range is missing from SegmentBase.
-        XCTAssertNil(stream.initialRange);
-      } else {
-        // Initalization Range is missing.
-        XCTAssertNil(stream.initialRange);
-      }
+    if (stream.streamIndex == 0) {
+      XCTAssertEqual([[stream.initialRange valueForKey:@"startRange"] intValue], 0);
+    }
+    if (stream.streamIndex == 1) {
+      XCTAssertEqual([[stream.initialRange valueForKey:@"length"] intValue], 924);
+    }
+    if (stream.streamIndex == 2) {
+      XCTAssertEqual([[stream.initialRange valueForKey:@"startRange"] intValue], 674);
     }
   }
 }
+
+// Validate Failure with Missing or Invalid MimeType and Codecs
+- (void)testInvalidCodeMimeType {
+  _streaming.streams =
+      [self parseStaticMPD:kInvalidParamsMpdData URLString:kClearContentMpdURL];
+  // Verify only 1 streams out of 5 were loaded. (Skip HEVC and missing MimeType)
+  XCTAssertEqual(_streaming.streams.count, 3);
+  for (Stream *stream in _streaming.streams) {
+    XCTAssertNotEqual(stream.codecs, @"hev1.2.4.L63.90");
+    XCTAssertNotEqual(stream.mimeType, @"application/mp4");
+  }
+}
+
+// Validate Failure with bad PSSH
+- (void)testInvalidPSSH {
+  _streaming.streams =
+      [self parseStaticMPD:kInvalidParamsMpdData URLString:kClearContentMpdURL];
+  // Verify only 3 streams out of 5 were loaded. (Skip HEVC and missing MimeType)
+  XCTAssertEqual(_streaming.streams.count, 3);
+  for (Stream *stream in _streaming.streams) {
+    if (stream.isVideo) {
+      XCTAssertGreaterThan(stream.pssh.length, 0);
+    } else {
+      XCTAssertEqual(stream.pssh.length, 0);
+    }
+  }
+}
+
 
 // Validate having a Base URL that is different than the MPD source.
 - (void)testSplitURL {

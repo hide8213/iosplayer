@@ -57,6 +57,7 @@ static CGFloat kImageSize = 40;
 
 - (void)prepareForReuse {
   [super prepareForReuse];
+  self.thumbnail = nil;
   [self.textLabel removeGestureRecognizer:_tap];
   [_offlineButton removeTarget:self action:NULL forControlEvents:UIControlEventAllEvents];
   [_downloadPercentLabel setHidden:YES];
@@ -132,13 +133,17 @@ static CGFloat kImageSize = 40;
   // Resize and scale downloaded image, then add to ImageView.
   // Size set to cell height.
   // TODO(seawardt): Change to use CoreGraphics
-  CGSize size = CGSizeMake(kImageSize, kImageSize);
-  UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
-  [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-  UIImage *thumbnail = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  self.imageView.image = thumbnail;
-  [self setNeedsLayout];
+  if (image) {
+    CGSize size = CGSizeMake(kImageSize, kImageSize);
+    UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+    [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *thumbnail = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    self.imageView.image = thumbnail;
+    [self setNeedsLayout];
+  } else {
+    self.imageView.image = nil;
+  }
 }
 
 #pragma mark - Player Methods

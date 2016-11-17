@@ -400,14 +400,15 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
     if ([urlString containsString:kNumberPlaceholder]) {
       NSRegularExpression *numberRegex =
           [[NSRegularExpression alloc] initWithPattern:kNumberRegexPattern options:0 error:nil];
+      urlString = [urlString
+                   stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
       NSTextCheckingResult *numberMatch =
           [numberRegex firstMatchInString:urlString
                                   options:0
                                     range:NSMakeRange(0, urlString.length)];
       if (numberMatch) {
         NSRange formatRange = [numberMatch rangeAtIndex:1];
-        urlString = [urlString
-            stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
         NSString *segmentFormat = formatRange.location != NSNotFound
                                       ? [urlString substringWithRange:formatRange]
                                       : kNumberFormat;

@@ -37,7 +37,7 @@ extern NSTimeInterval kPartialDownloadTimeout;
 }
 
 - (void)finishedDownloading:(Downloader *)downloader
-                       file:(NSURL *)file
+                    fileURL:(NSURL *)fileURL
                initialRange:(NSDictionary *)initialRange {
   self.finishedDownloadingCalled += 1;
   self.finalBlock(self.failedDownloadingCalled + self.finishedDownloadingCalled);

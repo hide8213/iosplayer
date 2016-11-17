@@ -6,7 +6,6 @@
 
 @implementation PlayerControlsView {
   UIToolbar *_buttonBar;
-  NSMutableArray *_buttonBarItems;
   UIBarButtonItem *_flexItem;
   BOOL _isFullscreen;
   UIBarButtonItem *_fullscreenButtonItem;
@@ -24,35 +23,37 @@
     _buttonBar.translucent = NO;
     // TODO(seawardt): Condense color configuration into central location
     _buttonBar.barTintColor = [UIColor blackColor];
-    _buttonBar.items = _buttonBarItems;
     _buttonBar.tintColor = [UIColor whiteColor];
-    _buttonBarItems = [[NSMutableArray alloc] init];
     // TODO(seawardt): Clean up images (location/support multiple resolutions)
     _fullscreenEnterImage = [UIImage imageNamed:@"inline_playback_enter_fullscreen_2x.png"];
     _fullscreenExitImage = [UIImage imageNamed:@"inline_playback_exit_fullscreen_2x.png"];
 
-    // Load button bar items in order to be displayed.
-    _pauseButtonItem = [self barButtonWithTitle:@"Pause"
-                                     systemItem:UIBarButtonSystemItemPause
-                                       selector:@selector(didPressPause)];
-    _flexItem = [self barButtonWithTitle:@"Flex"
+    MPVolumeView *airplayView = [[MPVolumeView alloc] init];
+    airplayView.showsVolumeSlider = NO;
+    airplayView.showsRouteButton = YES;
+    [airplayView sizeToFit];
+
+    // Generate bar button items
+    _playButtonItem = [self barButtonItemWithTitle:@"Play" systemItem:UIBarButtonSystemItemPlay
+                                          selector:@selector(didPressPlay)];
+    _pauseButtonItem = [self barButtonItemWithTitle:@"Pause"
+                                         systemItem:UIBarButtonSystemItemPause
+                                           selector:@selector(didPressPause)];
+    _flexItem = [self barButtonItemWithTitle:@"Flex"
                               systemItem:UIBarButtonSystemItemFlexibleSpace
                                 selector:nil];
-    MPVolumeView *airplayView = [[MPVolumeView alloc] init];
-    [airplayView setShowsVolumeSlider:NO];
-    [airplayView sizeToFit];
-    UIBarButtonItem *airplayButtonItem = [[UIBarButtonItem alloc] initWithCustomView:airplayView];
-    [_buttonBarItems addObject:airplayButtonItem];
-    _restartButtonItem = [self barButtonWithTitle:@"Restart"
+    UIBarButtonItem *airplayItem =
+        [[UIBarButtonItem alloc] initWithCustomView:airplayView];
+    _restartButtonItem = [self barButtonItemWithTitle:@"Restart"
                                        systemItem:UIBarButtonSystemItemRefresh
                                          selector:@selector(didPressRestart)];
-    _fullscreenButtonItem = [self barButtonWithImage:_fullscreenEnterImage
+    _fullscreenButtonItem = [self barButtonItemWithImage:_fullscreenEnterImage
                                             selector:@selector(didPressToggleFullscreen)];
-    [_buttonBarItems addObject:_fullscreenButtonItem];
-    _playButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
-                                                                    target:self
-                                                                    action:@selector(didPressPlay)];
-    _buttonBar.items = _buttonBarItems;
+    _buttonBar.items = @[ _pauseButtonItem,
+                          _flexItem,
+                          airplayItem,
+                          _restartButtonItem,
+                          _fullscreenButtonItem ];
     [self addSubview:_buttonBar];
   }
   return self;
@@ -97,13 +98,15 @@
 }
 
 - (void)showPauseButton {
-  [_buttonBarItems replaceObjectAtIndex:0 withObject:_pauseButtonItem];
-  _buttonBar.items = _buttonBarItems;
+  NSMutableArray *newItems = [NSMutableArray arrayWithArray:_buttonBar.items];
+  [newItems replaceObjectAtIndex:0 withObject:_pauseButtonItem];
+  [_buttonBar setItems:newItems];
 }
 
 - (void)showPlayButton {
-  [_buttonBarItems replaceObjectAtIndex:0 withObject:_playButtonItem];
-  _buttonBar.items = _buttonBarItems;
+  NSMutableArray *newItems = [NSMutableArray arrayWithArray:_buttonBar.items];
+  [newItems replaceObjectAtIndex:0 withObject:_playButtonItem];
+  [_buttonBar setItems:newItems];
 }
 
 - (void)toggleFullscreenButton {
@@ -114,7 +117,7 @@
   }
 }
 
-- (UIBarButtonItem *)barButtonWithImage:(UIImage *)image selector:(SEL)selector {
+- (UIBarButtonItem *)barButtonItemWithImage:(UIImage *)image selector:(SEL)selector {
   UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithImage:_fullscreenEnterImage
                                                                 style:UIBarButtonItemStylePlain
                                                                target:self
@@ -122,14 +125,13 @@
   return barButton;
 }
 
-- (UIBarButtonItem *)barButtonWithTitle:(NSString *)title
-                             systemItem:(UIBarButtonSystemItem)systemItem
-                               selector:(SEL)selector {
+- (UIBarButtonItem *)barButtonItemWithTitle:(NSString *)title
+                                 systemItem:(UIBarButtonSystemItem)systemItem
+                                   selector:(SEL)selector {
   UIBarButtonItem *barButton =
       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:systemItem target:self action:selector];
   [barButton setStyle:UIBarButtonItemStyleDone];
   [barButton setTitle:title];
-  [_buttonBarItems addObject:barButton];
   return barButton;
 }
 

@@ -214,22 +214,21 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 - (void)fetchPsshFromFileURL:(NSURL *)fileURL
                 initialRange:(NSDictionary *)initialRange
              completionBlock:(void (^)(NSError *))completionBlock {
-  [Downloader
-      downloadPartialData:fileURL
-             initialRange:initialRange
-               completion:^(NSData *data, NSURLResponse *response,
-                            NSError *connectionError) {
-                 dispatch_async(_downloadQ, ^() {
-                   if (!data) {
-                     NSLog(@"\n::ERROR::Did not download %@", connectionError);
-                     return;
-                   }
-                   if (![self findPssh:data]) {
-                     return;
-                   }
-                   completionBlock(connectionError);
-                 });
-               }];
+  [Downloader downloadPartialData:fileURL
+                     initialRange:initialRange
+                       completion:^(NSData *data, NSURLResponse *response,
+                                    NSError *connectionError) {
+                         dispatch_async(_downloadQ, ^() {
+                           if (!data) {
+                             NSLog(@"\n::ERROR::Did not download %@", connectionError);
+                             return;
+                           }
+                           if (![self findPssh:data]) {
+                             return;
+                           }
+                           completionBlock(connectionError);
+                         });
+                       }];
 }
 
 - (BOOL)findPssh:(NSData *)initializationData {
