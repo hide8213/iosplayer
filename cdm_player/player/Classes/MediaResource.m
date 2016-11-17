@@ -136,8 +136,8 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
   NSString *errorMessage =
   [NSString stringWithFormat:@"\n::ERROR::Download Failed! \n %@: %@",
    fileURL, error];
-
-  alert = [[UIAlertView alloc] initWithTitle:@"Error"
+  NSString *errorString = NSLocalizedString(@"Download Failed.","");
+  alert = [[UIAlertView alloc] initWithTitle:errorString
                                      message:errorMessage
                                     delegate:nil
                            cancelButtonTitle:@"OK"
@@ -214,22 +214,21 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
 - (void)fetchPsshFromFileURL:(NSURL *)fileURL
                 initialRange:(NSDictionary *)initialRange
              completionBlock:(void (^)(NSError *))completionBlock {
-  [Downloader
-      downloadPartialData:fileURL
-             initialRange:initialRange
-               completion:^(NSData *data, NSURLResponse *response,
-                            NSError *connectionError) {
-                 dispatch_async(_downloadQ, ^() {
-                   if (!data) {
-                     NSLog(@"\n::ERROR::Did not download %@", connectionError);
-                     return;
-                   }
-                   if (![self findPssh:data]) {
-                     return;
-                   }
-                   completionBlock(connectionError);
-                 });
-               }];
+  [Downloader downloadPartialData:fileURL
+                     initialRange:initialRange
+                       completion:^(NSData *data, NSURLResponse *response,
+                                    NSError *connectionError) {
+                         dispatch_async(_downloadQ, ^() {
+                           if (!data) {
+                             NSLog(@"\n::ERROR::Did not download %@", connectionError);
+                             return;
+                           }
+                           if (![self findPssh:data]) {
+                             return;
+                           }
+                           completionBlock(connectionError);
+                         });
+                       }];
 }
 
 - (BOOL)findPssh:(NSData *)initializationData {
@@ -253,7 +252,7 @@ DashToHlsStatus mediaResourceDecryptionHandler(void *context,
     return NO;
   }
   status = Udt_ParseDash(session, 0, (uint8_t *)[initializationData bytes],
-                         [initializationData length], nil, nil, nil);
+                         [initializationData length], nil, 0, nil);
   if (status == kDashToHlsStatus_ClearContent) {
   } else if (status == kDashToHlsStatus_OK) {
   } else {

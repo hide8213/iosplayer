@@ -16,9 +16,6 @@ const int kElementWidth = 70;
   self = [super initWithFrame:frame];
   if (self) {
     self.backgroundColor = [UIColor blackColor];
-    _videoRenderingView = [[UIView alloc] init];
-    _videoRenderingView.backgroundColor = [UIColor grayColor];
-    [self addSubview:_videoRenderingView];
 
     _controlsView = [[PlayerControlsView alloc] init];
     [self addSubview:_controlsView];
@@ -41,13 +38,6 @@ const int kElementWidth = 70;
   [_controlsView setFrame:CGRectMake(0, height - kElementHeight, width, kElementHeight)];
   [self bringSubviewToFront:_scrubberView];
   [self bringSubviewToFront:_controlsView];
-  if (_fullscreen) {
-    [_videoRenderingView setFrame:self.bounds];
-  } else {
-    [_videoRenderingView setFrame:CGRectInset(self.bounds, 0, kElementHeight)];
-    [_videoRenderingView setContentMode:UIViewContentModeScaleAspectFit];
-    [_videoRenderingView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-  }
 }
 
 + (Class)layerClass {

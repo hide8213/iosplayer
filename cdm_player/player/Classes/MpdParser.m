@@ -7,6 +7,7 @@
 
 NSString *const kDashAdaptationSet = @"AdaptationSet";
 NSString *const kDashContentComponent = @"ContentComponent";
+NSString *const kDashContentProtection = @"ContentProtection";
 NSString *const kDashPeriod = @"Period";
 NSString *const kDashRepresentation = @"Representation";
 NSString *const kDashRepresentationBaseURL = @"BaseURL";
@@ -27,6 +28,8 @@ NSString *const kDashSegmentTimeline = @"SegmentTimeline";
 NSString *const kAttrAudioSampleRate = @"audioSamplingRate";
 NSString *const kAttrBandwidth = @"bandwidth";
 NSString *const kAttrCodecs = @"codecs";
+NSString *const kAttrCodecAvc1 = @"avc1";
+NSString *const kAttrCodecMp4a = @"mp4a";
 NSString *const kAttrContentType = @"contentType";
 NSString *const kAttrDuration = @"duration";
 NSString *const kAttrHeight = @"height";
@@ -34,7 +37,8 @@ NSString *const kAttrId = @"id";
 NSString *const kAttrIndexRange = @"indexRange";
 NSString *const kAttrLang = @"lang";
 NSString *const kAttrMimeType = @"mimeType";
-NSString *const kAttrMimeTypeMp4 = @"/mp4";
+NSString *const kAttrMimeTypeAudio = @"audio/";
+NSString *const kAttrMimeTypeVideo = @"video/";
 NSString *const kAttrNumChannels = @"numChannels";
 NSString *const kAttrPssh = @"pssh";
 NSString *const kAttrPsshCenc = @"cenc:pssh";
@@ -48,6 +52,7 @@ NSString *const kDashToHlsString = @"DashToHls";
 NSString *const kDashSeparator = @"-";
 NSString *const kHttpString = @"http";
 NSString *const kIsVideoString = @"isVideo";
+NSString *const kNewLineCharacter = @"\n";
 NSString *const kRootURL = @"rootURL";
 NSString *const kRangeLength = @"length";
 NSString *const kRangeStart = @"startRange";
@@ -132,6 +137,10 @@ NSString *const kRegexPattern =
   for (NSString *key in attributeDict) {
     NSString *value = [[attributeDict valueForKey:key]
         stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if ([elementName isEqualToString:kDashContentProtection]) {
+      // Reset PSSH for each Adapation Set.
+      [_mpdDict removeObjectForKey:kAttrPsshCenc];
+    }
     // Check that value isnt blank.
     if (([value length] != 0)) {
       [_mpdDict setValue:value forKey:key];
@@ -154,15 +163,15 @@ NSString *const kRegexPattern =
 // Characters found within an element that do not contain a specific key.
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
   if (string) {
-    if ([string hasPrefix:kSlashesString]) {
-      [_mpdDict setValue:string forKey:kRootURL];
-    }
-    // Stores PSSH to dictionary
-    if ([_currentElement isEqualToString:kAttrPsshCenc]) {
-      [_mpdDict setValue:string forKey:kAttrPssh];
-    }
     // Ignores values that contain two lines. If needed, modify as necessary.
-    if (![string containsString:@"\n "]) {
+    if (![string containsString:kNewLineCharacter]) {
+      if ([string hasPrefix:kSlashesString]) {
+        [_mpdDict setValue:string forKey:kRootURL];
+      }
+      // Stores PSSH to dictionary
+      if ([_currentElement isEqualToString:kAttrPsshCenc]) {
+        [_mpdDict setValue:string forKey:kAttrPssh];
+      }
       [_mpdDict setValue:string forKey:_currentElement];
     }
   }
@@ -174,10 +183,20 @@ NSString *const kRegexPattern =
      namespaceURI:(NSString *)namespaceURI
     qualifiedName:(NSString *)qName {
   if ([elementName isEqualToString:kDashRepresentation]) {
-    // Only setup stream object when mimeType is MP4. Ignores all others.
-    if ([[_mpdDict objectForKey:kAttrMimeType] containsString:kAttrMimeTypeMp4]) {
-      if (![self setStreamProperties:elementName]) {
-        [parser abortParsing];
+    // Setup stream if mimeType (video/mp4) and codec (avc1) are supported.
+    if ([[_mpdDict objectForKey:kAttrMimeType] containsString:kAttrMimeTypeVideo]) {
+      if ([[_mpdDict objectForKey:kAttrCodecs] containsString:kAttrCodecAvc1]) {
+        if (![self setStreamProperties:elementName]) {
+          [parser abortParsing];
+        }
+      }
+    }
+    // Setup stream if mimeType (audio/mp4) and codec (mp4a) are supported.
+    if ([[_mpdDict objectForKey:kAttrMimeType] containsString:kAttrMimeTypeAudio]) {
+      if ([[_mpdDict objectForKey:kAttrCodecs] containsString:kAttrCodecMp4a]) {
+        if (![self setStreamProperties:elementName]) {
+          [parser abortParsing];
+        }
       }
     }
   }
@@ -285,7 +304,7 @@ NSString *const kRegexPattern =
       if ([propertyType isEqualToString:@"NSData"]) {
         NSData *value = [[NSData alloc] init];
         if ([propertyName isEqualToString:@"pssh"]) {
-          NSString *psshString = [_mpdDict objectForKey:@"cenc:pssh"];
+          NSString *psshString = [_mpdDict objectForKey:kAttrPsshCenc];
           if (psshString) {
             value = [[NSData alloc] initWithBase64EncodedString:psshString options:0];
           }
@@ -515,11 +534,11 @@ NSString *const kRegexPattern =
   liveStream.initializationURL = [self setStreamURL:_mpdDict[@"initialization"] init:YES];
   liveStream.mediaFileName = _mpdDict[@"media"];
   liveStream.minBufferTime = [self convertDurationToSeconds:_mpdDict[@"minBufferTime"]];
-  liveStream.minimumUpdatePeriod = _mpdDict[@"minimumUpdatePeriod"];
+  liveStream.minimumUpdatePeriod = [_mpdDict[@"minimumUpdatePeriod"] integerValue];
   liveStream.representationId = _mpdDict[@"id"];
   liveStream.startNumber = [_mpdDict[@"startNumber"] integerValue];
   liveStream.timescale = [_mpdDict[@"timescale"] integerValue];
-  liveStream.timeShiftBufferDepth = _mpdDict[@"timeShiftBufferDepth"];
+  liveStream.timeShiftBufferDepth = [_mpdDict[@"timeShiftBufferDepth"] integerValue];
   liveStream.segmentDuration = (float)liveStream.duration / (float)liveStream.timescale;
 }
 

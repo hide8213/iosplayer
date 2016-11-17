@@ -116,10 +116,10 @@ static NSString *const kLicenseUrlString =
 - (void)onSessionCreatedWithPssh:(NSData *)pssh sessionId:(NSString *)sessionId {
   NSURL *fileURL = [NSURL URLWithString:kKeyMapName relativeToURL:_keyStoreURL];
 
+  NSMutableDictionary *keyMap = [NSMutableDictionary dictionary];
   NSData *keyMapData = [NSData dataWithContentsOfURL:fileURL];
-  NSMutableDictionary *keyMap = [NSKeyedUnarchiver unarchiveObjectWithData:keyMapData];
-  if (!keyMap) {
-    keyMap = [NSMutableDictionary dictionary];
+  if (keyMapData) {
+    keyMap = [NSKeyedUnarchiver unarchiveObjectWithData:keyMapData];
   }
   keyMap[pssh] = sessionId;
 

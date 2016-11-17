@@ -94,8 +94,6 @@ static DashToHlsStatus dashDecryptionHandler(void *context,
 
 - (void)hlsFromDashData:(NSData *)dashData {
   DashToHlsStatus status;
-  const uint8_t *hlsSegment = NULL;
-  size_t hlsSize = 0;
   // Parse Data to setup UDT Session properties.
   status = [self parseInitData:dashData];
   if (status == kDashToHlsStatus_ClearContent) {

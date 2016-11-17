@@ -101,7 +101,7 @@ NSError *iOSCdmHost::GetLicenseInfo(NSString *sessionId, int64_t *expiration) {
   if (expirationData > 0) {
     *expiration = expirationData;
   } else {
-    *expiration = nil;
+    *expiration = 0;
     NSLog(@"::INFO::No Expiration Data found");
   }
   widevine::Cdm::KeyStatusMap map;

@@ -21,6 +21,8 @@
 // Offline License File ready to be deleted.
 @property BOOL releaseLicense;
 @property(nonatomic, strong) NSURL *thumbnail;
+@property(nonatomic, strong) UIImage *thumbnailImage;
+@property int thumbnailLoadTries;
 @property(nonatomic, strong) NSURL *URL;
 @property dispatch_queue_t downloadQ;
 @property(nonatomic) NSRange initRange;

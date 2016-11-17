@@ -105,6 +105,10 @@ extern const char *OEMCryptoTfit_Version();
       _offlineSessions[sessionId] = @YES;
     }
   }
+  if (isOfflineVod && sessionId) {
+    // Changing from Streaming license to Offline.
+    sessionId = nil;
+  }
   if (!sessionId) {
     // Setup new Streaming Session.
     error = iOSCdmHost::GetHost()->CreateSession(

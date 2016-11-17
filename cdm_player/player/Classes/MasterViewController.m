@@ -12,12 +12,14 @@ static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 static NSString *kAlertTitle = @"Info";
 static NSString *kAlertButtonTitle = @"OK";
 static NSString *kPlaylistTitle = @"Playlist";
+int const kMaxThumbnailLoadTries = 5;
 
 @interface MasterViewController () <MediaCellDelegate>
 @property(nonatomic, strong) MediaResource *mediaResource;
 @property(nonatomic, strong) NSMutableArray *mediaResources;
 @property(nonatomic, strong) NSIndexPath *offlineIndexPath;
 @property(nonatomic, strong) NSIndexPath *selectedIndexPath;
+@property(nonatomic, strong) NSURLSession *thumbnailSession;
 @end
 
 @implementation MasterViewController
@@ -33,6 +35,8 @@ static NSString *kPlaylistTitle = @"Playlist";
     NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources" ofType:@"json"];
     NSData *jsonData = [NSData dataWithContentsOfFile:jsonPath];
     NSError *error = nil;
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+    self.thumbnailSession = [NSURLSession sessionWithConfiguration:config];
     NSArray *mediaResources = [NSJSONSerialization JSONObjectWithData:jsonData
                                                               options:NSJSONReadingAllowFragments
                                                                 error:&error];
@@ -87,16 +91,47 @@ static NSString *kPlaylistTitle = @"Playlist";
   mediaCell.isDownloaded = mediaResource.isDownloaded;
   mediaCell.filesBeingDownloaded = mediaResource.filesBeingDownloaded;
   mediaCell.percentage = mediaResource.percentage;
-  dispatch_async(mediaResource.downloadQ, ^() {
-    mediaCell.thumbnail =
-        [UIImage imageWithData:[NSData dataWithContentsOfURL:mediaResource.thumbnail]];
-    dispatch_sync(dispatch_get_main_queue(), ^{
-      [mediaCell layoutSubviews];
-    });
-  });
+  if (mediaResource.thumbnailImage) {
+    mediaCell.thumbnail = mediaResource.thumbnailImage;
+  } else {
+    [self downloadThumbnailForResource:mediaResource atIndexPath:indexPath];
+  }
   mediaCell.delegate = self;
   [mediaCell updateDisplay];
   return mediaCell;
+}
+
+- (void)downloadThumbnailForResource:(MediaResource *)resource
+                         atIndexPath:(NSIndexPath *)indexPath {
+  resource.thumbnailLoadTries += 1;
+  NSURLSessionDataTask *task = [self.thumbnailSession
+        dataTaskWithURL:resource.thumbnail
+      completionHandler:^(NSData *data, NSURLResponse *response,
+                          NSError *error) {
+        [self didDownloadThumbnailData:data forResource:resource atIndexPath:indexPath];
+      }];
+  [task resume];
+}
+
+- (void)didDownloadThumbnailData:(NSData *)data
+                     forResource:(MediaResource *)resource
+                     atIndexPath:(NSIndexPath *)indexPath {
+  if (data) {
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      MediaCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+      resource.thumbnailImage = [UIImage imageWithData:data];
+      cell.thumbnail = resource.thumbnailImage;
+    });
+  }
+  if (!resource.thumbnailImage) {
+    // either there was an error downloading, or the data failed to turn into an image
+    // so try to download again
+    if (resource.thumbnailLoadTries < kMaxThumbnailLoadTries) {
+      // don't try to load indefinitely; don't want to eat up the user's network plan if the server
+      // is down
+      [self downloadThumbnailForResource:resource atIndexPath:indexPath];
+    }
+  }
 }
 
 #pragma mark - Private Methods
@@ -105,17 +140,14 @@ static NSString *kPlaylistTitle = @"Playlist";
 - (BOOL)isInternetConnectionAvailable {
   NSURL *scriptURL = [NSURL URLWithString:@"http://www.google.com"];
   NSData *data = [NSData dataWithContentsOfURL:scriptURL];
-  if (data) {
-    return YES;
-  } else {
-    return NO;
-  }
+  return (data != nil);
 }
 
 - (void)connectionErrorAlert {
   // Display the error.
+  NSString *errorString = NSLocalizedString(@"No Connection Available.","");
   NSError *error = [NSError cdmErrorWithCode:CdmPlayeriOSErrorCode_NoConnection userInfo:nil];
-  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[error localizedDescription]
+  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:errorString
                                                       message:[error localizedFailureReason]
                                                      delegate:nil
                                             cancelButtonTitle:@"OK"

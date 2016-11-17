@@ -1,7 +1,17 @@
+v3.0.9 (2016 November)
+| CDM and Wrapper |
+-- Update ProcessPssh to support switching stream to offline
+-- Update ProtoBuf utility
+-- Update Obfuscation techniques
+-- Improve RSA encryption to fix multiple offline playback failures
+| Reference App |
+-- Clean up views and remove unused code
+| Dash Transmuxer (UDT) |
+-- Fix multiple memory buffer overflows
+
 v3.0.8 (2016 September)
 | CDM and Wrapper |
 -- Retain offline licensing data that is signed and encrypted
--- iOS 10 and iPhone7 support
 | Reference App |
 -- Additional support for Dash Manifests, ie. availableStartTime
 -- Add ability to remove licenses from device

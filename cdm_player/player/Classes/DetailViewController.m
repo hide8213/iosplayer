@@ -23,8 +23,6 @@ static DetailViewController *sDetailViewController;
   NSURL *_mediaURL;
   BOOL *_offline;
   PlaybackView *_playbackView;
-  AVPlayer *_player;
-  UIView *_renderingView;
   float _restoreAfterScrubbingRate;
   float _resumeTime;
   BOOL _seekToZeroBeforePlay;
@@ -177,7 +175,6 @@ NSString *kDash2HlsURL = @"http://%@:%d/dash2hls.m3u8";
   _playbackView.controlsView.controlsDelegate = self;
   _playbackView.scrubberView.scrubberDelegate = self;
   _streaming.streamingDelegate = self;
-  [_playbackView setVideoRenderingView:_renderingView];
   [self setView:_playbackView];
   _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap)];
   [[NSNotificationCenter defaultCenter] addObserver:self

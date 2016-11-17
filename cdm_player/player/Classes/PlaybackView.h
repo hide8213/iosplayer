@@ -14,7 +14,6 @@ extern const int kElementHeight;
 extern const int kElementWidth;
 
 @property(nonatomic, strong) AVPlayer *player;
-@property(nonatomic, strong) UIView *videoRenderingView;
 @property(nonatomic, readonly) PlayerControlsView *controlsView;
 @property(nonatomic, readonly) PlayerScrubberView *scrubberView;
 
