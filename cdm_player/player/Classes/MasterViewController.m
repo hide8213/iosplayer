@@ -5,8 +5,10 @@
 #import "AppDelegate.h"
 #import "DetailViewController.h"
 #import "CdmPlayerErrors.h"
+#import "CdmPlayerHelpers.h"
 #import "MediaCell.h"
 #import "MediaResource.h"
+#import "Logging.h"
 
 static NSString *kOfflineChangedNotification = @"OfflineChangedNotification";
 static NSString *kAlertTitle = @"Info";
@@ -14,8 +16,8 @@ static NSString *kAlertButtonTitle = @"OK";
 static NSString *kPlaylistTitle = @"Playlist";
 int const kMaxThumbnailLoadTries = 5;
 
+
 @interface MasterViewController () <MediaCellDelegate>
-@property(nonatomic, strong) MediaResource *mediaResource;
 @property(nonatomic, strong) NSMutableArray *mediaResources;
 @property(nonatomic, strong) NSIndexPath *offlineIndexPath;
 @property(nonatomic, strong) NSIndexPath *selectedIndexPath;
@@ -28,30 +30,23 @@ int const kMaxThumbnailLoadTries = 5;
   self = [super initWithStyle:UITableViewStylePlain];
   if (self) {
     self.title = kPlaylistTitle;
-    self.mediaResources = [NSMutableArray array];
-    self.detailViewController = (DetailViewController *)[
+    _mediaResources = [NSMutableArray array];
+    _detailViewController = (DetailViewController *)[
         [self.splitViewController.viewControllers lastObject] topViewController];
     // Load Media from JSON file (mediaResources.json)
     NSString *jsonPath = [[NSBundle mainBundle] pathForResource:@"mediaResources" ofType:@"json"];
     NSData *jsonData = [NSData dataWithContentsOfFile:jsonPath];
     NSError *error = nil;
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-    self.thumbnailSession = [NSURLSession sessionWithConfiguration:config];
-    NSArray *mediaResources = [NSJSONSerialization JSONObjectWithData:jsonData
+    _thumbnailSession = [NSURLSession sessionWithConfiguration:config];
+    NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData
                                                               options:NSJSONReadingAllowFragments
                                                                 error:&error];
-    for (NSDictionary *mediaResource in mediaResources) {
-      if ([mediaResource isKindOfClass:[NSDictionary class]] && error == nil) {
-        NSString *name = [mediaResource objectForKey:@"name"];
-        NSString *thumbnail = [mediaResource objectForKey:@"thumbnail"];
-        NSString *URL = [mediaResource objectForKey:@"url"];
-        if (thumbnail && URL && name) {
-          [self.mediaResources
-              addObject:[[MediaResource alloc] initWithName:name
-                                                  thumbnail:[NSURL URLWithString:thumbnail]
-                                                        URL:[NSURL URLWithString:URL]]];
-        } else {
-          NSLog(@"ERROR::Media Entry Found, but not complete. Skipping.");
+    if (error == nil) {
+      for (NSDictionary *jsonDictionary in jsonArray) {
+        MediaResource *mediaResource = [[MediaResource alloc] initWithJson:jsonDictionary];
+        if (mediaResource) {
+          [_mediaResources addObject:mediaResource];
         }
       }
     }
@@ -74,7 +69,7 @@ int const kMaxThumbnailLoadTries = 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return self.mediaResources.count;
+  return _mediaResources.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
@@ -103,9 +98,11 @@ int const kMaxThumbnailLoadTries = 5;
 
 - (void)downloadThumbnailForResource:(MediaResource *)resource
                          atIndexPath:(NSIndexPath *)indexPath {
+  CDMLogInfo(@"Downloading thumbnail for %@.", resource.name);
+
   resource.thumbnailLoadTries += 1;
-  NSURLSessionDataTask *task = [self.thumbnailSession
-        dataTaskWithURL:resource.thumbnail
+  NSURLSessionDataTask *task = [_thumbnailSession
+        dataTaskWithURL:resource.thumbnailURL
       completionHandler:^(NSData *data, NSURLResponse *response,
                           NSError *error) {
         [self didDownloadThumbnailData:data forResource:resource atIndexPath:indexPath];
@@ -130,6 +127,8 @@ int const kMaxThumbnailLoadTries = 5;
       // don't try to load indefinitely; don't want to eat up the user's network plan if the server
       // is down
       [self downloadThumbnailForResource:resource atIndexPath:indexPath];
+    } else {
+      CDMLogWarn(@"Failed to download thumbnail image for %@, at %@.", resource.name, resource.URL);
     }
   }
 }
@@ -145,9 +144,8 @@ int const kMaxThumbnailLoadTries = 5;
 
 - (void)connectionErrorAlert {
   // Display the error.
-  NSString *errorString = NSLocalizedString(@"No Connection Available.","");
   NSError *error = [NSError cdmErrorWithCode:CdmPlayeriOSErrorCode_NoConnection userInfo:nil];
-  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:errorString
+  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"No Connection Available"
                                                       message:[error localizedFailureReason]
                                                      delegate:nil
                                             cancelButtonTitle:@"OK"
@@ -157,43 +155,42 @@ int const kMaxThumbnailLoadTries = 5;
 
 - (void)didDeleteMediaURL:(NSURL *)mediaURL error:(NSError *)error {
   if (error) {
-    NSLog(@"\n::ERROR::Could not delete: %@\n%@", mediaURL, error);
-  } else {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
-                                                        object:self];
-    UIAlertView *alert = nil;
-    NSString *alertMessage = [NSString
-        stringWithFormat:@"Downloaded File Removed.\n File: %@", [mediaURL lastPathComponent]];
-    alert = [[UIAlertView alloc] initWithTitle:kAlertTitle
-                                       message:alertMessage
-                                      delegate:nil
-                             cancelButtonTitle:kAlertButtonTitle
-                             otherButtonTitles:nil];
-    [alert show];
+    CDMLogNSError(error, @"deleting %@", mediaURL);
+    return;
   }
+
+  [[NSNotificationCenter defaultCenter] postNotificationName:kOfflineChangedNotification
+                                                      object:self];
+  UIAlertView *alert = nil;
+  NSString *alertMessage = [NSString
+      stringWithFormat:@"Downloaded File Removed.\n File: %@", [mediaURL lastPathComponent]];
+  alert = [[UIAlertView alloc] initWithTitle:kAlertTitle
+                                     message:alertMessage
+                                    delegate:nil
+                           cancelButtonTitle:kAlertButtonTitle
+                           otherButtonTitles:nil];
+  [alert show];
 }
 
 - (void)didPressDelete:(MediaCell *)cell {
   NSInteger row = [self.tableView indexPathForCell:cell].row;
   MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
-  NSURL *mpdURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-      urlInDocumentDirectoryForFile:[mediaResource.URL lastPathComponent]];
+  NSURL *mpdURL = CDMDocumentFileURLForFilename(mediaResource.URL.lastPathComponent);
   [mediaResource deleteMediaResource:mpdURL
                      completionBlock:^(NSError *error) {
                        [self didDeleteMediaURL:mediaResource.URL error:error];
                      }];
 }
 
+// TODO (theodab): break media resource downloading, deleting, etc into a separate manager class
 - (void)didPressDownload:(MediaCell *)cell {
   if ([self isInternetConnectionAvailable]) {
     NSInteger row = [self.tableView indexPathForCell:cell].row;
     MediaResource *mediaResource = [_mediaResources objectAtIndex:row];
-    NSURL *fileURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:[mediaResource.URL lastPathComponent]];
-    [Downloader downloaderWithURL:mediaResource.URL
-                          fileURL:fileURL
-                     initialRange:nil
-                         delegate:mediaResource];
+    NSURL *fileURL = CDMDocumentFileURLForFilename(mediaResource.URL.lastPathComponent);
+    [[Downloader sharedInstance] downloadURL:mediaResource.URL
+                                   toFileURL:fileURL
+                                    delegate:mediaResource];
   } else {
     [self connectionErrorAlert];
   }
@@ -206,7 +203,7 @@ int const kMaxThumbnailLoadTries = 5;
       fetchLicenseInfo:mediaResource.URL
        completionBlock:^(NSError *error) {
          if (error) {
-           NSLog(@"\n::INFO::License: %@\n%@", mediaResource.name, error);
+           CDMLogNSError(error, @"fetching license for %@", mediaResource.name);
          }
        }];
 }

@@ -4,6 +4,7 @@
 
 #import "LiveStream.h"
 #import "Streaming.h"
+#import "Logging.h"
 
 NSString *kAudioMimeType = @"audio/mp4";
 NSString *kVideoMimeType = @"video/mp4";
@@ -17,7 +18,7 @@ static DashToHlsStatus dashPsshHandler(void *context, const uint8_t *pssh, size_
                              isOfflineVod:[stream.sourceURL isFileURL]
                           completionBlock:^(NSError *error) {
                             if (error) {
-                              NSLog(@"Unable to obtain PSSH Key %@", error);
+                              CDMLogNSError(error, @"obtaining PSSH key");
                               return;
                             }
                             [stream.streaming streamReady:stream];
@@ -66,18 +67,18 @@ static DashToHlsStatus dashDecryptionHandler(void *context,
   struct DashToHlsSession *session = NULL;
   DashToHlsStatus status = Udt_CreateSession(&session);
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not initialize session");
+    CDMLogError(@"failed to initialize session");
     return NO;
   }
   _session = session;
   status = [self setPsshHandler:dashPsshHandler];
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set PSSH Handler");
+    CDMLogError(@"failed to set PSSH handler");
     return NO;
   }
   status = [self setDecryptionHandler:dashDecryptionHandler];
   if (status != kDashToHlsStatus_OK) {
-    NSLog(@"Could not set Decrypt Handler");
+    CDMLogError(@"failed to set decrypt handler");
     return NO;
   }
   status = [self parseInitData:initializationData];
@@ -85,7 +86,7 @@ static DashToHlsStatus dashDecryptionHandler(void *context,
     [_streaming streamReady:self];
   } else if (status == kDashToHlsStatus_OK) {
   } else {
-    NSLog(@"Could not parse dash");
+    CDMLogError(@"failed to parse dash");
     Udt_PrettyPrint(_session);
     return NO;
   }
@@ -101,7 +102,7 @@ static DashToHlsStatus dashDecryptionHandler(void *context,
   } else if (kDashToHlsStatus_OK == status) {
     DashToHls_ReleaseHlsSegment(_session, (uint32_t)_streamIndex);
   } else {
-    NSLog(@"Could not parse dash URL=%@", _sourceURL);
+    CDMLogError(@"failed to initialize session from URL %@", _sourceURL);
     Udt_PrettyPrint(_session);
     return;
   }

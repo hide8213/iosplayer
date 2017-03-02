@@ -10,8 +10,10 @@
 
 #import "DashToHlsApiAVFramework.h"
 #import "Downloader.h"
+#import "LicenseManager.h"
 #import "LocalWebServer.h"
 #import "MpdParser.h"
+#import "Logging.h"
 
 NSString *kStreamingReadyNotification = @"StreamingReadyNotificaiton";
 
@@ -62,9 +64,19 @@ static NSString *kLiveNumber = @"$Number$";
 static NSString *kLiveRepresentationID = @"$RepresentationID$";
 
 // Create streaming object with local IP address if Airplay is off or network IP if on.
-- (id)initWithAirplay:(BOOL)isAirplayActive {
+- (id)initWithAirplay:(BOOL)isAirplayActive
+     licenseServerURL:(NSURL *)licenseServerURL {
   self = [super init];
   if (self) {
+    if (licenseServerURL) {
+      NSURL *licMgrURL = [LicenseManager sharedInstance].licenseServerURL;
+      if (licMgrURL && ![licMgrURL isEqual:licenseServerURL]) {
+        // Changing License Server URLs in not supported due to the Host being a
+        // singleton.
+        NSLog(@"ERROR: Cannot reset existing License Server URL. Using: %@",
+              licMgrURL);
+      }
+    }
     _address = kLocalHost;
     if (isAirplayActive) {
       _address = [self getIPAddress];
@@ -74,6 +86,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
     // Random HTTP Port generator.
     // Avoids issues when multiple streams are selected quickly.
     _httpPort = sHttpPort++;
+
     [_localWebServer start:&error];
     _streamingQ = dispatch_queue_create("com.google.widevine.cdm-ref-player.Streaming", NULL);
     _streams = [NSMutableArray array];
@@ -129,11 +142,10 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
 }
 
 // Downloads MPD and creates HLS Playlists.
-- (void)processMpd:(NSURL *)mpdURL
-    withCompletion:(void (^)(NSArray<Stream *> *streams, NSError *error))completion {
-  // TODO(seawardt): Implement Logging macro
+- (void)downloadAndParseMpd:(NSURL *)mpdURL
+        withCompletionBlock:(void (^)(NSArray<Stream *> *streams, NSError *error))completion {
   NSParameterAssert(mpdURL);
-  NSLog(@"\n::INFO::Processing: %@", mpdURL);
+  CDMLogInfo(@"Processing %@", mpdURL);
   dispatch_async(_streamingQ, ^{
     NSError *error = nil;
     NSData *mpdData =
@@ -150,15 +162,18 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
   });
 }
 
-- (void)processMpd:(NSURL *)mpdURL {
-  [self processMpd:mpdURL
-      withCompletion:^(NSArray<Stream *> *streams, NSError *error) {
+- (void)processMpd:(NSURL *)mpdURL
+    withCompletion:(void (^)(NSError *))completion {
+  [self downloadAndParseMpd:mpdURL
+      withCompletionBlock:^(NSArray<Stream *> *streams, NSError *error) {
         if (error) {
-          NSLog(@"Error reading %@ %@", mpdURL, error);
+          CDMLogNSError(error, @"reading %@", mpdURL);
+          completion(error);
         } else {
           for (Stream *stream in _streams) {
             [self loadStream:stream];
           }
+          completion(nil);
         }
       }];
 }
@@ -322,6 +337,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
     stream.isLive = YES;
   }
   NSURL *requestURL = stream.sourceURL;
+  Downloader *downloader = [Downloader sharedInstance];
   // Check if Dash Type is something other than Segment Base.
   if (stream.dashMediaType != SEGMENT_BASE) {
     // Determine if stream has Init segment that contains stream data.
@@ -337,25 +353,24 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
       URLString = [URLString stringByReplacingOccurrencesOfString:kLiveNumber withString:number];
       requestURL = [[NSURL alloc] initWithString:URLString];
     }
-    NSData *data =
-        [Downloader downloadPartialData:requestURL initialRange:stream.initialRange completion:nil];
+    NSData *data = [downloader downloadPartialDataSync:requestURL range:stream.initialRange];
     if (data == nil) {
-      NSLog(@"\n::ERROR::Failed to load data: %@", requestURL);
+      CDMLogError(@"failed to load data from %@", requestURL);
       return;
     }
     if (![stream initialize:data]) {
-      NSLog(@"\n::ERROR::Failed to initialize stream: %@", requestURL);
+      CDMLogError(@"failed to initialize stream from %@", requestURL);
       return;
     }
     stream.m3u8 = [self buildChildPlaylist:stream];
   } else {
-    [Downloader
+    [downloader
         downloadPartialData:requestURL
-               initialRange:stream.initialRange
-                 completion:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
+               range:stream.initialRange
+                 completion:^(NSData *data, NSError *connectionError) {
                    dispatch_async(_streamingQ, ^{
                      if (!data) {
-                       NSLog(@"\n::ERROR::Did not download %@", connectionError);
+                       CDMLogNSError(connectionError, @"downloading %@", requestURL);
                      }
                      if (![stream initialize:data]) {
                        return;
@@ -400,8 +415,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
     if ([urlString containsString:kNumberPlaceholder]) {
       NSRegularExpression *numberRegex =
           [[NSRegularExpression alloc] initWithPattern:kNumberRegexPattern options:0 error:nil];
-      urlString = [urlString
-                   stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      urlString = [urlString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
       NSTextCheckingResult *numberMatch =
           [numberRegex firstMatchInString:urlString
                                   options:0
@@ -418,34 +432,32 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
       }
     }
     requestURL = [[NSURL alloc] initWithString:urlString];
-    data =
-        [Downloader downloadPartialData:requestURL initialRange:stream.initialRange completion:nil];
+    data = [[Downloader sharedInstance] downloadPartialDataSync:requestURL
+                                                          range:stream.initialRange];
   } else {
     requestURL = stream.sourceURL;
     if (!stream.dashIndex) {
-      NSLog(@"\n::ERROR::DashIndex is Empty");
+      CDMLogError(@"dashIndex is empty from %@", requestURL);
       return nil;
     }
     if ((int)stream.dashIndex->index_count <= segment) {
-      NSLog(@"\n::ERROR::Segment out of range %@/%@", @(segment), @(stream.dashIndex->index_count));
+      CDMLogError(@"segment %d is out of range %u from %@",
+                  segment,
+                  stream.dashIndex->index_count,
+                  requestURL);
       return nil;
     }
     const auto &segments = stream.dashIndex->segments[segment];
-    NSDictionary *initialRange = @{
-      @"startRange" : @(segments.location),
-      @"length" : @(segments.length)
-    };
-    data = [Downloader downloadPartialData:requestURL
-                              initialRange:initialRange
-                                completion:nil];
+    NSRange range = NSMakeRange(segments.location, segments.length);
+    data = [[Downloader sharedInstance] downloadPartialDataSync:requestURL range:range];
   }
   if ([data length] == 0) {
-    NSLog(@"Could not initialize session url=\n%@", requestURL);
+    CDMLogError(@"could not initialize session from %@", requestURL);
     return nil;
   }
   NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
   if ([responseString containsString:@"NoSuchKey"]) {
-    NSLog(@"File Not Found on Google Storage: %@", requestURL);
+    CDMLogError(@"key for %@ not found on Google Storage", requestURL);
     return nil;
   }
 
@@ -473,20 +485,19 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
   NSData *response_data = nil;
   // Check for incoming filename and return appropriate data.
   if ([path.lastPathComponent isEqualToString:kLocalPlaylist]) {
-    NSLog(@"\n::INFO::Requesting: %@", path);
+    CDMLogInfo(@"Requesting %@", path);
     // kDashPlaylist is pre-assigned name in ViewController to ensure variant
     // playlist creation.
     response_data = [_variantPlaylist dataUsingEncoding:NSUTF8StringEncoding];
   } else if ([path.pathExtension isEqualToString:@"m3u8"]) {
-    NSLog(@"\n::INFO::Requesting: %@", path);
-    // Catches children playlist requests and provides the appropriate data in
-    // place of m3u8.
+    CDMLogInfo(@"Requesting %@", path);
+    // Catches children playlist requests and provides the appropriate data in place of m3u8.
     NSScanner *scanner = [NSScanner scannerWithString:path];
     int index = 0;
     if ([scanner scanString:@"/" intoString:NULL] && [scanner scanInt:&index]) {
       Stream *stream = _streams[index];
       if (!stream.m3u8) {
-        NSLog(@"ERROR");
+        CDMLogError(@"stream does not have m3u8");
         return nil;
       }
       if (stream.isLive) {
@@ -498,7 +509,7 @@ static NSString *kLiveRepresentationID = @"$RepresentationID$";
       response_data = stream.m3u8;
     }
   } else if ([path.pathExtension isEqualToString:@"ts"]) {
-    NSLog(@"\n::INFO::Requesting: %@", path);
+    CDMLogInfo(@"Requesting %@", path);
     // Handles individual TS segment requests by transmuxing the source MP4.
     NSScanner *scanner = [NSScanner scannerWithString:path];
     int index = 0;

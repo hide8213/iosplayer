@@ -45,10 +45,11 @@ extern NSString *kStreamingReadyNotification;
 // Master HLS Playlist that is created to contain high level info about the child streams
 // (bandwidth, codec, URL of stream, etc.)
 @property NSString *variantPlaylist;
+
 // Init method. isAirplayActive determines what local address to be used when setting up the local
 // web server.
-
-- (id)initWithAirplay:(BOOL)isAirplayActive;
+- (id)initWithAirplay:(BOOL)isAirplayActive
+     licenseServerURL:(NSURL *)licenseServerURL;
 // Creates the Master/Variant Playlist
 - (NSString *)buildVariantPlaylist:(NSArray *)parsedMpd;
 // Creates an HLS playlist that lists all of the TS segments within the stream.
@@ -57,11 +58,7 @@ extern NSString *kStreamingReadyNotification;
 // Obtains the actual data for the given stream.
 - (void)loadStream:(Stream *)stream;
 // XML Parsing of the DASH Manifest that populates the Stream object values.
-- (void)processMpd:(NSURL *)mpdURL;
-// XML Parsing of the DASH Manifest that populates the Stream object values, and then calls a custom
-// block to handle the resulting Streams.
-- (void)processMpd:(NSURL *)mpdURL
-    withCompletion:(void (^)(NSArray<Stream *> *streams, NSError *error))completion;
+- (void)processMpd:(NSURL *)mpdURL withCompletion:(void (^)(NSError *))completion;
 // Re-creates the Streaming object.
 // Used primarily when switching between AirPlay and non-Airplay usage.
 - (void)restart:(BOOL)isAirplayActive;

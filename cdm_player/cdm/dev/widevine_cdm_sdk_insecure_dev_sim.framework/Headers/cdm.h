@@ -10,7 +10,7 @@ typedef unsigned int uint32_t;
 typedef int int32_t;
 typedef __int64 int64_t;
 #else
-# include <stdint.h>
+#include <stdint.h>
 #endif
 
 #include <map>
@@ -18,17 +18,17 @@ typedef __int64 int64_t;
 
 // Define CDM_EXPORT to export functionality across shared library boundaries.
 #if defined(WIN32)
-# if defined(CDM_IMPLEMENTATION)
-#  define CDM_EXPORT __declspec(dllexport)
-# else
-#  define CDM_EXPORT __declspec(dllimport)
-# endif  // defined(CDM_IMPLEMENTATION)
-#else  // defined(WIN32)
-# if defined(CDM_IMPLEMENTATION)
-#  define CDM_EXPORT __attribute__((visibility("default")))
-# else
-#  define CDM_EXPORT
-# endif
+#if defined(CDM_IMPLEMENTATION)
+#define CDM_EXPORT __declspec(dllexport)
+#else
+#define CDM_EXPORT __declspec(dllimport)
+#endif  // defined(CDM_IMPLEMENTATION)
+#else   // defined(WIN32)
+#if defined(CDM_IMPLEMENTATION)
+#define CDM_EXPORT __attribute__((visibility("default")))
+#else
+#define CDM_EXPORT
+#endif
 #endif  // defined(WIN32)
 
 namespace widevine {
@@ -179,10 +179,8 @@ class CDM_EXPORT Cdm : public ITimerClient {
   // See http://www.w3.org/TR/encrypted-media/#privacy-storedinfo.
   class IStorage {
    public:
-    virtual bool read(const std::string& name,
-                      std::string* data) = 0;
-    virtual bool write(const std::string& name,
-                       const std::string& data) = 0;
+    virtual bool read(const std::string& name, std::string* data) = 0;
+    virtual bool write(const std::string& name, const std::string& data) = 0;
     virtual bool exists(const std::string& name) = 0;
     virtual bool remove(const std::string& name) = 0;
     virtual int32_t size(const std::string& name) = 0;
@@ -214,12 +212,11 @@ class CDM_EXPORT Cdm : public ITimerClient {
     typedef ITimerClient IClient;
 
     // Call |client->onTimerExpired(context)| after a delay of |delay_ms| ms.
-    virtual void setTimeout(int64_t delay_ms,
-                            IClient* client,
+    virtual void setTimeout(int64_t delay_ms, IClient* client,
                             void* context) = 0;
 
     // Cancel all timers associated with |client|.
-    virtual void cancel(IClient *client) = 0;
+    virtual void cancel(IClient* client) = 0;
 
    protected:
     ITimer() {}
@@ -289,14 +286,11 @@ class CDM_EXPORT Cdm : public ITimerClient {
   // See documentation for DeviceCertificateRequest for more information.
   // Logging is controlled by |verbosity|.
   // Must be called and must return kSuccess before create() is called.
-  static Status initialize(
-      SecureOutputType secure_output_type,
-      const ClientInfo& client_info,
-      IStorage* storage,
-      IClock* clock,
-      ITimer* timer,
-      DeviceCertificateRequest* device_certificate_request,
-      LogLevel verbosity);
+  static Status initialize(SecureOutputType secure_output_type,
+                           const ClientInfo& client_info, IStorage* storage,
+                           IClock* clock, ITimer* timer,
+                           DeviceCertificateRequest* device_certificate_request,
+                           LogLevel verbosity);
 
   // Query the CDM library version.
   static const char* version();
@@ -314,8 +308,7 @@ class CDM_EXPORT Cdm : public ITimerClient {
   // the server.
   // This is particularly useful for browser environments, but is recommended
   // for use whenever possible.
-  static Cdm* create(IEventListener* listener,
-                     bool privacy_mode);
+  static Cdm* create(IEventListener* listener, bool privacy_mode);
 
   virtual ~Cdm() {}
 
@@ -376,17 +369,17 @@ class CDM_EXPORT Cdm : public ITimerClient {
   struct InputBuffer {
    public:
     InputBuffer()
-      : key_id(NULL),
-        key_id_length(0),
-        iv(NULL),
-        iv_length(0),
-        data(NULL),
-        data_length(0),
-        block_offset(0),
-        is_encrypted(true),
-        is_video(true),
-        first_subsample(true),
-        last_subsample(true) {}
+        : key_id(NULL),
+          key_id_length(0),
+          iv(NULL),
+          iv_length(0),
+          data(NULL),
+          data_length(0),
+          block_offset(0),
+          is_encrypted(true),
+          is_video(true),
+          first_subsample(true),
+          last_subsample(true) {}
 
     const uint8_t* key_id;
     uint32_t key_id_length;
@@ -417,10 +410,7 @@ class CDM_EXPORT Cdm : public ITimerClient {
 
   struct OutputBuffer {
     OutputBuffer()
-      : data(NULL),
-        data_length(0),
-        data_offset(0),
-        is_secure(false) {}
+        : data(NULL), data_length(0), data_offset(0), is_secure(false) {}
 
     // If |is_secure| is false or the secure output type is kNoSecureOutput,
     // this is a memory address in main memory.

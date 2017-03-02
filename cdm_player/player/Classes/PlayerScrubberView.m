@@ -67,8 +67,7 @@
   [_currentTimeLabel setText:[self convertSeconds:0]];
   [_endTimeLabel setText:[self convertSeconds:duration]];
   if (duration < 0) {
-    NSString *liveString = NSLocalizedString(@"LIVE","");
-    [_endTimeLabel setText:liveString];
+    [_endTimeLabel setText:@"LIVE"];
     _slider.userInteractionEnabled = NO;
   }
 }

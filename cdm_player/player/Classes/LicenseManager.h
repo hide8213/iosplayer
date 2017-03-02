@@ -6,4 +6,6 @@
 + (void)startup;
 + (LicenseManager *)sharedInstance;
 
+@property(nonatomic, retain) NSURL *licenseServerURL;
+
 @end

@@ -3,6 +3,7 @@
 #import "LicenseManager.h"
 
 #import "Streaming.h"
+#import "Logging.h"
 
 static NSString *kStorageName = @"Keystore/";
 static NSString *kKeyMapName = @"KeyMap";
@@ -10,7 +11,6 @@ static NSString *const kLicenseUrlString =
     @"https://proxy.uat.widevine.com/proxy";
 
 @interface LicenseManager () {
-  Streaming *_streaming;
   NSURL *_keyStoreURL;
   dispatch_queue_t _queue;
 }
@@ -47,7 +47,7 @@ static NSString *const kLicenseUrlString =
                                               attributes:nil
                                                    error:&error];
     if (error) {
-      NSLog(@"::ERROR::Could not create directory because %@", error);
+      CDMLogNSError(error, @"creating directory");
       return nil;
     }
   }
@@ -57,6 +57,7 @@ static NSString *const kLicenseUrlString =
 + (LicenseManager *)sharedInstance {
   static dispatch_once_t token;
   static LicenseManager *s_licMgr = nil;
+
   dispatch_once(&token, ^{
     s_licMgr = [[LicenseManager alloc] init];
     [[iOSCdm sharedInstance] setupCdmWithDelegate:s_licMgr];
@@ -73,7 +74,7 @@ static NSString *const kLicenseUrlString =
   NSString *filePath = [[_keyStoreURL path] stringByAppendingPathComponent:fileName];
   [data writeToFile:filePath options:NSDataWritingAtomic error:&error];
   if (error) {
-    NSLog(@"::ERROR::Could not write data to %@ because %@", fileName, error);
+    CDMLogNSError(error, @"writing data to %@", fileName);
   }
 }
 
@@ -145,10 +146,14 @@ static NSString *const kLicenseUrlString =
 - (void)iOSCdm:(iOSCdm *)iOSCdm
     fetchLicenseWithData:(NSData *)data
          completionBlock:(void (^)(NSData *, NSError *))completionBlock {
+  if (!_licenseServerURL) {
+    _licenseServerURL = [NSURL URLWithString:kLicenseUrlString];
+  }
   NSMutableURLRequest *request =
-      [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kLicenseUrlString]];
+      [NSMutableURLRequest requestWithURL:_licenseServerURL];
   [request setHTTPMethod:@"POST"];
   [request setHTTPBody:data];
+
   NSURLResponse *response = nil;
   NSError *error = nil;
   NSData *response_data =

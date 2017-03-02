@@ -1,3 +1,13 @@
+v3.0.10 (2017 March)
+| CDM and Wrapper |
+| Reference App |
+-- Large clean up and refactor.
+-- Changed NSURLConnection to NSURLSession.
+-- More testing added for app usage.
+-- Ability to set License URL with Media (MPD) URL.
+| Dash Transmuxer (UDT) |
+-- Fix bug with Sync issues when GOP was not equal to segment size.
+
 v3.0.9 (2016 November)
 | CDM and Wrapper |
 -- Update ProcessPssh to support switching stream to offline

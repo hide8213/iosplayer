@@ -68,8 +68,7 @@ DashToHlsStatus Udt_ReleaseSession(struct DashToHlsSession* session);
 // when ReleaseHlsSegment or ReleaseSession is called.
 DashToHlsStatus Udt_ConvertDash(struct DashToHlsSession* session,
                                 uint32_t segment_number,
-                                const uint8_t* dash_data,
-                                size_t dash_data_size,
+                                const uint8_t* dash_data, size_t dash_data_size,
                                 const uint8_t** segment_out,
                                 size_t* segment_out_size);
 
@@ -80,10 +79,8 @@ DashToHlsStatus Udt_ConvertDash(struct DashToHlsSession* session,
 // kDashToHlsStatus_NeedsMoreData if the entire sidx box was not found.
 // The next call should continue with the next bytes from DASH content.
 DashToHlsStatus Udt_ParseDash(struct DashToHlsSession* session,
-                              uint8_t stream_index,
-                              uint8_t* dash_data,
-                              size_t dash_data_size,
-                              uint8_t* pssh,
+                              uint8_t stream_index, uint8_t* dash_data,
+                              size_t dash_data_size, uint8_t* pssh,
                               size_t pssh_length,
                               struct DashToHlsIndex** index);
 
@@ -102,8 +99,7 @@ DashToHlsStatus Udt_ReleaseHlsSegment(struct DashToHlsSession* session,
 // just trust me and AES-128-CTR the entire block passed and don't worry
 // about the packing.
 typedef DashToHlsStatus (*PsshHandler)(DashToHlsContext context,
-                                       const uint8_t* pssh,
-                                       size_t pssh_length);
+                                       const uint8_t* pssh, size_t pssh_length);
 DashToHlsStatus Udt_SetPsshHandler(struct DashToHlsSession* session,
                                    DashToHlsContext context,
                                    CENC_PsshHandler pssh_handler);
@@ -114,16 +110,11 @@ DashToHlsStatus Udt_SetPsshHandler(struct DashToHlsSession* session,
 // If use_sample_entries is false then the Udt library will concatenate
 // all encrypted data, pass just the encrypted data, and reinsert the clear
 // content.  If use_sample_entries is false then samples will be nullptr.
-typedef DashToHlsStatus (*DecryptionHandler)(DashToHlsContext context,
-                                             const uint8_t* encrypted,
-                                             uint8_t* clear,
-                                             size_t length,
-                                             uint8_t* iv,
-                                             size_t iv_length,
-                                             const uint8_t* key_id,
-                                             // key_id is always 16 bytes.
-                                             struct SampleEntry*,
-                                             size_t sampleEntrySize);
+typedef DashToHlsStatus (*DecryptionHandler)(
+    DashToHlsContext context, const uint8_t* encrypted, uint8_t* clear,
+    size_t length, uint8_t* iv, size_t iv_length, const uint8_t* key_id,
+    // key_id is always 16 bytes.
+    struct SampleEntry*, size_t sampleEntrySize);
 DashToHlsStatus Udt_SetDecryptSample(struct DashToHlsSession* session,
                                      DashToHlsContext context,
                                      CENC_DecryptionHandler decryption_handler,

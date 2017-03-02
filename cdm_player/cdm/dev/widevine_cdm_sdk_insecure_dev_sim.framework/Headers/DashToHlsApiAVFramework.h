@@ -45,9 +45,9 @@ extern "C" {
 
 void Udt_InitializeEncryption(struct DashToHlsSession* session);
 
-DashToHlsStatus Udt_SetAVURLAsset(AVURLAsset* asset,
-                                  id<AVAssetResourceLoaderDelegate> assetDelegate,
-                                  dispatch_queue_t queue);
+DashToHlsStatus Udt_SetAVURLAsset(
+    AVURLAsset* asset, id<AVAssetResourceLoaderDelegate> assetDelegate,
+    dispatch_queue_t queue);
 NSString* GetKeyUrl(struct DashToHlsSession* session);
 #ifdef __cplusplus
 };

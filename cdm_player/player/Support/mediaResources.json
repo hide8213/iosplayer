@@ -1,20 +1,21 @@
-[{
-  "name": "Short",
-  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
-  "url": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd"
-},
-{
-  "name": "Long",
-  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/valkaama.jpg",
-  "url": "http://storage.googleapis.com/wvmedia/cenc/valkaama.mpd"
-},
-{
-  "name": "SegmentTemplate",
-  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/counter.png",
-  "url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/live/mp4-live-mpd-AV-BS.mpd"
-},
-{
-  "name": "Clear",
-  "thumbnail": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/nexusq.png",
-  "url": "http://yt-dash-mse-test.commondatastorage.googleapis.com/media/oops-20120802-manifest.mpd"
-}]
+ [{
+  "media_name": "Short - CENC",
+  "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
+  "media_url": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd",
+  "license_server_url": "https://proxy.uat.widevine.com/proxy"
+  },
+  {
+  "media_name": "Long - CENC",
+  "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/valkaama.jpg",
+  "media_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/valkaama/valkaama.mpd"
+  },
+  {
+  "media_name": "SegmentTemplate",
+  "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/counter.png",
+  "media_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/live/mp4-live-mpd-AV-noMediaPresTime.mpd"
+  },
+  {
+  "media_name": "FFMpeg - Clear",
+  "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
+  "media_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/sync/tos.mpd"
+  }]

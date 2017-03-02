@@ -1,5 +1,6 @@
 #import "MpdParser.h"
 #import "Streaming.h"
+#import "Logging.h"
 
 static NSString *kMultiAudioMpdURL =
     @"https://shaka-player-demo.appspot.com/assets/angel_one.mpd";
@@ -69,7 +70,8 @@ static NSString *const kInvalidParamsMpdData =
         @"<AdaptationSet>"
           @"<ContentProtection value=\"Widevine\" "
             @"schemeIdUri=\"urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed\">"
-            @"<cenc:pssh>AAAANHBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAABQIARIQnrQFDeRLSAKTLifXUIPiZg==</cenc:pssh>"
+            @"<cenc:pssh>AAAANHBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAABQIARIQnrQFDeRLSAKTLifXUIPiZg=="
+                                                                                     @"</cenc:pssh>"
           @"</ContentProtection>"
           @"<ContentComponent contentType=\"video\" id=\"1\" />"
             @"<Representation bandwidth=\"4190760\" codecs=\"avc1\" height=\"1080\" "
@@ -121,6 +123,7 @@ static NSString *const kInvalidParamsMpdData =
 
 
 @interface MpdParserTest : XCTestCase {
+  DDTTYLogger *_logger;
   Streaming *_streaming;
 }
 @end
@@ -128,7 +131,13 @@ static NSString *const kInvalidParamsMpdData =
 @implementation MpdParserTest
 
 - (void)setUp {
-  _streaming = [[Streaming alloc] initWithAirplay:NO];
+  _logger = [DDTTYLogger sharedInstance];
+  [DDLog addLogger:_logger];
+  _streaming = [[Streaming alloc] initWithAirplay:NO licenseServerURL:nil];
+}
+
+- (void)tearDown {
+  [DDLog removeLogger:_logger];
 }
 
 // Validate Parents attributes in Adaptation set are propogated down.
@@ -160,7 +169,7 @@ static NSString *const kInvalidParamsMpdData =
       [self parseStaticMPD:kSplitBaseMpdData URLString:kEncContentMpdURL];
   for (Stream *stream in _streaming.streams) {
     if (stream.isVideo) {
-      XCTAssertEqual([[stream.initialRange valueForKey:@"length"] intValue], 1767);
+      XCTAssertEqual(stream.initialRange.length, 1767);
     }
   }
 }
@@ -172,13 +181,13 @@ static NSString *const kInvalidParamsMpdData =
   XCTAssertEqual(_streaming.streams.count, 3);
   for (Stream *stream in _streaming.streams) {
     if (stream.streamIndex == 0) {
-      XCTAssertEqual([[stream.initialRange valueForKey:@"startRange"] intValue], 0);
+      XCTAssertEqual(stream.initialRange.location, 0);
     }
     if (stream.streamIndex == 1) {
-      XCTAssertEqual([[stream.initialRange valueForKey:@"length"] intValue], 924);
+      XCTAssertEqual(stream.initialRange.length, 924);
     }
     if (stream.streamIndex == 2) {
-      XCTAssertEqual([[stream.initialRange valueForKey:@"startRange"] intValue], 674);
+      XCTAssertEqual(stream.initialRange.location, 674);
     }
   }
 }
@@ -261,7 +270,7 @@ static NSString *const kInvalidParamsMpdData =
   _streaming.streams = [self parseStaticMPD:kSubParamOverrideMpdData
                                   URLString:kMultiAudioMpdURL];
   for (Stream *stream in _streaming.streams) {
-    NSLog(@"%@", stream);
+    CDMLogInfo(@"Stream %@", stream);
     if (stream.isVideo) {
       // Representation Scheme should stay HTTP.
       XCTAssertEqualObjects(stream.sourceURL.scheme, @"http");
@@ -309,7 +318,7 @@ static NSString *const kInvalidParamsMpdData =
                                        options:NSDataReadingUncached
                                          error:&error];
   if (error) {
-    NSLog(@"Error reading %@ %@", mpdURL, error);
+    CDMLogNSError(error, @"reading %@", mpdURL);
     return nil;
   } else {
     return [MpdParser parseMpdWithStreaming:_streaming

@@ -19,64 +19,7 @@
 		E319C0741C73B363001DDC88 /* StreamingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C05B1C73B2D0001DDC88 /* StreamingTest.m */; };
 		E319C0751C73B363001DDC88 /* StreamTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C05C1C73B2D0001DDC88 /* StreamTest.m */; };
 		E353B9C21C21DFF400233332 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */; };
-		E35552D81DD50C710000856D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */; };
-		E35552D91DD50C710000856D /* video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F81CA3425500CC47CB /* video.mp4 */; };
-		E35552DA1DD50C710000856D /* noenc_tears_audio_eng.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB971D9095370001B9B9 /* noenc_tears_audio_eng.mp4 */; };
-		E35552DB1DD50C710000856D /* ico_download_after.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */; };
-		E35552DC1DD50C710000856D /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
-		E35552DD1DD50C710000856D /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
-		E35552DE1DD50C710000856D /* dash-139.fmp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F61CA3425500CC47CB /* dash-139.fmp4 */; };
-		E35552DF1DD50C710000856D /* inline_playback_exit_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */; };
-		E35552E01DD50C710000856D /* mediaResources.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */; };
-		E35552E11DD50C710000856D /* tears_audio_eng.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB991D9095370001B9B9 /* tears_audio_eng.mp4 */; };
-		E35552E21DD50C710000856D /* tears_clear_small.mpd in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9B1D9095370001B9B9 /* tears_clear_small.mpd */; };
-		E35552E31DD50C710000856D /* RefPlayer_Prefix.pch in Resources */ = {isa = PBXBuildFile; fileRef = 8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */; };
-		E35552E41DD50C710000856D /* dash-160.fmp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F71CA3425500CC47CB /* dash-160.fmp4 */; };
-		E35552E51DD50C710000856D /* tears_cenc_small.mpd in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9A1D9095370001B9B9 /* tears_cenc_small.mpd */; };
-		E35552E61DD50C710000856D /* tears_h264_baseline_240p_800.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9C1D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 */; };
-		E35552E71DD50C710000856D /* noenc_tears_h264_baseline_240p_800.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB981D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 */; };
-		E35552E91DD50C710000856D /* MpdParser.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C0531C6EA9CE001DDC88 /* MpdParser.m */; };
-		E35552EA1DD50C710000856D /* CdmHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD11AF2C37200BF7D6C /* CdmHost.mm */; };
-		E35552EB1DD50C710000856D /* CdmWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */; };
-		E35552EC1DD50C710000856D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D2270C567D944441117F046 /* AppDelegate.m */; };
-		E35552EE1DD50C710000856D /* release-tfit-keys.cc in Sources */ = {isa = PBXBuildFile; fileRef = E35552D31DD50C650000856D /* release-tfit-keys.cc */; };
-		E35552EF1DD50C710000856D /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 314D35F3B535A008EC6F276F /* DetailViewController.m */; };
-		E35552F01DD50C710000856D /* Downloader.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */; };
-		E35552F11DD50C710000856D /* LicenseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */; };
-		E35552F31DD50C710000856D /* LocalWebConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 080A1685568016AFB8419D56 /* LocalWebConnection.m */; };
-		E35552F41DD50C710000856D /* release-cdm-cert.cc in Sources */ = {isa = PBXBuildFile; fileRef = E35552D21DD50C650000856D /* release-cdm-cert.cc */; };
-		E35552F51DD50C710000856D /* LocalWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */; };
-		E35552F61DD50C710000856D /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 688EE9F49558E65235EEC34E /* MasterViewController.m */; };
-		E35552F71DD50C710000856D /* MediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D431BD58DD90018A2E4 /* MediaCell.m */; };
-		E35552F81DD50C710000856D /* MediaResource.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D451BD58DD90018A2E4 /* MediaResource.m */; };
-		E35552F91DD50C710000856D /* PlaybackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C99ABA0498D603BF32587C9 /* PlaybackView.m */; };
-		E35552FA1DD50C710000856D /* PlayerControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */; };
-		E35552FB1DD50C710000856D /* PlayerScrubberView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */; };
-		E35552FC1DD50C710000856D /* Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AD38975B118A3FAC18FAD2 /* Stream.m */; };
-		E35552FD1DD50C710000856D /* CdmPlayerErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = E3E407341D906140007A7682 /* CdmPlayerErrors.m */; };
-		E35552FE1DD50C710000856D /* Streaming.mm in Sources */ = {isa = PBXBuildFile; fileRef = FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */; };
-		E35552FF1DD50C710000856D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EA175CCA2CEE5F83A658681 /* main.m */; };
-		E35553031DD50C710000856D /* libCocoaAsyncSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */; };
-		E35553041DD50C710000856D /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */; };
-		E35553051DD50C710000856D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */; };
-		E35553061DD50C710000856D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */; };
-		E35553071DD50C710000856D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
-		E35553081DD50C710000856D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
-		E35553091DD50C710000856D /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */; };
-		E355530A1DD50C710000856D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A5D38A72F529F0B7DA626FD /* Foundation.framework */; };
-		E355530B1DD50C710000856D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */; };
-		E355530C1DD50C710000856D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
-		E355530D1DD50C710000856D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
-		E35553171DD50CAD0000856D /* widevine_cdm_sdk_release.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E35553161DD50CAD0000856D /* widevine_cdm_sdk_release.framework */; };
-		E35553181DD50CAD0000856D /* widevine_cdm_sdk_release.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E35553161DD50CAD0000856D /* widevine_cdm_sdk_release.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E36F58D81AFC6DC100DEEE20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
-		E390BB9D1D9095370001B9B9 /* noenc_tears_audio_eng.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB971D9095370001B9B9 /* noenc_tears_audio_eng.mp4 */; };
-		E390BB9E1D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB981D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 */; };
-		E390BB9F1D9095370001B9B9 /* tears_audio_eng.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB991D9095370001B9B9 /* tears_audio_eng.mp4 */; };
-		E390BBA01D9095370001B9B9 /* tears_cenc_small.mpd in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9A1D9095370001B9B9 /* tears_cenc_small.mpd */; };
-		E390BBA11D9095370001B9B9 /* tears_clear_small.mpd in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9B1D9095370001B9B9 /* tears_clear_small.mpd */; };
-		E390BBA21D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E390BB9C1D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 */; };
-		E390BBA61D90957D0001B9B9 /* DownloaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E390BBA51D90957D0001B9B9 /* DownloaderTest.m */; };
 		E3A398F01CA3422800CC47CB /* widevine_cdm_sdk_dev.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3A398EE1CA3422800CC47CB /* widevine_cdm_sdk_dev.framework */; };
 		E3A398F11CA3422800CC47CB /* widevine_cdm_sdk_dev.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E3A398EE1CA3422800CC47CB /* widevine_cdm_sdk_dev.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E3A398F21CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3A398EF1CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework */; };
@@ -86,6 +29,55 @@
 		E3A398FB1CA3425500CC47CB /* video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F81CA3425500CC47CB /* video.mp4 */; };
 		E3A399011CA342EF00CC47CB /* dev-cdm-cert.cc in Sources */ = {isa = PBXBuildFile; fileRef = E3A398FD1CA342EF00CC47CB /* dev-cdm-cert.cc */; };
 		E3A399021CA342EF00CC47CB /* dev-tfit-keys.cc in Sources */ = {isa = PBXBuildFile; fileRef = E3A398FE1CA342EF00CC47CB /* dev-tfit-keys.cc */; };
+		E3B138AE1E579A3A00277469 /* CdmPlayerErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138AD1E579A3A00277469 /* CdmPlayerErrors.m */; };
+		E3B138B01E579A4000277469 /* CdmPlayerHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138AF1E579A4000277469 /* CdmPlayerHelpers.m */; };
+		E3B138BF1E579C9D00277469 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138BE1E579C9D00277469 /* Logging.m */; };
+		E3B138C81E579F4A00277469 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */; };
+		E3B138C91E579F4A00277469 /* video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F81CA3425500CC47CB /* video.mp4 */; };
+		E3B138CA1E579F4A00277469 /* ico_download_after.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D5F1BD59B4F0018A2E4 /* ico_download_after.png */; };
+		E3B138CB1E579F4A00277469 /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
+		E3B138CC1E579F4A00277469 /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
+		E3B138CD1E579F4A00277469 /* dash-139.fmp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F61CA3425500CC47CB /* dash-139.fmp4 */; };
+		E3B138CE1E579F4A00277469 /* inline_playback_exit_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */; };
+		E3B138CF1E579F4A00277469 /* mediaResources.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */; };
+		E3B138D01E579F4A00277469 /* RefPlayer_Prefix.pch in Resources */ = {isa = PBXBuildFile; fileRef = 8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */; };
+		E3B138D11E579F4A00277469 /* dash-160.fmp4 in Resources */ = {isa = PBXBuildFile; fileRef = E3A398F71CA3425500CC47CB /* dash-160.fmp4 */; };
+		E3B138D31E579F4A00277469 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D2270C567D944441117F046 /* AppDelegate.m */; };
+		E3B138D41E579F4A00277469 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138BE1E579C9D00277469 /* Logging.m */; };
+		E3B138D51E579F4A00277469 /* CdmPlayerErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138AD1E579A3A00277469 /* CdmPlayerErrors.m */; };
+		E3B138D61E579F4A00277469 /* CdmPlayerHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = E3B138AF1E579A4000277469 /* CdmPlayerHelpers.m */; };
+		E3B138D71E579F4A00277469 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 314D35F3B535A008EC6F276F /* DetailViewController.m */; };
+		E3B138D81E579F4A00277469 /* Downloader.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D3D1BD58DAA0018A2E4 /* Downloader.m */; };
+		E3B138D91E579F4A00277469 /* LicenseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */; };
+		E3B138DA1E579F4A00277469 /* LocalWebConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 080A1685568016AFB8419D56 /* LocalWebConnection.m */; };
+		E3B138DB1E579F4A00277469 /* LocalWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */; };
+		E3B138DC1E579F4A00277469 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EA175CCA2CEE5F83A658681 /* main.m */; };
+		E3B138DD1E579F4A00277469 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 688EE9F49558E65235EEC34E /* MasterViewController.m */; };
+		E3B138DE1E579F4A00277469 /* MediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D431BD58DD90018A2E4 /* MediaCell.m */; };
+		E3B138DF1E579F4A00277469 /* MediaResource.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D451BD58DD90018A2E4 /* MediaResource.m */; };
+		E3B138E01E579F4A00277469 /* MpdParser.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C0531C6EA9CE001DDC88 /* MpdParser.m */; };
+		E3B138E11E579F4A00277469 /* PlaybackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C99ABA0498D603BF32587C9 /* PlaybackView.m */; };
+		E3B138E21E579F4A00277469 /* PlayerControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D481BD58DF20018A2E4 /* PlayerControlsView.m */; };
+		E3B138E31E579F4A00277469 /* PlayerScrubberView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A59D491BD58DF20018A2E4 /* PlayerScrubberView.m */; };
+		E3B138E41E579F4A00277469 /* Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AD38975B118A3FAC18FAD2 /* Stream.m */; };
+		E3B138E51E579F4A00277469 /* Streaming.mm in Sources */ = {isa = PBXBuildFile; fileRef = FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */; };
+		E3B138E61E579F4A00277469 /* CdmHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD11AF2C37200BF7D6C /* CdmHost.mm */; };
+		E3B138E71E579F4A00277469 /* CdmWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */; };
+		E3B138E81E579F4A00277469 /* dev-cdm-cert.cc in Sources */ = {isa = PBXBuildFile; fileRef = E3A398FD1CA342EF00CC47CB /* dev-cdm-cert.cc */; };
+		E3B138E91E579F4A00277469 /* dev-tfit-keys.cc in Sources */ = {isa = PBXBuildFile; fileRef = E3A398FE1CA342EF00CC47CB /* dev-tfit-keys.cc */; };
+		E3B138ED1E579F4A00277469 /* libCocoaAsyncSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */; };
+		E3B138EE1E579F4A00277469 /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */; };
+		E3B138EF1E579F4A00277469 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */; };
+		E3B138F01E579F4A00277469 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCCDF5308D7CD3178BC46A92 /* CFNetwork.framework */; };
+		E3B138F11E579F4A00277469 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
+		E3B138F21E579F4A00277469 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */; };
+		E3B138F31E579F4A00277469 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */; };
+		E3B138F41E579F4A00277469 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A5D38A72F529F0B7DA626FD /* Foundation.framework */; };
+		E3B138F51E579F4A00277469 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */; };
+		E3B138F61E579F4A00277469 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
+		E3B138F71E579F4A00277469 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
+		E3B139161E57AE3F00277469 /* widevine_cdm_sdk_release.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3B139141E57ADFC00277469 /* widevine_cdm_sdk_release.framework */; };
+		E3B139171E57AE3F00277469 /* widevine_cdm_sdk_release.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E3B139141E57ADFC00277469 /* widevine_cdm_sdk_release.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E3C9DC081BE94D2D00593C6F /* libCocoaAsyncSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE61BE94D1B00593C6F /* libCocoaAsyncSocket.a */; };
 		E3C9DC091BE94D2D00593C6F /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3C9DBE91BE94D1B00593C6F /* libCocoaHTTPServer.a */; };
 		E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */; };
@@ -111,7 +103,6 @@
 		E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */; };
 		E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */; };
 		E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */; };
-		E3E407351D906140007A7682 /* CdmPlayerErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = E3E407341D906140007A7682 /* CdmPlayerErrors.m */; };
 		E3F1DF961C1A3DFA008CDE56 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */; };
 		F78F3116635CA2F99CE0F2B7 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254DBAB78EBBE697DD8E7AB /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
@@ -150,17 +141,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E35553191DD50CAD0000856D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				E35553181DD50CAD0000856D /* widevine_cdm_sdk_release.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E3A398F41CA3422800CC47CB /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -169,6 +149,17 @@
 			files = (
 				E3A398F11CA3422800CC47CB /* widevine_cdm_sdk_dev.framework in Embed Frameworks */,
 				E3A398F31CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3B138F81E579F4A00277469 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E3B139171E57AE3F00277469 /* widevine_cdm_sdk_release.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -209,11 +200,6 @@
 		E319C05B1C73B2D0001DDC88 /* StreamingTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StreamingTest.m; path = cdm_player/player/Test/StreamingTest.m; sourceTree = SOURCE_ROOT; };
 		E319C05C1C73B2D0001DDC88 /* StreamTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StreamTest.m; path = cdm_player/player/Test/StreamTest.m; sourceTree = SOURCE_ROOT; };
 		E319C0681C73B33C001DDC88 /* CDMPlayerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CDMPlayerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E35552D21DD50C650000856D /* release-cdm-cert.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "release-cdm-cert.cc"; sourceTree = "<group>"; };
-		E35552D31DD50C650000856D /* release-tfit-keys.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "release-tfit-keys.cc"; sourceTree = "<group>"; };
-		E35553141DD50C710000856D /* CDM Player Release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CDM Player Release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E35553151DD50C710000856D /* Release-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Release-Info.plist"; path = "/Developer/widevine-internal/cdm_player/player/Support/Release-Info.plist"; sourceTree = "<absolute>"; };
-		E35553161DD50CAD0000856D /* widevine_cdm_sdk_release.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = widevine_cdm_sdk_release.framework; path = release/widevine_cdm_sdk_release.framework; sourceTree = "<group>"; };
 		E367BDCF1AF2C37200BF7D6C /* CdmHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHandler.h; sourceTree = "<group>"; };
 		E367BDD01AF2C37200BF7D6C /* CdmHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmHost.h; sourceTree = "<group>"; };
 		E367BDD11AF2C37200BF7D6C /* CdmHost.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CdmHost.mm; sourceTree = "<group>"; };
@@ -221,14 +207,6 @@
 		E367BDD31AF2C37200BF7D6C /* CdmWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CdmWrapper.mm; sourceTree = "<group>"; };
 		E367BDD51AF2C37200BF7D6C /* iOSDeviceCert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iOSDeviceCert.h; sourceTree = "<group>"; };
 		E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		E390BB961D90940F0001B9B9 /* CDMPlayer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CDMPlayer.entitlements; sourceTree = "<group>"; };
-		E390BB971D9095370001B9B9 /* noenc_tears_audio_eng.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = noenc_tears_audio_eng.mp4; sourceTree = "<group>"; };
-		E390BB981D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = noenc_tears_h264_baseline_240p_800.mp4; sourceTree = "<group>"; };
-		E390BB991D9095370001B9B9 /* tears_audio_eng.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tears_audio_eng.mp4; sourceTree = "<group>"; };
-		E390BB9A1D9095370001B9B9 /* tears_cenc_small.mpd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = tears_cenc_small.mpd; sourceTree = "<group>"; };
-		E390BB9B1D9095370001B9B9 /* tears_clear_small.mpd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = tears_clear_small.mpd; sourceTree = "<group>"; };
-		E390BB9C1D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tears_h264_baseline_240p_800.mp4; sourceTree = "<group>"; };
-		E390BBA51D90957D0001B9B9 /* DownloaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DownloaderTest.m; path = cdm_player/player/Test/DownloaderTest.m; sourceTree = SOURCE_ROOT; };
 		E3A398EE1CA3422800CC47CB /* widevine_cdm_sdk_dev.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = widevine_cdm_sdk_dev.framework; path = dev/widevine_cdm_sdk_dev.framework; sourceTree = "<group>"; };
 		E3A398EF1CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = widevine_cdm_sdk_insecure_dev_sim.framework; path = dev/widevine_cdm_sdk_insecure_dev_sim.framework; sourceTree = "<group>"; };
 		E3A398F61CA3425500CC47CB /* dash-139.fmp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dash-139.fmp4"; sourceTree = "<group>"; };
@@ -251,13 +229,19 @@
 		E3A59D601BD59B4F0018A2E4 /* ico_download_before.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ico_download_before.png; sourceTree = "<group>"; };
 		E3A59D611BD59B4F0018A2E4 /* inline_playback_enter_fullscreen_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inline_playback_enter_fullscreen_2x.png; sourceTree = "<group>"; };
 		E3A59D621BD59B4F0018A2E4 /* inline_playback_exit_fullscreen_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inline_playback_exit_fullscreen_2x.png; sourceTree = "<group>"; };
+		E3B138AD1E579A3A00277469 /* CdmPlayerErrors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CdmPlayerErrors.m; sourceTree = "<group>"; };
+		E3B138AF1E579A4000277469 /* CdmPlayerHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CdmPlayerHelpers.m; sourceTree = "<group>"; };
+		E3B138BD1E579C9D00277469 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		E3B138BE1E579C9D00277469 /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
+		E3B138C01E579CB400277469 /* CdmPlayerErrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CdmPlayerErrors.h; sourceTree = "<group>"; };
+		E3B138C11E579CB400277469 /* CdmPlayerHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CdmPlayerHelpers.h; sourceTree = "<group>"; };
+		E3B138FE1E579F4A00277469 /* CDM Player Release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CDM Player Release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3B139141E57ADFC00277469 /* widevine_cdm_sdk_release.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = widevine_cdm_sdk_release.framework; path = release/widevine_cdm_sdk_release.framework; sourceTree = "<group>"; };
 		E3C428901BDB4F3F0083B0D9 /* LicenseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LicenseManager.h; sourceTree = "<group>"; };
 		E3C428911BDB4F3F0083B0D9 /* LicenseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LicenseManager.m; sourceTree = "<group>"; };
 		E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E3C9DA571BE94D1800593C6F /* CocoaAsyncSocket_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaAsyncSocket_ios.xcodeproj; sourceTree = "<group>"; };
 		E3C9DA5A1BE94D1800593C6F /* CocoaHTTPServer_ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CocoaHTTPServer_ios.xcodeproj; sourceTree = "<group>"; };
-		E3E407331D906140007A7682 /* CdmPlayerErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CdmPlayerErrors.h; sourceTree = "<group>"; };
-		E3E407341D906140007A7682 /* CdmPlayerErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CdmPlayerErrors.m; sourceTree = "<group>"; };
 		E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		F86EA198D6632F06B8ECE658 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FDF77EC58BE9D2B6ECB4E7A4 /* Streaming.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Streaming.mm; sourceTree = "<group>"; };
@@ -271,22 +255,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E35553001DD50C710000856D /* Frameworks */ = {
+		E3B138EA1E579F4A00277469 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E35553031DD50C710000856D /* libCocoaAsyncSocket.a in Frameworks */,
-				E35553171DD50CAD0000856D /* widevine_cdm_sdk_release.framework in Frameworks */,
-				E35553041DD50C710000856D /* libCocoaHTTPServer.a in Frameworks */,
-				E35553051DD50C710000856D /* AVFoundation.framework in Frameworks */,
-				E35553061DD50C710000856D /* CFNetwork.framework in Frameworks */,
-				E35553071DD50C710000856D /* CoreFoundation.framework in Frameworks */,
-				E35553081DD50C710000856D /* CoreGraphics.framework in Frameworks */,
-				E35553091DD50C710000856D /* CoreMedia.framework in Frameworks */,
-				E355530A1DD50C710000856D /* Foundation.framework in Frameworks */,
-				E355530B1DD50C710000856D /* MediaPlayer.framework in Frameworks */,
-				E355530C1DD50C710000856D /* Security.framework in Frameworks */,
-				E355530D1DD50C710000856D /* UIKit.framework in Frameworks */,
+				E3B138ED1E579F4A00277469 /* libCocoaAsyncSocket.a in Frameworks */,
+				E3B139161E57AE3F00277469 /* widevine_cdm_sdk_release.framework in Frameworks */,
+				E3B138EE1E579F4A00277469 /* libCocoaHTTPServer.a in Frameworks */,
+				E3B138EF1E579F4A00277469 /* AVFoundation.framework in Frameworks */,
+				E3B138F01E579F4A00277469 /* CFNetwork.framework in Frameworks */,
+				E3B138F11E579F4A00277469 /* CoreFoundation.framework in Frameworks */,
+				E3B138F21E579F4A00277469 /* CoreGraphics.framework in Frameworks */,
+				E3B138F31E579F4A00277469 /* CoreMedia.framework in Frameworks */,
+				E3B138F41E579F4A00277469 /* Foundation.framework in Frameworks */,
+				E3B138F51E579F4A00277469 /* MediaPlayer.framework in Frameworks */,
+				E3B138F61E579F4A00277469 /* Security.framework in Frameworks */,
+				E3B138F71E579F4A00277469 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,8 +302,10 @@
 			children = (
 				21307AADD0E69F1E41A83014 /* AppDelegate.h */,
 				0D2270C567D944441117F046 /* AppDelegate.m */,
-				E3E407331D906140007A7682 /* CdmPlayerErrors.h */,
-				E3E407341D906140007A7682 /* CdmPlayerErrors.m */,
+				E3B138C01E579CB400277469 /* CdmPlayerErrors.h */,
+				E3B138AD1E579A3A00277469 /* CdmPlayerErrors.m */,
+				E3B138C11E579CB400277469 /* CdmPlayerHelpers.h */,
+				E3B138AF1E579A4000277469 /* CdmPlayerHelpers.m */,
 				29A3C6D1FFFB13C23EE63305 /* DetailViewController.h */,
 				314D35F3B535A008EC6F276F /* DetailViewController.m */,
 				E3A59D3C1BD58DAA0018A2E4 /* Downloader.h */,
@@ -330,6 +316,8 @@
 				080A1685568016AFB8419D56 /* LocalWebConnection.m */,
 				CF23949319E471FB0F7FED76 /* LocalWebServer.h */,
 				0D6AED56F206205C7C2A6DB8 /* LocalWebServer.m */,
+				E3B138BD1E579C9D00277469 /* Logging.h */,
+				E3B138BE1E579C9D00277469 /* Logging.m */,
 				603E1E8725C6CCB785CC2B86 /* MasterViewController.h */,
 				688EE9F49558E65235EEC34E /* MasterViewController.m */,
 				E3A59D421BD58DD90018A2E4 /* MediaCell.h */,
@@ -381,10 +369,8 @@
 			isa = PBXGroup;
 			children = (
 				E3A59D5E1BD59B4F0018A2E4 /* Images */,
-				E390BB961D90940F0001B9B9 /* CDMPlayer.entitlements */,
 				E3C4DB8F1BD5AB0600D5A74B /* Images.xcassets */,
 				F86EA198D6632F06B8ECE658 /* Info.plist */,
-				E35553151DD50C710000856D /* Release-Info.plist */,
 				B5C1432EA0C58AFB4EA2B8DD /* LaunchScreen.xib */,
 				E3A59D4C1BD58F7A0018A2E4 /* mediaResources.json */,
 				8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */,
@@ -398,7 +384,7 @@
 			children = (
 				A8AC6A1E44D852B3F0594CC8 /* CDMPlayer.app */,
 				E319C0681C73B33C001DDC88 /* CDMPlayerTests.xctest */,
-				E35553141DD50C710000856D /* CDM Player Release.app */,
+				E3B138FE1E579F4A00277469 /* CDM Player Release.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -416,7 +402,6 @@
 			isa = PBXGroup;
 			children = (
 				E3A398F51CA3425500CC47CB /* Media */,
-				E390BBA51D90957D0001B9B9 /* DownloaderTest.m */,
 				E319C0591C73B2D0001DDC88 /* LicenseManagerTest.m */,
 				E319C05A1C73B2D0001DDC88 /* MpdParserTest.m */,
 				E319C05B1C73B2D0001DDC88 /* StreamingTest.m */,
@@ -442,12 +427,6 @@
 		E3A398F51CA3425500CC47CB /* Media */ = {
 			isa = PBXGroup;
 			children = (
-				E390BB971D9095370001B9B9 /* noenc_tears_audio_eng.mp4 */,
-				E390BB981D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 */,
-				E390BB991D9095370001B9B9 /* tears_audio_eng.mp4 */,
-				E390BB9A1D9095370001B9B9 /* tears_cenc_small.mpd */,
-				E390BB9B1D9095370001B9B9 /* tears_clear_small.mpd */,
-				E390BB9C1D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 */,
 				E3A398F61CA3425500CC47CB /* dash-139.fmp4 */,
 				E3A398F71CA3425500CC47CB /* dash-160.fmp4 */,
 				E3A398F81CA3425500CC47CB /* video.mp4 */,
@@ -461,8 +440,6 @@
 			children = (
 				E3A398FD1CA342EF00CC47CB /* dev-cdm-cert.cc */,
 				E3A398FE1CA342EF00CC47CB /* dev-tfit-keys.cc */,
-				E35552D21DD50C650000856D /* release-cdm-cert.cc */,
-				E35552D31DD50C650000856D /* release-tfit-keys.cc */,
 			);
 			name = Certs;
 			path = cdm_player/cdm/certs;
@@ -482,9 +459,9 @@
 		E3C9DA001BE94B8000593C6F /* CDM */ = {
 			isa = PBXGroup;
 			children = (
-				E35553161DD50CAD0000856D /* widevine_cdm_sdk_release.framework */,
 				E3A398EE1CA3422800CC47CB /* widevine_cdm_sdk_dev.framework */,
 				E3A398EF1CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework */,
+				E3B139141E57ADFC00277469 /* widevine_cdm_sdk_release.framework */,
 			);
 			name = CDM;
 			path = cdm_player/cdm;
@@ -554,14 +531,14 @@
 			productReference = E319C0681C73B33C001DDC88 /* CDMPlayerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		E35552D61DD50C710000856D /* CDM Player Release */ = {
+		E3B138C61E579F4A00277469 /* CDM Player Release */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E35553111DD50C710000856D /* Build configuration list for PBXNativeTarget "CDM Player Release" */;
+			buildConfigurationList = E3B138FB1E579F4A00277469 /* Build configuration list for PBXNativeTarget "CDM Player Release" */;
 			buildPhases = (
-				E35552D71DD50C710000856D /* Resources */,
-				E35552E81DD50C710000856D /* Sources */,
-				E35553001DD50C710000856D /* Frameworks */,
-				E35553191DD50CAD0000856D /* Embed Frameworks */,
+				E3B138C71E579F4A00277469 /* Resources */,
+				E3B138D21E579F4A00277469 /* Sources */,
+				E3B138EA1E579F4A00277469 /* Frameworks */,
+				E3B138F81E579F4A00277469 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -569,12 +546,12 @@
 			);
 			name = "CDM Player Release";
 			productName = cdm_reference_player;
-			productReference = E35553141DD50C710000856D /* CDM Player Release.app */;
+			productReference = E3B138FE1E579F4A00277469 /* CDM Player Release.app */;
 			productType = "com.apple.product-type.application";
 		};
-		EA366CA36E247489944F66E2 /* CDM Player */ = {
+		EA366CA36E247489944F66E2 /* CDM Player Dev */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player" */;
+			buildConfigurationList = BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player Dev" */;
 			buildPhases = (
 				C5B744002620F58517BB55A1 /* Resources */,
 				028F2F3FBFC5782034C1559F /* Sources */,
@@ -585,7 +562,7 @@
 			);
 			dependencies = (
 			);
-			name = "CDM Player";
+			name = "CDM Player Dev";
 			productName = cdm_reference_player;
 			productReference = A8AC6A1E44D852B3F0594CC8 /* CDMPlayer.app */;
 			productType = "com.apple.product-type.application";
@@ -597,15 +574,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0820;
 				TargetAttributes = {
 					E319C0671C73B33C001DDC88 = {
 						CreatedOnToolsVersion = 7.2.1;
-						ProvisioningStyle = Automatic;
 						TestTargetID = EA366CA36E247489944F66E2;
 					};
 					EA366CA36E247489944F66E2 = {
-						DevelopmentTeam = UURJWD85L5;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
@@ -638,8 +613,8 @@
 			);
 			projectRoot = "";
 			targets = (
-				EA366CA36E247489944F66E2 /* CDM Player */,
-				E35552D61DD50C710000856D /* CDM Player Release */,
+				EA366CA36E247489944F66E2 /* CDM Player Dev */,
+				E3B138C61E579F4A00277469 /* CDM Player Release */,
 				E319C0671C73B33C001DDC88 /* CDMPlayerTests */,
 			);
 		};
@@ -669,20 +644,14 @@
 			files = (
 				E353B9C21C21DFF400233332 /* Images.xcassets in Resources */,
 				E3A398FB1CA3425500CC47CB /* video.mp4 in Resources */,
-				E390BB9D1D9095370001B9B9 /* noenc_tears_audio_eng.mp4 in Resources */,
 				E3C9DC4A1BE95ED700593C6F /* ico_download_after.png in Resources */,
 				E3C9DC4B1BE95ED700593C6F /* ico_download_before.png in Resources */,
 				E3C9DC4C1BE95ED700593C6F /* inline_playback_enter_fullscreen_2x.png in Resources */,
 				E3A398F91CA3425500CC47CB /* dash-139.fmp4 in Resources */,
 				E3C9DC4D1BE95ED700593C6F /* inline_playback_exit_fullscreen_2x.png in Resources */,
 				E3C9DC0C1BE94D5D00593C6F /* mediaResources.json in Resources */,
-				E390BB9F1D9095370001B9B9 /* tears_audio_eng.mp4 in Resources */,
-				E390BBA11D9095370001B9B9 /* tears_clear_small.mpd in Resources */,
 				E3C9DC0D1BE94D5D00593C6F /* RefPlayer_Prefix.pch in Resources */,
 				E3A398FA1CA3425500CC47CB /* dash-160.fmp4 in Resources */,
-				E390BBA01D9095370001B9B9 /* tears_cenc_small.mpd in Resources */,
-				E390BBA21D9095370001B9B9 /* tears_h264_baseline_240p_800.mp4 in Resources */,
-				E390BB9E1D9095370001B9B9 /* noenc_tears_h264_baseline_240p_800.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,26 +662,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E35552D71DD50C710000856D /* Resources */ = {
+		E3B138C71E579F4A00277469 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E35552D81DD50C710000856D /* Images.xcassets in Resources */,
-				E35552D91DD50C710000856D /* video.mp4 in Resources */,
-				E35552DA1DD50C710000856D /* noenc_tears_audio_eng.mp4 in Resources */,
-				E35552DB1DD50C710000856D /* ico_download_after.png in Resources */,
-				E35552DC1DD50C710000856D /* ico_download_before.png in Resources */,
-				E35552DD1DD50C710000856D /* inline_playback_enter_fullscreen_2x.png in Resources */,
-				E35552DE1DD50C710000856D /* dash-139.fmp4 in Resources */,
-				E35552DF1DD50C710000856D /* inline_playback_exit_fullscreen_2x.png in Resources */,
-				E35552E01DD50C710000856D /* mediaResources.json in Resources */,
-				E35552E11DD50C710000856D /* tears_audio_eng.mp4 in Resources */,
-				E35552E21DD50C710000856D /* tears_clear_small.mpd in Resources */,
-				E35552E31DD50C710000856D /* RefPlayer_Prefix.pch in Resources */,
-				E35552E41DD50C710000856D /* dash-160.fmp4 in Resources */,
-				E35552E51DD50C710000856D /* tears_cenc_small.mpd in Resources */,
-				E35552E61DD50C710000856D /* tears_h264_baseline_240p_800.mp4 in Resources */,
-				E35552E71DD50C710000856D /* noenc_tears_h264_baseline_240p_800.mp4 in Resources */,
+				E3B138C81E579F4A00277469 /* Images.xcassets in Resources */,
+				E3B138C91E579F4A00277469 /* video.mp4 in Resources */,
+				E3B138CA1E579F4A00277469 /* ico_download_after.png in Resources */,
+				E3B138CB1E579F4A00277469 /* ico_download_before.png in Resources */,
+				E3B138CC1E579F4A00277469 /* inline_playback_enter_fullscreen_2x.png in Resources */,
+				E3B138CD1E579F4A00277469 /* dash-139.fmp4 in Resources */,
+				E3B138CE1E579F4A00277469 /* inline_playback_exit_fullscreen_2x.png in Resources */,
+				E3B138CF1E579F4A00277469 /* mediaResources.json in Resources */,
+				E3B138D01E579F4A00277469 /* RefPlayer_Prefix.pch in Resources */,
+				E3B138D11E579F4A00277469 /* dash-160.fmp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -723,27 +686,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E319C0541C6EA9CE001DDC88 /* MpdParser.m in Sources */,
-				E3C9DC0E1BE94D6C00593C6F /* CdmHost.mm in Sources */,
-				E3C9DC0F1BE94D6C00593C6F /* CdmWrapper.mm in Sources */,
 				E3C9DC101BE94D6C00593C6F /* AppDelegate.m in Sources */,
-				E3A399021CA342EF00CC47CB /* dev-tfit-keys.cc in Sources */,
+				E3B138BF1E579C9D00277469 /* Logging.m in Sources */,
+				E3B138AE1E579A3A00277469 /* CdmPlayerErrors.m in Sources */,
+				E3B138B01E579A4000277469 /* CdmPlayerHelpers.m in Sources */,
 				E3C9DC111BE94D6C00593C6F /* DetailViewController.m in Sources */,
 				E3C9DC121BE94D6C00593C6F /* Downloader.m in Sources */,
 				E3C9DC131BE94D6D00593C6F /* LicenseManager.m in Sources */,
-				E3A399011CA342EF00CC47CB /* dev-cdm-cert.cc in Sources */,
 				E3C9DC141BE94D6D00593C6F /* LocalWebConnection.m in Sources */,
 				E3C9DC151BE94D6D00593C6F /* LocalWebServer.m in Sources */,
+				E3C9DC1F1BE94D6D00593C6F /* main.m in Sources */,
 				E3C9DC161BE94D6D00593C6F /* MasterViewController.m in Sources */,
 				E3C9DC171BE94D6D00593C6F /* MediaCell.m in Sources */,
 				E3C9DC181BE94D6D00593C6F /* MediaResource.m in Sources */,
+				E319C0541C6EA9CE001DDC88 /* MpdParser.m in Sources */,
 				E3C9DC1A1BE94D6D00593C6F /* PlaybackView.m in Sources */,
 				E3C9DC1B1BE94D6D00593C6F /* PlayerControlsView.m in Sources */,
 				E3C9DC1C1BE94D6D00593C6F /* PlayerScrubberView.m in Sources */,
 				E3C9DC1D1BE94D6D00593C6F /* Stream.m in Sources */,
-				E3E407351D906140007A7682 /* CdmPlayerErrors.m in Sources */,
 				E3C9DC1E1BE94D6D00593C6F /* Streaming.mm in Sources */,
-				E3C9DC1F1BE94D6D00593C6F /* main.m in Sources */,
+				E3C9DC0E1BE94D6C00593C6F /* CdmHost.mm in Sources */,
+				E3C9DC0F1BE94D6C00593C6F /* CdmWrapper.mm in Sources */,
+				E3A399011CA342EF00CC47CB /* dev-cdm-cert.cc in Sources */,
+				E3A399021CA342EF00CC47CB /* dev-tfit-keys.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,36 +719,37 @@
 				E319C0721C73B363001DDC88 /* LicenseManagerTest.m in Sources */,
 				E319C0731C73B363001DDC88 /* MpdParserTest.m in Sources */,
 				E319C0741C73B363001DDC88 /* StreamingTest.m in Sources */,
-				E390BBA61D90957D0001B9B9 /* DownloaderTest.m in Sources */,
 				E319C0751C73B363001DDC88 /* StreamTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E35552E81DD50C710000856D /* Sources */ = {
+		E3B138D21E579F4A00277469 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E35552E91DD50C710000856D /* MpdParser.m in Sources */,
-				E35552EA1DD50C710000856D /* CdmHost.mm in Sources */,
-				E35552EB1DD50C710000856D /* CdmWrapper.mm in Sources */,
-				E35552EC1DD50C710000856D /* AppDelegate.m in Sources */,
-				E35552EE1DD50C710000856D /* release-tfit-keys.cc in Sources */,
-				E35552EF1DD50C710000856D /* DetailViewController.m in Sources */,
-				E35552F01DD50C710000856D /* Downloader.m in Sources */,
-				E35552F11DD50C710000856D /* LicenseManager.m in Sources */,
-				E35552F31DD50C710000856D /* LocalWebConnection.m in Sources */,
-				E35552F41DD50C710000856D /* release-cdm-cert.cc in Sources */,
-				E35552F51DD50C710000856D /* LocalWebServer.m in Sources */,
-				E35552F61DD50C710000856D /* MasterViewController.m in Sources */,
-				E35552F71DD50C710000856D /* MediaCell.m in Sources */,
-				E35552F81DD50C710000856D /* MediaResource.m in Sources */,
-				E35552F91DD50C710000856D /* PlaybackView.m in Sources */,
-				E35552FA1DD50C710000856D /* PlayerControlsView.m in Sources */,
-				E35552FB1DD50C710000856D /* PlayerScrubberView.m in Sources */,
-				E35552FC1DD50C710000856D /* Stream.m in Sources */,
-				E35552FD1DD50C710000856D /* CdmPlayerErrors.m in Sources */,
-				E35552FE1DD50C710000856D /* Streaming.mm in Sources */,
-				E35552FF1DD50C710000856D /* main.m in Sources */,
+				E3B138D31E579F4A00277469 /* AppDelegate.m in Sources */,
+				E3B138D41E579F4A00277469 /* Logging.m in Sources */,
+				E3B138D51E579F4A00277469 /* CdmPlayerErrors.m in Sources */,
+				E3B138D61E579F4A00277469 /* CdmPlayerHelpers.m in Sources */,
+				E3B138D71E579F4A00277469 /* DetailViewController.m in Sources */,
+				E3B138D81E579F4A00277469 /* Downloader.m in Sources */,
+				E3B138D91E579F4A00277469 /* LicenseManager.m in Sources */,
+				E3B138DA1E579F4A00277469 /* LocalWebConnection.m in Sources */,
+				E3B138DB1E579F4A00277469 /* LocalWebServer.m in Sources */,
+				E3B138DC1E579F4A00277469 /* main.m in Sources */,
+				E3B138DD1E579F4A00277469 /* MasterViewController.m in Sources */,
+				E3B138DE1E579F4A00277469 /* MediaCell.m in Sources */,
+				E3B138DF1E579F4A00277469 /* MediaResource.m in Sources */,
+				E3B138E01E579F4A00277469 /* MpdParser.m in Sources */,
+				E3B138E11E579F4A00277469 /* PlaybackView.m in Sources */,
+				E3B138E21E579F4A00277469 /* PlayerControlsView.m in Sources */,
+				E3B138E31E579F4A00277469 /* PlayerScrubberView.m in Sources */,
+				E3B138E41E579F4A00277469 /* Stream.m in Sources */,
+				E3B138E51E579F4A00277469 /* Streaming.mm in Sources */,
+				E3B138E61E579F4A00277469 /* CdmHost.mm in Sources */,
+				E3B138E71E579F4A00277469 /* CdmWrapper.mm in Sources */,
+				E3B138E81E579F4A00277469 /* dev-cdm-cert.cc in Sources */,
+				E3B138E91E579F4A00277469 /* dev-tfit-keys.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -792,7 +758,7 @@
 /* Begin PBXTargetDependency section */
 		E319C06E1C73B33C001DDC88 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EA366CA36E247489944F66E2 /* CDM Player */;
+			target = EA366CA36E247489944F66E2 /* CDM Player Dev */;
 			targetProxy = E319C06D1C73B33C001DDC88 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -812,6 +778,10 @@
 		0C8AC55ECF4C599A03E6A8B7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -846,24 +816,21 @@
 				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include widevine-cdm/core/include widevine-cdm/cdm/include";
-				VALID_ARCHS = "armv7 arm64";
+				VALID_ARCHS = "i386 x86_64 armv7 arm64";
 			};
 			name = Release;
 		};
 		66A570A1E2E01D21EA234A20 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = (
-					i386,
-					x86_64,
-				);
+				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = UURJWD85L5;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -885,7 +852,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/**",
 					cdm_player/cdm/dev/widevine_cdm_sdk_insecure_dev_sim.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
@@ -912,6 +879,10 @@
 		A1342A3431FF0549449AC119 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = (
+					armv7,
+					arm64,
+				);
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -947,7 +918,7 @@
 				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include widevine-cdm/core/include widevine-cdm/cdm/include";
-				VALID_ARCHS = "armv7 arm64";
+				VALID_ARCHS = "i386 armv7 arm64 x86_64";
 			};
 			name = Debug;
 		};
@@ -970,7 +941,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = cdm_player/cdm/dev;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1022,7 +992,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = cdm_player/cdm/dev;
@@ -1051,13 +1020,12 @@
 			};
 			name = Release;
 		};
-		E35553121DD50C710000856D /* Debug */ = {
+		E3B138FC1E579F4A00277469 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -1067,7 +1035,7 @@
 					cdm_player/cdm/release,
 					"$(PROJECT_DIR)/cdm_player/cdm/release",
 				);
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
@@ -1084,10 +1052,10 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/**",
 					cdm_player/cdm/release/widevine_cdm_sdk_release.framework/Headers,
 				);
-				INFOPLIST_FILE = "Release-Info.plist";
+				INFOPLIST_FILE = "CDM Player copy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
@@ -1108,13 +1076,12 @@
 			};
 			name = Debug;
 		};
-		E35553131DD50C710000856D /* Release */ = {
+		E3B138FD1E579F4A00277469 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -1124,7 +1091,7 @@
 					cdm_player/cdm/release,
 					"$(PROJECT_DIR)/cdm_player/cdm/release",
 				);
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PLATFORM_COMPANY_NAME_WV=\\\"WV\\\"",
@@ -1140,10 +1107,10 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/**",
 					cdm_player/cdm/release/widevine_cdm_sdk_release.framework/Headers,
 				);
-				INFOPLIST_FILE = "Release-Info.plist";
+				INFOPLIST_FILE = "CDM Player copy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
@@ -1167,6 +1134,7 @@
 		F817ACD45E7561B0C5BE5BF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphonesimulator*]" = (
 					i386,
 					x86_64,
@@ -1174,10 +1142,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = UURJWD85L5;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1200,7 +1168,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"cdm_player/third_party/CocoaHTTPServer-2.3/Core",
+					"cdm_player/third_party/CocoaHTTPServer-2.3/**",
 					cdm_player/cdm/dev/widevine_cdm_sdk_insecure_dev_sim.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
@@ -1236,7 +1204,7 @@
 			defaultConfigurationIsVisible = 1;
 			defaultConfigurationName = Debug;
 		};
-		BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player" */ = {
+		BBA503313E46179B0E982FB7 /* Build configuration list for PBXNativeTarget "CDM Player Dev" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F817ACD45E7561B0C5BE5BF9 /* Debug */,
@@ -1254,11 +1222,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E35553111DD50C710000856D /* Build configuration list for PBXNativeTarget "CDM Player Release" */ = {
+		E3B138FB1E579F4A00277469 /* Build configuration list for PBXNativeTarget "CDM Player Release" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E35553121DD50C710000856D /* Debug */,
-				E35553131DD50C710000856D /* Release */,
+				E3B138FC1E579F4A00277469 /* Debug */,
+				E3B138FD1E579F4A00277469 /* Release */,
 			);
 			defaultConfigurationIsVisible = 1;
 			defaultConfigurationName = Debug;

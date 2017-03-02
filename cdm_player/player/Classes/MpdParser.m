@@ -4,62 +4,62 @@
 
 #import <objc/message.h>
 #import <objc/runtime.h>
+#import "Logging.h"
+#import "CdmPlayerHelpers.h"
 
-NSString *const kDashAdaptationSet = @"AdaptationSet";
-NSString *const kDashContentComponent = @"ContentComponent";
-NSString *const kDashContentProtection = @"ContentProtection";
-NSString *const kDashPeriod = @"Period";
-NSString *const kDashRepresentation = @"Representation";
-NSString *const kDashRepresentationBaseURL = @"BaseURL";
-NSString *const kDashRepresentationBW = @"bandwidth";
-NSString *const kDashRepresentationCodec = @"codecs";
-NSString *const kDashRepresentationHeight = @"height";
-NSString *const kDashRepresentationMime = @"mimeType";
-NSString *const kDashRepresentationWidth = @"width";
-NSString *const kDashSegmentBase = @"SegmentBase";
-NSString *const kDashSegmentBaseIndexRange = @"indexRange";
-NSString *const kDashSegmentBaseInitializationRange = @"range";
-NSString *const kDashSegmentInitRange = @"Initialization";
-NSString *const kDashSegmentList = @"SegmentList";
-NSString *const kDashSegmentListURL = @"SegmentURL";
-NSString *const kDashSegmentTemplate = @"SegmentTemplate";
-NSString *const kDashSegmentTimeline = @"SegmentTimeline";
+static NSString *const kDashAdaptationSet = @"AdaptationSet";
+static NSString *const kDashContentComponent = @"ContentComponent";
+static NSString *const kDashContentProtection = @"ContentProtection";
+static NSString *const kDashPeriod = @"Period";
+static NSString *const kDashRepresentation = @"Representation";
+static NSString *const kDashRepresentationBaseURL = @"BaseURL";
+static NSString *const kDashRepresentationBW = @"bandwidth";
+static NSString *const kDashRepresentationCodec = @"codecs";
+static NSString *const kDashRepresentationHeight = @"height";
+static NSString *const kDashRepresentationMime = @"mimeType";
+static NSString *const kDashRepresentationWidth = @"width";
+static NSString *const kDashSegmentBase = @"SegmentBase";
+static NSString *const kDashSegmentBaseIndexRange = @"indexRange";
+static NSString *const kDashSegmentBaseInitializationRange = @"range";
+static NSString *const kDashSegmentInitRange = @"Initialization";
+static NSString *const kDashSegmentList = @"SegmentList";
+static NSString *const kDashSegmentListURL = @"SegmentURL";
+static NSString *const kDashSegmentTemplate = @"SegmentTemplate";
+static NSString *const kDashSegmentTimeline = @"SegmentTimeline";
 
-NSString *const kAttrAudioSampleRate = @"audioSamplingRate";
-NSString *const kAttrBandwidth = @"bandwidth";
-NSString *const kAttrCodecs = @"codecs";
-NSString *const kAttrCodecAvc1 = @"avc1";
-NSString *const kAttrCodecMp4a = @"mp4a";
-NSString *const kAttrContentType = @"contentType";
-NSString *const kAttrDuration = @"duration";
-NSString *const kAttrHeight = @"height";
-NSString *const kAttrId = @"id";
-NSString *const kAttrIndexRange = @"indexRange";
-NSString *const kAttrLang = @"lang";
-NSString *const kAttrMimeType = @"mimeType";
-NSString *const kAttrMimeTypeAudio = @"audio/";
-NSString *const kAttrMimeTypeVideo = @"video/";
-NSString *const kAttrNumChannels = @"numChannels";
-NSString *const kAttrPssh = @"pssh";
-NSString *const kAttrPsshCenc = @"cenc:pssh";
-NSString *const kAttrSampleRate = @"sampleRate";
-NSString *const kAttrWidth = @"width";
+static NSString *const kAttrAudioSampleRate = @"audioSamplingRate";
+static NSString *const kAttrBandwidth = @"bandwidth";
+static NSString *const kAttrCodecs = @"codecs";
+static NSString *const kAttrCodecAvc1 = @"avc1";
+static NSString *const kAttrCodecMp4a = @"mp4a";
+static NSString *const kAttrContentType = @"contentType";
+static NSString *const kAttrDuration = @"duration";
+static NSString *const kAttrHeight = @"height";
+static NSString *const kAttrId = @"id";
+static NSString *const kAttrIndexRange = @"indexRange";
+static NSString *const kAttrLang = @"lang";
+static NSString *const kAttrMimeType = @"mimeType";
+static NSString *const kAttrMimeTypeAudio = @"audio/";
+static NSString *const kAttrMimeTypeVideo = @"video/";
+static NSString *const kAttrNumChannels = @"numChannels";
+static NSString *const kAttrPssh = @"pssh";
+static NSString *const kAttrPsshCenc = @"cenc:pssh";
+static NSString *const kAttrSampleRate = @"sampleRate";
+static NSString *const kAttrWidth = @"width";
 
-NSString *const kBoolNo = @"NO";
-NSString *const kBoolYes = @"YES";
-NSString *const kDashMediaType = @"dashMediaType";
-NSString *const kDashToHlsString = @"DashToHls";
-NSString *const kDashSeparator = @"-";
-NSString *const kHttpString = @"http";
-NSString *const kIsVideoString = @"isVideo";
-NSString *const kNewLineCharacter = @"\n";
-NSString *const kRootURL = @"rootURL";
-NSString *const kRangeLength = @"length";
-NSString *const kRangeStart = @"startRange";
-NSString *const kSlashesString = @"//";
-NSString *const kStreamingString = @"Streaming";
-NSString *const kVideoString = @"video";
-NSString *const kRegexPattern =
+static NSString *const kBoolNo = @"NO";
+static NSString *const kBoolYes = @"YES";
+static NSString *const kDashMediaType = @"dashMediaType";
+static NSString *const kDashToHlsString = @"DashToHls";
+static NSString *const kDashSeparator = @"-";
+static NSString *const kHttpString = @"http";
+static NSString *const kIsVideoString = @"isVideo";
+static NSString *const kNewLineCharacter = @"\n";
+static NSString *const kRootURL = @"rootURL";
+static NSString *const kSlashesString = @"//";
+static NSString *const kStreamingString = @"Streaming";
+static NSString *const kVideoString = @"video";
+static NSString *const kRegexPattern =
     @"^P(?:(\\d{0,2})Y)?(?:(\\d{0,2})M)?(?:(\\d{0,2})D)"
     @"?.(?:(\\d{0,2})H)?(?:(\\d{0,2})M)?(?:(\\d*[.]?\\d+)S)?$";
 
@@ -117,7 +117,7 @@ NSString *const kRegexPattern =
                                       mpdData:mpdData
                                       baseURL:baseURL
                                  storeOffline:storeOffline]
-      .streams;
+    .streams;
 }
 
 #pragma mark NSXMLParser methods -- start
@@ -129,14 +129,14 @@ NSString *const kRegexPattern =
 
 // XML Element found, being parsing.
 - (void)parser:(NSXMLParser *)parser
-    didStartElement:(NSString *)elementName
-       namespaceURI:(NSString *)namespaceURI
-      qualifiedName:(NSString *)qName
-         attributes:(NSDictionary *)attributeDict {
+didStartElement:(NSString *)elementName
+   namespaceURI:(NSString *)namespaceURI
+  qualifiedName:(NSString *)qName
+     attributes:(NSDictionary *)attributeDict {
   _currentElement = elementName;
   for (NSString *key in attributeDict) {
     NSString *value = [[attributeDict valueForKey:key]
-        stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                       stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([elementName isEqualToString:kDashContentProtection]) {
       // Reset PSSH for each Adapation Set.
       [_mpdDict removeObjectForKey:kAttrPsshCenc];
@@ -179,9 +179,9 @@ NSString *const kRegexPattern =
 
 // Finished parsing Element.
 - (void)parser:(NSXMLParser *)parser
-    didEndElement:(NSString *)elementName
-     namespaceURI:(NSString *)namespaceURI
-    qualifiedName:(NSString *)qName {
+ didEndElement:(NSString *)elementName
+  namespaceURI:(NSString *)namespaceURI
+ qualifiedName:(NSString *)qName {
   if ([elementName isEqualToString:kDashRepresentation]) {
     // Setup stream if mimeType (video/mp4) and codec (avc1) are supported.
     if ([[_mpdDict objectForKey:kAttrMimeType] containsString:kAttrMimeTypeVideo]) {
@@ -204,7 +204,7 @@ NSString *const kRegexPattern =
 
 // If parsing fails, this error will be returned.
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError {
-  NSLog(@"\n::ERROR::Parse Failed: %@", parseError);
+  CDMLogNSError(parseError, @"parsing");
 }
 
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
@@ -241,18 +241,18 @@ NSString *const kRegexPattern =
 - (NSString *)getPropertyType:(objc_property_t)property {
   const char *attribute = property_getAttributes(property);
   if (!attribute) {
-    NSLog(@"\n::ERROR::Empty Property Attribute | Name: %@\n", property);
+    CDMLogError(@"empty property attribute %@", property);
     return nil;
   }
   NSString *attributeString = [NSString stringWithUTF8String:attribute];
   NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
-  NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
-      stringByReplacingOccurrencesOfString:@"\""
-                                withString:@""];
+  NSString *attributeSubstr = [[attributeArray objectAtIndex:0] substringFromIndex:1];
+  NSString *attributeStripped = [attributeSubstr stringByReplacingOccurrencesOfString:@"\""
+                                                                           withString:@""];
 
   // Verify attribute values are valid.
   if (!attributeStripped || [attributeStripped length] == 0) {
-    NSLog(@"\n::ERROR::Empty Property Attribute Character | Name: %@\n", property);
+    CDMLogError(@"empty property character %@", property);
     return nil;
   }
 
@@ -272,10 +272,14 @@ NSString *const kRegexPattern =
       attributeString =
           [[[attributeStripped substringFromIndex:2] componentsSeparatedByString:@"="] firstObject];
       break;
-    default:
-      NSLog(@"No Property Matched: %c", attribute[1]);
+    case '{':
+      attributeString = @"NSRange";
+      break;
+    default: {
+      CDMLogError(@"no property matched %c", attribute[1]);
       attributeString = nil;
       break;
+    }
   }
   return attributeString;
 }
@@ -286,19 +290,15 @@ NSString *const kRegexPattern =
   const char *attribute = property_getAttributes(property);
   NSString *attributeString = [NSString stringWithUTF8String:attribute];
   NSArray *attributeArray = [attributeString componentsSeparatedByString:@","];
-  NSString *attributeStripped = [[[attributeArray objectAtIndex:0] substringFromIndex:1]
-      stringByReplacingOccurrencesOfString:@"\""
-                                withString:@""];
+  NSString *attributeSubstr = [[attributeArray objectAtIndex:0] substringFromIndex:1];
+  NSString *attributeStripped = [attributeSubstr stringByReplacingOccurrencesOfString:@"\""
+                                                                           withString:@""];
   NSString *propertyType = [attributeStripped substringFromIndex:1];
   switch (attribute[1]) {
     case '@':  // Char
       if ([propertyType isEqualToString:@"NSURL"]) {
         NSURL *value =
-            [self setStreamURL:[_mpdDict objectForKey:kDashRepresentationBaseURL] init:NO];
-        [stream setValue:value forKey:propertyName];
-      }
-      if ([propertyType isEqualToString:@"NSDictionary"]) {
-        NSDictionary *value = [self setInitRange];
+            [self makeStreamURL:[_mpdDict objectForKey:kDashRepresentationBaseURL] init:NO];
         [stream setValue:value forKey:propertyName];
       }
       if ([propertyType isEqualToString:@"NSData"]) {
@@ -343,10 +343,21 @@ NSString *const kRegexPattern =
       break;
     case '^':  // Special Class
       break;
-    default:
-      NSLog(@"No Property Matched");
+    case '{':
+      if ([propertyType isEqualToString:@"_NSRange=QQ}"]) {
+        NSRange value = [self extractInitialRange];
+        stream.initialRange = value;
+      }
+      if ([propertyType isEqualToString:@"_NSRange=II}"]) {
+        NSRange value = [self extractInitialRange];
+        stream.initialRange = value;
+      }
+      break;
+    default: {
+      CDMLogError(@"unknown property type %c", attribute[1]);
       attributeString = nil;
       break;
+    }
   }
 }
 
@@ -392,10 +403,7 @@ NSString *const kRegexPattern =
           if (![propertyType isEqualToString:kStreamingString]) {
             NSString *propertyValue = [stream valueForKey:propertyName];
             if (!propertyValue) {
-              NSLog(@"\n::ERROR::Property Not Set for Stream\n"
-                    @"  Name: %@ | Type: %@",
-                    propertyName,
-                    propertyType);
+              CDMLogWarn(@"Property of type %@ not set for stream %@", propertyType, propertyName);
               attributeExists = NO;
             }
           }
@@ -441,31 +449,28 @@ NSString *const kRegexPattern =
 }
 
 // Extract ranges from Dictionary, then parse and create Initialization Range.
-- (NSDictionary *)setInitRange {
+- (NSRange)extractInitialRange {
   NSString *range = [_mpdDict objectForKey:kDashSegmentBaseInitializationRange];
   [_mpdDict removeObjectForKey:kDashSegmentBaseInitializationRange];
   NSArray *rangeValues = [range componentsSeparatedByString:kDashSeparator];
-  NSNumber *startRange = [NSNumber numberWithInteger:[rangeValues[0] intValue]];
+  NSInteger startRange = [rangeValues[0] intValue];
   NSString *indexRange = [_mpdDict objectForKey:kAttrIndexRange];
   [_mpdDict removeObjectForKey:kAttrIndexRange];
   NSArray *indexRangeValues = [indexRange componentsSeparatedByString:kDashSeparator];
 
-  NSNumber *length = [NSNumber numberWithInteger:0];
+  NSInteger length = 0;
   if (indexRangeValues && rangeValues) {
     // Add 1 to avoid overlap in bytes to the length.
-    length = [NSNumber numberWithInteger:([indexRangeValues[1] intValue] + 1)];
-    if ([startRange intValue] >= [length intValue]) {
-      NSLog(@"\n::ERROR::Start Range is greater than Length: %d, %d",
-            [startRange intValue],
-            [length intValue]);
-      return nil;
+    length = [indexRangeValues[1] intValue] + 1;
+    if (startRange >= length) {
+      CDMLogError(@"start range %zd is greater than length %zd", startRange, length);
+      return NSMakeRange(0, 0);
     }
-    if ([length intValue] == 0) {
-      NSLog(@"\n::ERROR::Length is not valid: %d", [length intValue]);
+    if (length == 0) {
+      CDMLogError(@"length %zd is not valid", length);
     }
   }
-  NSDictionary *initialRange = [[NSDictionary alloc]
-      initWithObjectsAndKeys:startRange, kRangeStart, length, kRangeLength, nil];
+  NSRange initialRange = NSMakeRange(startRange, length);
   return initialRange;
 }
 
@@ -513,6 +518,10 @@ NSString *const kRegexPattern =
 
 // Builds Stream.LiveStream object. May be used for Non-Live streams depending on Manifest.
 - (void)setLiveProperties:(Stream *)stream {
+  if (![_mpdDict objectForKey:kDashMediaType]) {
+    // MediaType is unset. Skipping and assuming on-demand.
+    return;
+  }
   if ([[_mpdDict objectForKey:kDashMediaType] isEqual:@(SEGMENT_BASE)]) {
     // Ignore if SegmentBase manifest is being used.
     return;
@@ -527,14 +536,13 @@ NSString *const kRegexPattern =
       [_dateFormat setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
       [_dateFormat setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
-    stream.liveStream.availabilityStartTime =
-        [_dateFormat dateFromString:availableStartTimeString];
+    stream.liveStream.availabilityStartTime = [_dateFormat dateFromString:availableStartTimeString];
   }
   liveStream.duration = [_mpdDict[@"duration"] integerValue];
-  liveStream.initializationURL = [self setStreamURL:_mpdDict[@"initialization"] init:YES];
+  liveStream.initializationURL = [self makeStreamURL:_mpdDict[@"initialization"] init:YES];
   liveStream.mediaFileName = _mpdDict[@"media"];
   liveStream.minBufferTime = [self convertDurationToSeconds:_mpdDict[@"minBufferTime"]];
-  liveStream.minimumUpdatePeriod = [_mpdDict[@"minimumUpdatePeriod"] integerValue];
+  liveStream.minimumUpdatePeriod = [_mpdDict[@"minimumUpdatePeriod"]integerValue];
   liveStream.representationId = _mpdDict[@"id"];
   liveStream.startNumber = [_mpdDict[@"startNumber"] integerValue];
   liveStream.timescale = [_mpdDict[@"timescale"] integerValue];
@@ -543,14 +551,13 @@ NSString *const kRegexPattern =
 }
 
 // Adds a complete URL for each stream.
-- (NSURL *)setStreamURL:(NSString *)URLString init:(BOOL)init {
+- (NSURL *)makeStreamURL:(NSString *)URLString init:(BOOL)init {
   // BaseURL and Initialization URLs were not found. Use media URL then.
   if (!URLString) {
     URLString = [_mpdDict objectForKey:@"media"];
   }
   if (_playOffline) {
-    return [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:URLString.lastPathComponent];
+    return CDMDocumentFileURLForFilename(URLString.lastPathComponent);
   }
   // URL is already complete. Move on.
   if ([URLString containsString:kHttpString]) {
@@ -586,7 +593,7 @@ NSString *const kRegexPattern =
 + (void)deleteFilesInMpd:(NSURL *)mpdURL {
   NSData *mpdData = [NSData dataWithContentsOfURL:mpdURL];
   if (!mpdData) {
-    NSLog(@"\n::ERROR:: No mpdData from %@", mpdData);
+    CDMLogError(@"no mpdData for %@", mpdURL);
     return;
   }
   NSError *error = nil;
@@ -594,18 +601,13 @@ NSString *const kRegexPattern =
       [MpdParser parseMpdWithStreaming:nil mpdData:mpdData baseURL:mpdURL storeOffline:YES];
   NSFileManager *defaultFileManager = [NSFileManager defaultManager];
   for (Stream *stream in remoteURLs) {
-    NSURL *fileURL = [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-        urlInDocumentDirectoryForFile:stream.sourceURL.lastPathComponent];
+    NSURL *fileURL = CDMDocumentFileURLForFilename(stream.sourceURL.lastPathComponent);
     [defaultFileManager removeItemAtURL:fileURL error:&error];
     if (error) {
-      NSLog(@"\n::ERROR::Unable to delete existing file.\n"
-             "Error: %@ %ld %@",
-            [error domain],
-            (long)[error code],
-            [[error userInfo] description]);
+      CDMLogNSError(error, @"deleting existing file at %@", fileURL);
       return;
     }
-    NSLog(@"\n::INFO:: Deleting: %@", fileURL);
+    CDMLogInfo(@"Deleting %@", fileURL);
   }
   [defaultFileManager removeItemAtURL:mpdURL error:nil];
 }

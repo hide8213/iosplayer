@@ -131,8 +131,7 @@
   UIBarButtonItem *barButton =
       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:systemItem target:self action:selector];
   [barButton setStyle:UIBarButtonItemStyleDone];
-  NSString *titleString = NSLocalizedString(title,"");
-  [barButton setTitle:titleString];
+  [barButton setTitle:title];
   return barButton;
 }
 

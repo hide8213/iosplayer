@@ -1,40 +1,67 @@
 #import "LicenseManager.h"
+#import "Logging.h"
 
 NSString *kMockLicenseFile = @"mockLicenseFile.lic";
 NSString *kMockWebSessionId = @"webSessionId12345";
+NSString *kNewWebSessionId = @"12345WebSessionId";
+NSString *kMockLicenseServerURL = @"http://license.server.com";
 const char kMockBytes[2] = { 0, 1 };
 
 @interface LicenseManagerTest : XCTestCase {
   LicenseManager *_licMgr;
   NSData *_mockData;
+  DDTTYLogger *_logger;
 }
 @end
 
 @implementation LicenseManagerTest
 
 - (void)setUp {
-  _licMgr = [self getSharedLicMgr];
+  _licMgr = [LicenseManager sharedInstance];
+  _logger = [DDTTYLogger sharedInstance];
+  [DDLog addLogger:_logger];
   _mockData = [NSData dataWithBytes:kMockBytes length:sizeof(kMockBytes)];
+}
+
+- (void)tearDown {
+  [DDLog removeLogger:_logger];
 }
 
 - (void)testLicenseManager {
   // Verify License Manager was created.
-  XCTAssertNotNil([self getSharedLicMgr]);
+  XCTAssertNotNil(_licMgr);
+  // Verify no license server URL exists.
+  XCTAssertNil(_licMgr.licenseServerURL);
+  _licMgr.licenseServerURL = [NSURL URLWithString:kMockLicenseServerURL];
+  // Verify license server URL is set.
+  XCTAssertEqual([_licMgr.licenseServerURL absoluteString],
+                 kMockLicenseServerURL);
+  XCTAssertNotNil(_licMgr);
+  _licMgr.licenseServerURL = nil;
+
+  // Verify license server URL has been cleared out.
+  XCTAssertNil(_licMgr.licenseServerURL);
+  _licMgr.licenseServerURL = [NSURL URLWithString:kMockLicenseServerURL];
+  // Verify license server URL is set again.
+  XCTAssertEqual([_licMgr.licenseServerURL absoluteString],
+                 kMockLicenseServerURL);
 }
 
 - (void)testLicensePssh {
   // Validate setting KeyMapData and extracting.
   XCTAssertNoThrow([_licMgr onSessionCreatedWithPssh:_mockData sessionId:kMockWebSessionId]);
-  XCTAssertEqualObjects([_licMgr sessionIdFromPssh:_mockData], kMockWebSessionId);
+  XCTAssertEqualObjects([_licMgr sessionIdFromPssh:_mockData],
+                        kMockWebSessionId);
 }
 
 - (void)testLicensePsshFail {
   // Validate mismatch data -- Negative Test.
-  NSString *newMockWebSessionId = @"12345WebSessionId";
+  NSString *newMockWebSessionId = kNewWebSessionId;
   // Create KeyMapData using expected WebSessionID.
   XCTAssertNoThrow([_licMgr onSessionCreatedWithPssh:_mockData sessionId:kMockWebSessionId]);
   // Check for different WebSessionID than what was created.
-  XCTAssertNotEqualObjects([_licMgr sessionIdFromPssh:_mockData], newMockWebSessionId);
+  XCTAssertNotEqualObjects([_licMgr sessionIdFromPssh:_mockData],
+                           newMockWebSessionId);
 }
 
 - (void)testRemoveFile {
@@ -59,12 +86,6 @@ const char kMockBytes[2] = { 0, 1 };
   NSString *badFileName = @"http://file";
   [_licMgr writeData:_mockData file:badFileName];
   XCTAssertFalse([_licMgr fileExists:badFileName]);
-}
-
-# pragma mark private methods
-
-- (LicenseManager *)getSharedLicMgr {
-  return [LicenseManager sharedInstance];
 }
 
 @end

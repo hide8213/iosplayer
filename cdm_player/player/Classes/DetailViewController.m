@@ -11,6 +11,7 @@
 #import "PlayerControlsView.h"
 #import "PlayerScrubberView.h"
 #import "Streaming.h"
+#import "Logging.h"
 
 static DetailViewController *sDetailViewController;
 
@@ -18,7 +19,6 @@ static DetailViewController *sDetailViewController;
                                     PlayerScrubberDelegate,
                                     StreamingDelegate> {
   BOOL _isSeeking;
-  NSURL *_keyStoreURL;
   NSString *_mediaName;
   NSURL *_mediaURL;
   BOOL *_offline;
@@ -70,7 +70,9 @@ NSString *kDash2HlsURL = @"http://%@:%d/dash2hls.m3u8";
 }
 
 - (void)setupStreaming:(MediaResource *)mediaResource {
-  _streaming = [[Streaming alloc] initWithAirplay:[self isAirplayActive]];
+  _streaming =
+      [[Streaming alloc] initWithAirplay:[self isAirplayActive]
+                        licenseServerURL:mediaResource.licenseServerURL];
   _streaming.offline = mediaResource.isDownloaded;
   _mediaName = mediaResource.name;
   if (_streaming.offline) {
@@ -79,7 +81,11 @@ NSString *kDash2HlsURL = @"http://%@:%d/dash2hls.m3u8";
     _mediaURL = mediaResource.URL;
   }
   if ([_mediaURL.pathExtension isEqualToString:@"mpd"]) {
-    [_streaming processMpd:_mediaURL];
+    [_streaming processMpd:_mediaURL withCompletion:^(NSError *error) {
+      if (error) {
+        [self assetFailedToPrepareForPlayback:error];
+      }
+    }];
   }
 }
 
@@ -212,7 +218,7 @@ NSString *kDash2HlsURL = @"http://%@:%d/dash2hls.m3u8";
   _mediaURL = [[NSURL alloc] initWithString:address];
   AVURLAsset *asset = [AVURLAsset URLAssetWithURL:_mediaURL options:nil];
   if (Udt_SetAVURLAsset(asset, NULL, dispatch_get_main_queue()) != kDashToHlsStatus_OK) {
-    NSLog(@"Cannot set the loopback encryption");
+    CDMLogWarn(@"Cannot set the loopback encryption");
   }
 
   NSArray *requestedKeys = @[ @"playable" ];

@@ -43,7 +43,7 @@ typedef NS_ENUM(NSUInteger, DashMediaType) {
 // Video height.
 @property NSUInteger height;
 // Contains the byte range to be used for transmuxing.
-@property(strong) NSDictionary *initialRange;
+@property NSRange initialRange;
 // Determines what path to take when Transmuxing.
 @property BOOL isVideo;
 // Indicates whether stream is live or on-demand.

@@ -4,16 +4,10 @@
 
 #import "LicenseManager.h"
 #import "MasterViewController.h"
+#import "Logging.h"
 
 @implementation AppDelegate {
   UIWindow *_window;
-}
-
-- (NSURL *)urlInDocumentDirectoryForFile:(NSString *)filename {
-  NSURL *documentDirectoryUrl =
-      [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
-                                             inDomains:NSUserDomainMask][0];
-  return [NSURL URLWithString:filename relativeToURL:documentDirectoryUrl];
 }
 
 - (UIWindow *)window {
@@ -26,6 +20,10 @@
 
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  // enable cocoalumberjack logging to xcode console and to apple system logs
+  [DDLog addLogger:[DDTTYLogger sharedInstance]];
+  [DDLog addLogger:[DDASLLogger sharedInstance]];
+
   // Disable the idle timer so that the screen does not sleep while playing video.
   application.idleTimerDisabled = YES;
   MasterViewController *masterViewController = [[MasterViewController alloc] init];

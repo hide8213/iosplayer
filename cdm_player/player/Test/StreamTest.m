@@ -1,6 +1,7 @@
 #import "MpdParser.h"
 #import "Stream.h"
 #import "Streaming.h"
+#import "Logging.h"
 
 static NSString *const kMpdURLString = @"http://www.google.com/path/to.mpd";
 static NSString *const kEndList = @"#EXT-X-ENDLIST";
@@ -26,11 +27,18 @@ static NSString *const kVideoMpd =
 @end
 
 @implementation StreamTest {
+  DDTTYLogger *_logger;
   Streaming *_streaming;
 }
 
 - (void)setUp {
-  _streaming = [[Streaming alloc] initWithAirplay:NO];
+  _logger = [DDTTYLogger sharedInstance];
+  [DDLog addLogger:_logger];
+  _streaming = [[Streaming alloc] initWithAirplay:NO licenseServerURL:nil];
+}
+
+- (void)tearDown {
+  [DDLog removeLogger:_logger];
 }
 
 - (void)testStreamInit {

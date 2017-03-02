@@ -204,7 +204,8 @@ void iOSCdmHost::cancel(Cdm::ITimer::IClient* client) {
 }
 
 int64_t iOSCdmHost::now() {
-  return [[NSDate date] timeIntervalSince1970];
+  // NSDate uses seconds, convert to match CDM (milliseconds).
+  return [[NSDate date] timeIntervalSince1970] * 1000;
 }
 
 void iOSCdmHost::onMessage(

@@ -102,8 +102,8 @@ DashToHlsStatus DashToHls_ReleaseSession(struct DashToHlsSession* session);
 // kDashToHlsStatus_NeedsMore if the entire sidx box was not found.  The next
 // call should continue with the next bytes from DASH content.
 DashToHlsStatus DashToHls_ParseDash(struct DashToHlsSession* session,
-                                   const uint8_t* bytes, size_t length,
-                                   struct DashToHlsIndex** index);
+                                    const uint8_t* bytes, size_t length,
+                                    struct DashToHlsIndex** index);
 
 // Parses a sidx box in |bytes| and |length| and return the
 // DashToHlsSegments in |index|.
@@ -111,16 +111,13 @@ DashToHlsStatus DashToHls_ParseDash(struct DashToHlsSession* session,
 // DashToHlsSegment.location are relative to 0. So you'll need to add the
 // startOffset of the sidx.
 DashToHlsStatus DashToHls_ParseSidx(struct DashToHlsSession* session,
-                                    const uint8_t* bytes,
-                                    uint64_t length,
+                                    const uint8_t* bytes, uint64_t length,
                                     struct DashToHlsIndex** index);
 
 // Returns the |pts| and the |duration| of a dash |bytes|.
 DashToHlsStatus DashToHls_ParseSegmentPTS(struct DashToHlsSession* session,
-                                          const uint8_t* bytes,
-                                          uint64_t length,
-                                          uint64_t* pts,
-                                          uint64_t* duration);
+                                          const uint8_t* bytes, uint64_t length,
+                                          uint64_t* pts, uint64_t* duration);
 
 // The pssh is usually handled out of band.  To simplify things this call
 // only extracts a pssh and calls the pssh callback.
@@ -136,8 +133,7 @@ DashToHlsStatus DashToHls_ParseLivePssh(struct DashToHlsSession* session,
 // segment.  |segment_number| should be unique for each segment and used
 // to release the segment.
 DashToHlsStatus DashToHls_ParseLive(struct DashToHlsSession* session,
-                                    const uint8_t* bytes,
-                                    uint64_t length,
+                                    const uint8_t* bytes, uint64_t length,
                                     uint32_t segment_number,
                                     const uint8_t** hls_segment,
                                     size_t* hls_length);
@@ -158,12 +154,9 @@ DashToHlsStatus DashToHls_ConvertDashSegment(struct DashToHlsSession* session,
 // segment. Like DashToHls_ConvertDashSegment, the |segment_number| is owned
 // by |session| and is freed in DashToHls_ReleaseHlsSegment.
 DashToHlsStatus DashToHls_ConvertDashSegmentData(
-    struct DashToHlsSession* session,
-    uint32_t segment_number,
-    const uint8_t* moof_mdat,
-    size_t moof_mdat_size,
-    const uint8_t** hls_segment,
-    size_t* hls_length);
+    struct DashToHlsSession* session, uint32_t segment_number,
+    const uint8_t* moof_mdat, size_t moof_mdat_size,
+    const uint8_t** hls_segment, size_t* hls_length);
 
 // Optional call to free up some memory without destroying the entire
 // |session|.
@@ -200,21 +193,14 @@ struct SampleEntry {
   int32_t cipher_bytes;
 };
 
-typedef DashToHlsStatus (*CENC_DecryptionHandler)(DashToHlsContext context,
-                                                  const uint8_t* encrypted,
-                                                  uint8_t* clear,
-                                                  size_t length,
-                                                  uint8_t* iv,
-                                                  size_t iv_length,
-                                                  const uint8_t* key_id,
-                                                  // key_id is always 16 bytes.
-                                                  struct SampleEntry*,
-                                                  size_t sampleEntrySize);
-DashToHlsStatus
-DashToHls_SetCenc_DecryptSample(struct DashToHlsSession* session,
-                                DashToHlsContext context,
-                                CENC_DecryptionHandler decryption_handler,
-                                bool use_sample_entries);
+typedef DashToHlsStatus (*CENC_DecryptionHandler)(
+    DashToHlsContext context, const uint8_t* encrypted, uint8_t* clear,
+    size_t length, uint8_t* iv, size_t iv_length, const uint8_t* key_id,
+    // key_id is always 16 bytes.
+    struct SampleEntry*, size_t sampleEntrySize);
+DashToHlsStatus DashToHls_SetCenc_DecryptSample(
+    struct DashToHlsSession* session, DashToHlsContext context,
+    CENC_DecryptionHandler decryption_handler, bool use_sample_entries);
 
 // Optional Callback for diagnostic messages.  Returns a structured JSON
 // object (C string) with detailed information.

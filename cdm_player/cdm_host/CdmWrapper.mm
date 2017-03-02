@@ -51,8 +51,8 @@ extern const char *OEMCryptoTfit_Version();
 #pragma mark public methods
 
 + (iOSCdm *)sharedInstance {
-  static dispatch_once_t token;
   static iOSCdm *s_host = nil;
+  static dispatch_once_t token;
   dispatch_once(&token, ^{
     s_host = [[iOSCdm alloc] init];
   });
@@ -83,14 +83,18 @@ extern const char *OEMCryptoTfit_Version();
   NSString *sessionId = _psshKeysToIds[psshKey];
   NSError *error = nil;
 
-  // No Session has been loaded.
   if (isOfflineVod && !sessionId) {
     // Check if license was previously stored.
     if ([_delegate respondsToSelector:@selector(sessionIdFromPssh:)]) {
       sessionId = [_delegate sessionIdFromPssh:psshKey];
+      _psshKeysToIds[psshKey] = sessionId;
     }
-    // License exists, attempt to Load Session.
-    if (sessionId) {
+  }
+  // Session ID exists, attempt to Load Session.
+  if (isOfflineVod && sessionId) {
+    if (_offlineSessions[sessionId]) {
+      // NOOP. Already Loaded.
+    } else {
       error = iOSCdmHost::GetHost()->LoadSession(sessionId);
       if (error) {
         // Do NOT error out if session is already loaded.
@@ -101,13 +105,8 @@ extern const char *OEMCryptoTfit_Version();
           return;
         }
       }
-      _psshKeysToIds[psshKey] = sessionId;
       _offlineSessions[sessionId] = @YES;
     }
-  }
-  if (isOfflineVod && sessionId) {
-    // Changing from Streaming license to Offline.
-    sessionId = nil;
   }
   if (!sessionId) {
     // Setup new Streaming Session.

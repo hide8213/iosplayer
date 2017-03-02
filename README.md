@@ -11,6 +11,7 @@
 
 * iOS 8
 * iOS 9
+* iOS 10
 
 ### Components
 * CDM Host Interface
