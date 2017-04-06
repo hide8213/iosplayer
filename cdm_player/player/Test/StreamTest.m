@@ -5,7 +5,7 @@
 
 static NSString *const kMpdURLString = @"http://www.google.com/path/to.mpd";
 static NSString *const kEndList = @"#EXT-X-ENDLIST";
-static NSString *const kFileURL = @"tears_h264_baseline_240p_800";
+static NSString *const kFileURL = @"video";
 
 static NSString *const kVideoMpd =
     @"<MPD type=\"static\">"

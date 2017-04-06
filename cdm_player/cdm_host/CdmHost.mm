@@ -214,6 +214,7 @@ void iOSCdmHost::onMessage(
     const std::string& message) {
   std::string local_session_id = session_id;
   NSString *sessionIdStr = [NSString stringWithStdString:session_id];
+    [sessionIdStr stringByAppendingString:@"license"];
   NSData *messageData = [NSData dataWithBytes:message.c_str()
                                        length:message.length()];
 

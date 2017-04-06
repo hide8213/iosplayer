@@ -11,6 +11,7 @@
 		310871D975AC584DE2576C48 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8CE51EEB1C0AD25E5F4E154 /* AVFoundation.framework */; };
 		4A5B6837B3EBAA181EEBAF57 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A5D38A72F529F0B7DA626FD /* Foundation.framework */; };
 		782D3BE5BA64D9FC83728775 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E2D8E07E53399051A05A871 /* CoreFoundation.framework */; };
+		7C6E469D1E91686B000BF8F2 /* CocoaLumberjack.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7C6E469C1E91686B000BF8F2 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8FA1C729D572390720479B7E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5EF5DB13BA3A4B36A1D312 /* Security.framework */; };
 		A49F4DB3F710C45C29E75732 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2427F5060B3A7AEA1B0CC5D1 /* UIKit.framework */; };
 		E319C0541C6EA9CE001DDC88 /* MpdParser.m in Sources */ = {isa = PBXBuildFile; fileRef = E319C0531C6EA9CE001DDC88 /* MpdParser.m */; };
@@ -132,6 +133,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7C6E469E1E916947000BF8F2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E319C0761C73B438001DDC88 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -147,6 +157,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7C6E469D1E91686B000BF8F2 /* CocoaLumberjack.framework in Embed Frameworks */,
 				E3A398F11CA3422800CC47CB /* widevine_cdm_sdk_dev.framework in Embed Frameworks */,
 				E3A398F31CA3422800CC47CB /* widevine_cdm_sdk_insecure_dev_sim.framework in Embed Frameworks */,
 			);
@@ -183,6 +194,8 @@
 		5F5EF5DB13BA3A4B36A1D312 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		603E1E8725C6CCB785CC2B86 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
 		688EE9F49558E65235EEC34E /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
+		7C6E469B1E9167B6000BF8F2 /* CocoaLumberjack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaLumberjack.h; path = ../../../Carthage/Checkouts/CocoaLumberjack/Classes/CocoaLumberjack.h; sourceTree = "<group>"; };
+		7C6E469C1E91686B000BF8F2 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = Carthage/Build/iOS/CocoaLumberjack.framework; sourceTree = "<group>"; };
 		8A5D38A72F529F0B7DA626FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8D492D9C31A0303F1530CF9F /* RefPlayer_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefPlayer_Prefix.pch; sourceTree = "<group>"; };
 		8EA175CCA2CEE5F83A658681 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -303,6 +316,7 @@
 		08AD10C3E36DBE4038F4EA9B /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				7C6E469B1E9167B6000BF8F2 /* CocoaLumberjack.h */,
 				21307AADD0E69F1E41A83014 /* AppDelegate.h */,
 				0D2270C567D944441117F046 /* AppDelegate.m */,
 				E3B138C01E579CB400277469 /* CdmPlayerErrors.h */,
@@ -501,6 +515,7 @@
 		FBB0EF706389D1AF4E5FED57 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7C6E469C1E91686B000BF8F2 /* CocoaLumberjack.framework */,
 				E3C9DA001BE94B8000593C6F /* CDM */,
 				E3F1DF951C1A3DFA008CDE56 /* MediaPlayer.framework */,
 				E36F58D71AFC6DC100DEEE20 /* CoreGraphics.framework */,
@@ -563,6 +578,7 @@
 				028F2F3FBFC5782034C1559F /* Sources */,
 				F4D69EDAE6C83DB1A44DF17B /* Frameworks */,
 				E3A398F41CA3422800CC47CB /* Embed Frameworks */,
+				7C6E469E1E916947000BF8F2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -594,6 +610,7 @@
 						};
 					};
 					EA366CA36E247489944F66E2 = {
+						DevelopmentTeam = MKK9DM2XD9;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
@@ -807,7 +824,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -823,10 +840,12 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include widevine-cdm/core/include widevine-cdm/cdm/include";
 				VALID_ARCHS = "i386 x86_64 armv7 arm64";
@@ -843,11 +862,12 @@
 				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = MKK9DM2XD9;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					cdm_player/cdm/dev,
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
@@ -869,7 +889,7 @@
 					cdm_player/cdm/dev/widevine_cdm_sdk_insecure_dev_sim.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
@@ -878,10 +898,11 @@
 				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "i386 armv7 arm64 x86_64";
 				WRAPPER_PREFIX = "";
+				d = "";
 				proto_dir = cdm_host_interface;
 				protobuf_lib = libProtocolBuffers.a;
 				protobuf_lib_type = "";
@@ -908,7 +929,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -925,10 +946,12 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
+				SDKROOT = iphoneos10.3;
 				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "CocoaHTTPServer/Core universal-dash-transmuxer/include widevine-cdm/core/include widevine-cdm/cdm/include";
 				VALID_ARCHS = "i386 armv7 arm64 x86_64";
@@ -1048,6 +1071,7 @@
 					"$(inherited)",
 					cdm_player/cdm/release,
 					"$(PROJECT_DIR)/cdm_player/cdm/release",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
@@ -1070,7 +1094,7 @@
 					cdm_player/cdm/release/widevine_cdm_sdk_release.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
@@ -1083,6 +1107,7 @@
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "armv7 arm64";
 				WRAPPER_PREFIX = "";
+				a = "";
 				proto_dir = cdm_host_interface;
 				protobuf_lib = libProtocolBuffers.a;
 				protobuf_lib_type = "";
@@ -1105,6 +1130,7 @@
 					"$(inherited)",
 					cdm_player/cdm/release,
 					"$(PROJECT_DIR)/cdm_player/cdm/release",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
@@ -1126,7 +1152,7 @@
 					cdm_player/cdm/release/widevine_cdm_sdk_release.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
@@ -1139,6 +1165,7 @@
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "armv7 arm64";
 				WRAPPER_PREFIX = "";
+				a = "";
 				proto_dir = cdm_host_interface;
 				protobuf_lib = libProtocolBuffers.a;
 				protobuf_lib_type = "";
@@ -1160,11 +1187,12 @@
 				CODE_SIGN_ENTITLEMENTS = cdm_player/player/Support/CDMPlayer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = MKK9DM2XD9;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					cdm_player/cdm/dev,
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = cdm_player/player/Support/RefPlayer_Prefix.pch;
@@ -1187,7 +1215,7 @@
 					cdm_player/cdm/dev/widevine_cdm_sdk_insecure_dev_sim.framework/Headers,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/cdm_player/player/Support/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
@@ -1196,10 +1224,11 @@
 				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "i386 armv7 arm64 x86_64";
 				WRAPPER_PREFIX = "";
+				d = "";
 				proto_dir = cdm_host_interface;
 				protobuf_lib = libProtocolBuffers.a;
 				protobuf_lib_type = "";

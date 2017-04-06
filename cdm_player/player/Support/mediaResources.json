@@ -18,4 +18,10 @@
   "media_name": "FFMpeg - Clear",
   "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
   "media_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/sync/tos.mpd"
+  },
+  {
+  "media_name": "Rex - Download",
+  "media_thumbnail_url": "https://storage.googleapis.com/wvtemp/seawardt/ios_test_streams/thumbs/tos.jpg",
+  "media_url": "https://storage.googleapis.com/eason-media/en3_sintel_vod.mpd",
+  "license_server_url": "http://146.148.35.45:8081"
   }]

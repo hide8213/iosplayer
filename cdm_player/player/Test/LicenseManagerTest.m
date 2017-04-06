@@ -4,7 +4,7 @@
 NSString *kMockLicenseFile = @"mockLicenseFile.lic";
 NSString *kMockWebSessionId = @"webSessionId12345";
 NSString *kNewWebSessionId = @"12345WebSessionId";
-NSString *kMockLicenseServerURL = @"http://license.server.com";
+NSString *kMockLicenseServerURL = @"http://146.148.35.45:8081";
 const char kMockBytes[2] = { 0, 1 };
 
 @interface LicenseManagerTest : XCTestCase {

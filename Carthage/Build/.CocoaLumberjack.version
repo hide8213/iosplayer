@@ -1,0 +1,14 @@
+{
+  "xcodeVersion" : "Xcode 8.3\nBuild version 8E162",
+  "commitish" : "3.1.0",
+  "iOS" : [
+    {
+      "hash" : "e2acaf8ece3089c0f7813e5ec0cfa17bc2ae2e292f8bd5388437f1e7147de05a",
+      "name" : "CocoaLumberjackSwift"
+    },
+    {
+      "hash" : "625a6983327fb5f7a2c4056b42f1914785c602054ef3d2fad2e42cbc01ac948b",
+      "name" : "CocoaLumberjack"
+    }
+  ]
+}

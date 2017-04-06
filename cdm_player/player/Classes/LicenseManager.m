@@ -9,6 +9,8 @@ static NSString *kStorageName = @"Keystore/";
 static NSString *kKeyMapName = @"KeyMap";
 static NSString *const kLicenseUrlString =
     @"https://proxy.uat.widevine.com/proxy";
+static NSString *const rexLicenseUrlString =
+@"http://146.148.35.45:8081";
 
 @interface LicenseManager () {
   NSURL *_keyStoreURL;
@@ -147,13 +149,12 @@ static NSString *const kLicenseUrlString =
     fetchLicenseWithData:(NSData *)data
          completionBlock:(void (^)(NSData *, NSError *))completionBlock {
   if (!_licenseServerURL) {
-    _licenseServerURL = [NSURL URLWithString:kLicenseUrlString];
+    _licenseServerURL = [NSURL URLWithString:rexLicenseUrlString];
   }
   NSMutableURLRequest *request =
       [NSMutableURLRequest requestWithURL:_licenseServerURL];
   [request setHTTPMethod:@"POST"];
   [request setHTTPBody:data];
-
   NSURLResponse *response = nil;
   NSError *error = nil;
   NSData *response_data =
